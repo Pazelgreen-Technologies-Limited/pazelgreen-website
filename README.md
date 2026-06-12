@@ -44,7 +44,7 @@ This codebase is organized around a **colocation pattern**. The goal is to keep 
 
 ### How Components are Distributed:
 
-- Global Components (app/components/):  
+- Global Components (components/):  
   This folder is the home for building blocks shared across the entire site. Things like the Navbar, Footer, or core ui elements (like generic buttons or cards) live here because they aren't tied to any single view.
 
 - Page-Specific Components (\_components/ inside a route):  
@@ -53,7 +53,38 @@ This codebase is organized around a **colocation pattern**. The goal is to keep 
 Tip: The underscore in \_components is a Next.js convention that tells the framework to ignore this folder for routing, keeping it safely tucked away as private UI code.
 
 ```plaintext
-
+pazelgreen-website/
+├── AGENTS.md
+├── CLAUDE.md
+├── README.md
+├── app/
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── lib/
+│   │   └── (empty)
+│   ├── _components/
+│   │   ├── CoreCapabilities.tsx
+│   │   ├── GetInvolvedSection.tsx
+│   │   ├── Hero.tsx
+│   │   ├── PagexSection.tsx
+│   │   ├── ProblemSection.tsx
+│   │   └── VisionSection.tsx
+│   └── solutions/
+│       ├── page.tsx
+│       └── _components/
+├── components/
+│   ├── Footer.tsx
+│   └── Navbar.tsx
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── tsconfig.json
+└── public/
+    └── favicon.ico
 ```
 
 ### 🛠️ Tech Stack
