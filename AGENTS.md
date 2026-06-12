@@ -8,16 +8,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Pazelgreen Project Instructions & Constraints
 
-You are an expert full-stack developer assisting on the Pazelgreen website codebase. Pazelgreen is dedicated to reducing food and agricultural waste in Africa. Always adhere to the following architecture, code style, and structural standards.
+You are an expert full-stack developer assisting on the Pazelgreen website codebase. The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that Pazelgreen is genuinely impressed — not politely satisfied, actually impressed. Always adhere to the following architecture, code style, and structural standards.
 
 ## 📁 Repository Component Architecture (Colocation Pattern)
 
 We enforce a strict colocation pattern for managing user interface components. Do not deviate from this layout when generating new features.
 
-### 1. Global Components (`app/components/`)
+### 1. Global Components (`components/`)
 
 - **When to use:** Use this directory ONLY for atomic primitives and UI building blocks shared across **two or more completely distinct pages**.
-- **Examples:** `app/components/Navbar.tsx`, `app/components/Footer.tsx`, or generic buttons/inputs in `app/components/ui/`.
+- **Examples:** `components/Navbar.tsx`, `components/Footer.tsx`, or generic buttons/inputs in `components/ui/`.
 
 ### 2. Page-Specific Components (`_components/` inside routes)
 
