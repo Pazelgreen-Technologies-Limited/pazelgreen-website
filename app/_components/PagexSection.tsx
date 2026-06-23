@@ -11,7 +11,7 @@ const pagexFeatures = [
 
 export default function PagexSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-white px-6 py-16 font-sans text-gray-900">
       <div className="mx-auto max-w-5xl text-center">
         {/* Section heading */}
         <h3 className="text-sm font-semibold tracking-wide text-orange-500">

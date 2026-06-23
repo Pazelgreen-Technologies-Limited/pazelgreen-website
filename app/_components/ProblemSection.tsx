@@ -5,6 +5,7 @@ import {
   Leaf,
   Network,
   BarChart3,
+  ArrowRight,
 } from "lucide-react";
 
 // Feature grid items with their icon, title, and description
@@ -55,12 +56,12 @@ const features = [
 
 export default function ProblemSection() {
   return (
-    <section className="bg-gray-50 px-6 py-16">
+    <section className="bg-gray-50 px-6 py-16 my-16 font-sans text-gray-900">
       <div className="mx-auto max-w-6xl">
         {/* Section heading */}
-        <h2 className="text-center text-2xl font-bold text-gray-900 md:text-3xl">
+        <h1 className="text-center text-2xl font-extrabold text-gray-900 md:text-5xl">
           Transforming Agricultural Inefficiencies into Scalable Opportunities
-        </h2>
+        </h1>
         <p className="mx-auto mt-4 max-w-3xl text-center text-sm text-gray-600">
           We identify critical inefficiencies across agricultural value chains
           and transform them into scalable, technology-driven solutions that
@@ -69,7 +70,7 @@ export default function ProblemSection() {
 
         {/* Problem statement card */}
         <div className="mt-10 rounded-2xl bg-white p-8 text-center shadow-sm">
-          <h3 className="text-sm font-semibold tracking-wide text-orange-500">
+          <h3 className="text-xl font-extrabold tracking-wide text-orange-500">
             Problem Statement
           </h3>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
@@ -88,7 +89,10 @@ export default function ProblemSection() {
               <Icon className="mb-3 text-green-500" size={28} />
               <p className="text-xs text-gray-400">{tag}</p>
               <h4 className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-900">
-                <span className="text-orange-500">+</span> {title}
+                <span className="text-orange-500">
+                  <ArrowRight size={16} />
+                </span>{" "}
+                {title}
               </h4>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
             </div>

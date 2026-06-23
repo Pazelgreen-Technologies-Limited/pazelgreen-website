@@ -4,7 +4,7 @@ import { ArrowRight, Phone } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden font-sans text-white">
       {/* Background image */}
       <Image
         src="/hero-bg.jpg"
@@ -22,12 +22,12 @@ export default function Hero() {
           PAZELGREEN TECHNOLOGIES
         </span>
 
-        <h1 className="max-w-3xl text-4xl font-bold text-white md:text-5xl">
+        <h1 className="max-w-3xl text-4xl font-bold md:text-5xl">
           Innovating the Future of{" "}
           <span className="text-brand">Sustainable</span> Agriculture
         </h1>
 
-        <p className="mt-4 max-w-2xl text-sm text-gray-200 md:text-base">
+        <p className="mt-4 max-w-2xl text-sm  md:text-base">
           Transforming agricultural inefficiencies into opportunities for
           growth, resilience, and sustainable development across emerging
           markets worldwide.
@@ -37,15 +37,18 @@ export default function Hero() {
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
           <Link
             href="/pagex"
-            className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
+            className="flex items-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-medium hover:bg-brand-dark"
           >
             Explore PAGEX <ArrowRight size={16} />
           </Link>
           <Link
             href="/contact"
-            className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-100"
+            className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-100"
           >
-            <Phone size={16} /> Contact Us
+            <span className="text-brand">
+              <Phone size={16} />
+            </span>
+            Contact Us
           </Link>
         </div>
       </div>
