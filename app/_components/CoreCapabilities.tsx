@@ -41,10 +41,10 @@ export default function CoreCapabilities() {
       <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 shadow-sm md:p-12">
         {/* Section heading */}
         <div className="text-center">
-          <h3 className="text-sm font-semibold tracking-wide text-orange-500">
+          <h3 className="text-normal font-extrabold tracking-wide text-orange-500">
             What We Do
           </h3>
-          <h2 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">
+          <h2 className="mt-2 text-2xl font-extrabold text-gray-900 md:text-4xl">
             Core Capabilities
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
@@ -65,10 +65,13 @@ export default function CoreCapabilities() {
           {capabilities.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="rounded-xl bg-green-50 p-6 transition-colors hover:bg-green-100"
+              className="rounded-xl bg-green-50 p-6 pr-16 transition-colors"
             >
               <Icon className="mb-3 text-green-600" size={24} />
-              <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
+              <div className="pr-20">
+                <h4 className="text-normal font-bold text-gray-900">{title}</h4>
+              </div>
+
               <p className="mt-2 text-sm text-gray-600">{description}</p>
             </div>
           ))}

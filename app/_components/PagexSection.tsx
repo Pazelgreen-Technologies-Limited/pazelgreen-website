@@ -14,13 +14,13 @@ export default function PagexSection() {
     <section className="bg-white px-6 py-16 font-sans text-gray-900">
       <div className="mx-auto max-w-5xl text-center">
         {/* Section heading */}
-        <h3 className="text-sm font-semibold tracking-wide text-orange-500">
+        <h3 className="text-2xl font-extrabold tracking-wide text-orange-500">
           Flagship Product
         </h3>
-        <h2 className="mt-2 text-3xl font-bold text-gray-900 md:text-4xl">
+        <h2 className="mt-2 text-3xl font-inter font-extrabold text-gray-900 md:text-5xl">
           PAGEX
         </h2>
-        <p className="mt-1 text-base font-medium text-gray-700">
+        <p className="mt-1 text-base font-bold text-green-800">
           Ecosystem Coordination & Market Intelligence Platform
         </p>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
@@ -30,14 +30,16 @@ export default function PagexSection() {
         </p>
 
         {/* Feature checklist */}
-        <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
+        <div className="mt-8 flex items-center gap-4 justify-between ">
           {pagexFeatures.map((feature) => (
             <div
               key={feature}
-              className="flex items-center gap-2 rounded-full border border-green-200 px-4 py-2 text-sm text-gray-700"
+              className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-brand px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
             >
-              <CheckCircle size={16} className="text-green-500" />
-              {feature}
+              <div className="flex items-start gap-2 px-2 justify-center">
+                <CheckCircle size={16} className="text-green-800" />
+                {feature}
+              </div>
             </div>
           ))}
         </div>
@@ -46,13 +48,13 @@ export default function PagexSection() {
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             href="/pagex"
-            className="flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-medium text-white hover:bg-green-600"
+            className="flex items-center gap-2 rounded-2xl bg-green-500 px-6 py-3 text-base font-extrabold text-white hover:bg-brand-dark"
           >
             Explore PAGEX <ArrowRight size={16} />
           </Link>
           <Link
             href="/demo"
-            className="flex items-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-2xl border border-gray-300 px-6 py-3 text-base font-extrabold text-brand hover:bg-gray-200"
           >
             <PlayCircle size={16} /> Watch Demo
           </Link>
