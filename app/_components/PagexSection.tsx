@@ -30,7 +30,7 @@ export default function PagexSection() {
         </p>
 
         {/* Feature checklist */}
-        <div className="mt-8 flex items-center gap-4 justify-between ">
+        <div className="mt-8 flex flex-col items-center gap-4 justify-between md:flex-row ">
           {pagexFeatures.map((feature) => (
             <div
               key={feature}
