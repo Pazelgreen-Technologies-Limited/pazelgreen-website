@@ -4,7 +4,7 @@ import { ArrowRight, Phone } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative h-[600px] w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden">
       {/* Background image */}
       <Image
         src="/hero-bg.jpg"
@@ -24,7 +24,7 @@ export default function Hero() {
 
         <h1 className="max-w-3xl text-4xl font-bold text-white md:text-5xl">
           Innovating the Future of{" "}
-          <span className="text-green-400">Sustainable</span> Agriculture
+          <span className="text-brand">Sustainable</span> Agriculture
         </h1>
 
         <p className="mt-4 max-w-2xl text-sm text-gray-200 md:text-base">
@@ -37,7 +37,7 @@ export default function Hero() {
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
           <Link
             href="/pagex"
-            className="flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-medium text-white hover:bg-green-600"
+            className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
           >
             Explore PAGEX <ArrowRight size={16} />
           </Link>
