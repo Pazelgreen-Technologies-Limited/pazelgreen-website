@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 // Nav links shown on desktop
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Solution", href: "/solution" },
+  { label: "Solution", href: "/solutions" },
   { label: "About Us", href: "/about" },
   { label: "Blog", href: "/blog" },
   { label: "Join Us", href: "/join-us" },
