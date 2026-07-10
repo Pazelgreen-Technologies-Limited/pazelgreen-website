@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Phone } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 export default function Hero() {
   return (
@@ -35,21 +36,15 @@ export default function Hero() {
 
         {/* CTA buttons */}
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-          <Link
-            href="/pagex"
-            className="flex items-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-medium hover:bg-brand-dark"
-          >
-            Explore PAGEX <ArrowRight size={16} />
-          </Link>
-          <Link
-            href="/contact"
-            className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-100"
-          >
+          <Button href="/pagex" variant="solid" showArrow>
+            Explore PAGEX
+          </Button>
+          <Button href="/contact" variant="white">
             <span className="text-brand">
               <Phone size={16} />
             </span>
             Contact Us
-          </Link>
+          </Button>
         </div>
       </div>
     </section>
