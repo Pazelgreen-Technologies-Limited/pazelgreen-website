@@ -33,7 +33,9 @@ export default function Navbar() {
               width={36}
               height={36}
             />
-            <span className="text-lg font-semibold">Pazelgreen</span>
+            <span className="text-lg font-semibold text-brand md:text-white">
+              Pazelgreen
+            </span>
           </Link>
 
           {/* Center nav links */}
@@ -86,20 +88,20 @@ export default function Navbar() {
 
             {/* Top bar */}
             <span
-              className={`block h-0.5 w-8 rounded-full bg-white transition-all duration-300
-              ${isOpen ? "translate-y-[8px] rotate-45" : ""}`}
+              className={`block h-0.5 w-8 rounded-full bg-brand transition-all duration-300
+              ${isOpen ? "translate-y-2 rotate-45" : ""}`}
             />
 
             {/* Middle bar — fades out when open */}
             <span
-              className={`my-1.5 block h-0.5 w-4 rounded-full bg-white transition-all duration-300
+              className={`my-1.5 block h-0.5 w-4 rounded-full bg-brand transition-all duration-300
               ${isOpen ? "opacity-0" : ""}`}
             />
 
             {/* Bottom bar */}
             <span
-              className={`block h-0.5 w-2 rounded-full bg-white transition-all duration-300
-              ${isOpen ? "-translate-y-[8px] w-8 -rotate-45" : ""}`}
+              className={`block h-0.5 w-2 rounded-full bg-brand transition-all duration-300
+              ${isOpen ? "-translate-y-2 w-8 -rotate-45" : ""}`}
             />
           </button>
         </nav>

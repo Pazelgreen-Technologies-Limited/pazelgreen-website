@@ -13,7 +13,7 @@ export default function VisionSection() {
         Our Vision
       </span>
       <div className="my-4 h-1 rounded-full w-12 bg-orange-500/60" />
-      <p className="max-w-4xl text-4xl py-4 font-bold text-white md:text-2xl">
+      <p className="max-w-4xl text-2xl py-4 font-bold text-white md:text-4xl">
         &quot;To become a global leader in developing innovative solutions that
         drive sustainable agricultural transformation and resilient food systems
         across emerging markets.&quot;

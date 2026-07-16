@@ -38,7 +38,7 @@ const capabilities = [
 export default function CoreCapabilities() {
   return (
     <section className="bg-white px-6 py-16">
-      <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
+      <div className="mx-auto md:max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 md:shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
         {/* Section heading */}
         <div className="text-center">
           <h3 className="text-normal font-extrabold tracking-wide text-orange-500">
@@ -68,13 +68,13 @@ export default function CoreCapabilities() {
           {capabilities.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="rounded-xl bg-green-50 p-6 pr-16 transition-colors"
+              className="rounded-xl bg-green-50 p-6 md:pr-16 transition-colors"
             >
               <div className="mb-3 inline-flex rounded-xl bg-white p-2">
                 <Icon size={24} className="text-green-600" />
               </div>
 
-              <div className="pr-20">
+              <div className="md:pr-20">
                 <h4 className="text-normal font-bold text-gray-900">{title}</h4>
               </div>
 

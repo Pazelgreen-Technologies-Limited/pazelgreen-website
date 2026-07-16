@@ -56,7 +56,7 @@ const features = [
 
 export default function ProblemSection() {
   return (
-    <section className="bg-gray-50 px-6 py-16 my-16 font-sans text-gray-900">
+    <section className="bg-gray-50 px-6 py-8 my-8 font-sans text-gray-900 md:py-16 md:my-16">
       <div className="mx-auto max-w-6xl">
         {/* Section heading */}
         <h1 className="text-center text-2xl font-extrabold text-gray-900 md:text-5xl">
