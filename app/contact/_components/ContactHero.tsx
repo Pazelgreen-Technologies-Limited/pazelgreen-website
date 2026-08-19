@@ -7,8 +7,8 @@ export default function ContactHero() {
     <BackgroundSection
       imageSrc="/contact-hero-bg.jpg"
       imageAlt="Greenhouse interior"
-      overlayColor="bg-black/60"
-      height="h-[520px]"
+      overlayColor="bg-[#06260FE0]"
+      height="h-screen"
     >
       {/* Pill label with decorative lines */}
       <div className="mb-6 flex items-center gap-3">
