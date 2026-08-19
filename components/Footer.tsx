@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
-import {
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { socialLinks } from "@/lib/social-links";
 
 // Footer link columns
 const companyLinks = [
@@ -23,13 +18,6 @@ const solutionLinks = [
   { label: "Supply Chain", href: "/supply-chain" },
   { label: "Quality Control", href: "/quality-control" },
   { label: "Analytics", href: "/analytics" },
-];
-
-const socialLinks = [
-  { icon: FaFacebook, href: "#", label: "Facebook" },
-  { icon: FaXTwitter, href: "#", label: "Twitter/X" },
-  { icon: FaLinkedin, href: "#", label: "LinkedIn" },
-  { icon: FaInstagram, href: "#", label: "Instagram" },
 ];
 
 export default function Footer() {

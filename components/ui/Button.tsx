@@ -23,7 +23,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   // White border — secondary on dark backgrounds
   outline: "border border-white text-white hover:bg-white/10",
   // Light border — secondary on light backgrounds
-  ghost: "border border-gray-300 text-gray-700 hover:bg-gray-50",
+  ghost: "bg-[#FFFFFF3D] border border-gray-300 text-white hover:bg-gray-500",
 };
 
 export default function Button({
