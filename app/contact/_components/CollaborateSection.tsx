@@ -49,7 +49,7 @@ const collaborations = [
 
 export default function CollaborateSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-green-50 px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
@@ -68,10 +68,16 @@ export default function CollaborateSection() {
 
         {/* 2-row, 3-column grid of collaboration cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {collaborations.map(({ icon: Icon, title, description }) => (
+          {collaborations.map(({ icon: Icon, title, description }, index) => (
             <div
               key={title}
-              className="rounded-2xl border border-gray-100 bg-gray-50 p-6 transition-colors hover:bg-green-50 hover:border-green-100 cursor-pointer"
+              // Odd-indexed cards (1, 3, 5) get white bg; even (0, 2, 4) get light green
+              className={`rounded-2xl border p-6 transition-colors cursor-pointer
+                ${
+                  index % 2 !== 0
+                    ? "border-gray-200"
+                    : "bg-white border-green-100 hover:border-green-100"
+                }`}
             >
               <div className="mb-4 inline-flex rounded-xl bg-white p-3 shadow-sm">
                 <Icon size={20} className="text-green-600" />

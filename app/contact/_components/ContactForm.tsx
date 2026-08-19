@@ -1,4 +1,4 @@
-import { Mail, Building2, User } from "lucide-react";
+import { Mail, Building2, Handshake, Sprout, User } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { socialLinks } from "@/lib/social-links";
 import Link from "next/link";
@@ -12,13 +12,13 @@ const contactCards = [
     description: "For any general questions or information.",
   },
   {
-    icon: Mail,
+    icon: Handshake,
     title: "Partnerships",
     email: "partners@pazelgreen.com",
     description: "Explore partnership and collaboration opportunities.",
   },
   {
-    icon: Mail,
+    icon: Sprout,
     title: "PAGEX Inquiry",
     email: "pagex@pazelgreen.com",
     description:
@@ -164,8 +164,8 @@ export default function ContactForm() {
                 key={title}
                 className="flex gap-4 rounded-xl bg-green-50 p-4"
               >
-                <div className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100">
-                  <Icon size={16} className="text-green-600" />
+                <div className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                  <Icon size={16} className="text-green-900" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{title}</p>
@@ -199,7 +199,9 @@ export default function ContactForm() {
                     aria-label={label}
                     className={`rounded-full p-2 transition-colors hover:bg-green-800/50 focus:outline-none focus:ring-2 focus:ring-green-400`}
                   >
-                    <Icon size={16} className="text-white" />
+                    <div className=" rounded-full border border-white p-3">
+                      <Icon size={16} className="text-white" />
+                    </div>
                   </Link>
                 ))}
               </div>
