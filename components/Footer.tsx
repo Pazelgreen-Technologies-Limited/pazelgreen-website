@@ -182,7 +182,6 @@ export default function Footer() {
                 <span className="text-xs ">Dedicated Assistance</span>
               </div>
             </div>
-            {/* hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh */}
           </div>
         </div>
 
