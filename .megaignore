@@ -1,5 +1,0 @@
-+sync:.megaignore
--d:node_modules
--d:.pnpm
--d:.next
--d:.turbo

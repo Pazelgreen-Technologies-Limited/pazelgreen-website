@@ -22,7 +22,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 w-full z-50 text-white font-sans md:mt-4">
+    <header className="fixed top-0 w-full mt-4 z-50 text-white font-sans">
       <div className="bg-navbar px-6 py-4 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between">
           {/* Logo + brand name */}
