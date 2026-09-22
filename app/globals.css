@@ -16,6 +16,11 @@
   --color-dark-bg: #0a0a0a;
   --color-dark-card: #171717;
   --color-navbar: #041a0899;
+  /* Custom aspect-ratio values used by the About page */
+  --aspect-3\/4: 3 / 4;
+  --aspect-4\/5: 4 / 5;
+  --aspect-4\/3: 4 / 3;
+  --aspect-5\/4: 5 / 4;
 }
 
 /* @media (prefers-color-scheme: dark) {

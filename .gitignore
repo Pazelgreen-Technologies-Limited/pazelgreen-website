@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Figma source exports (kept locally, not committed)
+/About_us.png
+/about_us*.png
