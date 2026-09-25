@@ -1,4 +1,5 @@
 import { Sprout, Send, Leaf } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Three pillars describing how Pazelgreen operates
 const pillars = [
@@ -59,9 +60,9 @@ export default function WhoWeAreSection() {
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {pillars.map(
             ({ icon: Icon, title, description, highlighted, footerTag }) => (
-              <div
+              <MotionCard
                 key={title}
-                className={`flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
+                className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
                     ? "border-transparent bg-green-800 text-white shadow-lg"
                     : "border-green-100 bg-white hover:border-green-200"
@@ -75,7 +76,7 @@ export default function WhoWeAreSection() {
                 >
                   <Icon
                     size={22}
-                    className={highlighted ? "text-brand" : "text-brand"}
+                    className="text-brand transition-transform duration-300 group-hover:-rotate-12"
                   />
                 </div>
 
@@ -109,7 +110,7 @@ export default function WhoWeAreSection() {
                     </p>
                   </>
                 )}
-              </div>
+              </MotionCard>
             ),
           )}
         </div>

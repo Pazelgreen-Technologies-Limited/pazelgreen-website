@@ -6,6 +6,7 @@ import {
   Building,
   TrendingUp,
 } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Six collaboration areas
 const collaborations = [
@@ -69,8 +70,9 @@ export default function CollaborateSection() {
         {/* 2-row, 3-column grid of collaboration cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
           {collaborations.map(({ icon: Icon, title, description }, index) => (
-            <div
+            <MotionCard
               key={title}
+              delay={index * 0.05}
               // Odd-indexed cards (1, 3, 5) get white bg; even (0, 2, 4) get light green
               className={`rounded-2xl border p-6 transition-colors cursor-pointer
                 ${
@@ -84,7 +86,7 @@ export default function CollaborateSection() {
               </div>
               <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

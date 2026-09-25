@@ -1,4 +1,5 @@
 import { Send, Lightbulb, Leaf, Diamond, Globe } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Core values shown as 5 cards (3 in top row, 2 in bottom row).
 // Middle card on the top row is highlighted to match the Figma emphasis.
@@ -60,52 +61,57 @@ export default function CoreValuesSection() {
 
         {/* Top row — 3 cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {values.slice(0, 3).map(({ icon: Icon, title, description, highlighted }) => (
-            <div
-              key={title}
-              className={`rounded-2xl border p-6 md:p-8 transition-colors ${
-                highlighted
-                  ? "border-transparent bg-green-800 text-white shadow-lg"
-                  : "border-green-100 bg-white"
-              }`}
-            >
-              <div
-                className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                  highlighted ? "bg-green-700" : "bg-green-50"
+          {values
+            .slice(0, 3)
+            .map(({ icon: Icon, title, description, highlighted }) => (
+              <MotionCard
+                key={title}
+                className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
+                  highlighted
+                    ? "border-transparent bg-green-800 text-white shadow-lg"
+                    : "border-green-100 bg-white"
                 }`}
               >
-                <Icon
-                  size={22}
-                  className={highlighted ? "text-brand" : "text-brand"}
-                />
-              </div>
-              <h3
-                className={`text-base font-bold md:text-lg ${
-                  highlighted ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {title}
-              </h3>
-              <p
-                className={`mt-3 text-sm md:text-base ${
-                  highlighted ? "text-green-50" : "text-gray-600"
-                }`}
-              >
-                {description}
-              </p>
-            </div>
-          ))}
+                <div
+                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
+                    highlighted ? "bg-green-700" : "bg-green-50"
+                  }`}
+                >
+                  <Icon
+                    size={22}
+                    className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                  />
+                </div>
+                <h3
+                  className={`text-base font-bold md:text-lg ${
+                    highlighted ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {title}
+                </h3>
+                <p
+                  className={`mt-3 text-sm md:text-base ${
+                    highlighted ? "text-green-50" : "text-gray-600"
+                  }`}
+                >
+                  {description}
+                </p>
+              </MotionCard>
+            ))}
         </div>
 
         {/* Bottom row — 2 cards, offset to mimic the centered Figma layout */}
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:max-w-3xl md:mx-auto">
           {values.slice(3).map(({ icon: Icon, title, description }) => (
-            <div
+            <MotionCard
               key={title}
-              className="rounded-2xl border border-green-100 bg-white p-6 md:p-8 transition-colors hover:border-green-200"
+              className="group rounded-2xl border border-green-100 bg-white p-6 md:p-8 transition-colors hover:border-green-200"
             >
               <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-50">
-                <Icon size={22} className="text-brand" />
+                <Icon
+                  size={22}
+                  className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                />
               </div>
               <h3 className="text-base font-bold text-gray-900 md:text-lg">
                 {title}
@@ -113,7 +119,7 @@ export default function CoreValuesSection() {
               <p className="mt-3 text-sm text-gray-600 md:text-base">
                 {description}
               </p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { Briefcase, Star } from "lucide-react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Current open roles
 const openings = [
@@ -51,7 +52,7 @@ export default function CareersSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Current Openings card */}
-          <div className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
+          <MotionCard className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-white p-2">
               <Briefcase size={24} className="text-green-600" />
             </div>
@@ -72,10 +73,13 @@ export default function CareersSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
 
           {/* Why Join Us card */}
-          <div className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
+          <MotionCard
+            delay={0.06}
+            className="rounded-xl bg-green-50 p-6 pr-16 transition-colors"
+          >
             <div className="mb-3 inline-flex rounded-xl bg-white p-2">
               <Star size={24} className="text-green-600" />
             </div>
@@ -93,7 +97,7 @@ export default function CareersSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
         </div>
       </div>
     </section>

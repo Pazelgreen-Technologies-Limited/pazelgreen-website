@@ -1,6 +1,7 @@
 import { Puzzle, Search } from "lucide-react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Types of partnerships Pazelgreen seeks
 const partnershipTypes = [
@@ -51,7 +52,7 @@ export default function PartnershipsSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Partnership Types */}
-          <div className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
+          <MotionCard className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-white p-2">
               <Puzzle size={24} className="text-green-600" />
             </div>
@@ -71,10 +72,13 @@ export default function PartnershipsSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
 
           {/* What We Look For */}
-          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
+          <MotionCard
+            delay={0.06}
+            className="rounded-2xl border border-gray-100 bg-gray-50 p-6"
+          >
             <div className="mb-4 inline-flex rounded-xl bg-green-50 p-3">
               <Search size={24} className="text-green-600" />
             </div>
@@ -94,7 +98,7 @@ export default function PartnershipsSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
         </div>
       </div>
     </section>

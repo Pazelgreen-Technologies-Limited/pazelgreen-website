@@ -7,13 +7,25 @@ import GetInvolvedSection from "./_components/GetInvolvedSection";
 
 export default function Home() {
   return (
+    // <main>
+    //   <Hero />
+    //   <ProblemSection />
+    //   <VisionSection />
+    //   <CoreCapabilities />
+    //   <PagexSection />
+    //   <GetInvolvedSection />
+    // </main>
     <main>
-      <Hero />
-      <ProblemSection />
-      <VisionSection />
-      <CoreCapabilities />
-      <PagexSection />
-      <GetInvolvedSection />
+      <div className="relative">
+        <Hero />
+        <div className="relative z-10 -mt-6 rounded-t-3xl bg-white">
+          <ProblemSection />
+          <VisionSection />
+          <CoreCapabilities />
+          <PagexSection />
+          <GetInvolvedSection />
+        </div>
+      </div>
     </main>
   );
 }

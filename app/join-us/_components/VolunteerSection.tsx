@@ -1,6 +1,7 @@
 import { GitMerge, Gift } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import MotionCard from "@/components/MotionCard";
 
 // Ways contributors can get involved
 const ways = [
@@ -53,7 +54,7 @@ export default function VolunteerSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Ways to Contribute */}
-          <div className="rounded-xl bg-white p-6 pr-16 transition-colors">
+          <MotionCard className="rounded-xl bg-white p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-green-50 p-2">
               <GitMerge size={24} className="text-green-600" />
             </div>
@@ -73,10 +74,13 @@ export default function VolunteerSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
 
           {/* Benefits */}
-          <div className="rounded-xl bg-white p-6 pr-16 transition-colors">
+          <MotionCard
+            delay={0.06}
+            className="rounded-xl bg-white p-6 pr-16 transition-colors"
+          >
             <div className="mb-3 inline-flex rounded-xl bg-green-50 p-2">
               <Gift size={24} className="text-green-600" />
             </div>
@@ -94,7 +98,7 @@ export default function VolunteerSection() {
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
         </div>
       </div>
     </section>

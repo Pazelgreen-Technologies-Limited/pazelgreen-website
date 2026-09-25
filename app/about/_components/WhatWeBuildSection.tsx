@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Send, BarChart3, GraduationCap, LineChart } from "lucide-react";
+import {
+  ArrowRight,
+  Send,
+  BarChart3,
+  GraduationCap,
+  LineChart,
+} from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 type CardVisual = "icon" | "bars" | "list" | "chart";
 
@@ -92,16 +99,20 @@ function SolutionCardItem({
   visual,
 }: SolutionCard) {
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-green-100 bg-white transition-colors hover:border-green-200">
+    <MotionCard className="group flex flex-col overflow-hidden rounded-2xl border border-green-100 bg-white transition-colors hover:border-green-200">
       {/* Visual header area */}
       <div className="relative flex h-44 items-end justify-start bg-green-50 p-6 md:h-48">
         {/* Top-left icon */}
         <div className="absolute top-5 left-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm">
-          <Icon size={20} className="text-brand" />
+          <Icon
+            size={20}
+            className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+          />
         </div>
 
         {/* Pill label — placed inside the visual area */}
-        {(pillLabel === "Capacity" || pillLabel === "Data-Driven Decisions") && (
+        {(pillLabel === "Capacity" ||
+          pillLabel === "Data-Driven Decisions") && (
           <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-3 py-1 text-[10px] font-bold tracking-widest text-brand uppercase">
             <span className="h-1.5 w-1.5 rounded-full bg-brand" />
             {pillLabel}
@@ -125,7 +136,9 @@ function SolutionCardItem({
           <span className="h-1.5 w-1.5 rounded-full bg-brand" />
           {tag}
         </p>
-        <h3 className="text-base font-bold text-gray-900 md:text-lg">{title}</h3>
+        <h3 className="text-base font-bold text-gray-900 md:text-lg">
+          {title}
+        </h3>
         <p className="mt-3 text-sm text-gray-600 md:text-base">{description}</p>
 
         {/* Divider + Learn More link */}
@@ -139,7 +152,7 @@ function SolutionCardItem({
           </Link>
         </div>
       </div>
-    </article>
+    </MotionCard>
   );
 }
 
@@ -151,7 +164,11 @@ function BarChartVisual() {
         <div
           key={i}
           className={`w-3 rounded-t-md ${
-            i === 3 ? "h-16 bg-brand" : i === 2 ? "h-12 bg-brand/80" : "bg-brand/40"
+            i === 3
+              ? "h-16 bg-brand"
+              : i === 2
+                ? "h-12 bg-brand/80"
+                : "bg-brand/40"
           }`}
           style={{ height: `${h * 0.5}px` }}
         />

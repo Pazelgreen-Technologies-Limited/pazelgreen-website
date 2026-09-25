@@ -1,11 +1,13 @@
 import { Eye, Sprout, TrendingUp, Globe } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Four-part narrative timeline of how Pazelgreen evolved
 const storyCards = [
   {
     icon: Eye,
     tag: "The Observation",
-    title: "Agricultural systems were fragmented, inefficient, and under-optimized.",
+    title:
+      "Agricultural systems were fragmented, inefficient, and under-optimized.",
     description:
       "Agricultural systems across emerging markets were fragmented, inefficient, and under-optimized — a structural gap that limited the value available to every participant in the chain.",
     highlighted: false,
@@ -21,7 +23,8 @@ const storyCards = [
   {
     icon: TrendingUp,
     tag: "The Evolution",
-    title: "Platforms, programs, and initiatives that strengthen the whole system.",
+    title:
+      "Platforms, programs, and initiatives that strengthen the whole system.",
     description:
       "That focus expanded into platforms, programs, and initiatives that strengthen coordination, improve efficiency, and unlock value across agricultural ecosystems at every level.",
     highlighted: false,
@@ -29,7 +32,8 @@ const storyCards = [
   {
     icon: Globe,
     tag: "Today",
-    title: "An agritech innovation company developing solutions for Africa and emerging markets.",
+    title:
+      "An agritech innovation company developing solutions for Africa and emerging markets.",
     description:
       "Pazelgreen operates as an agritech innovation company developing solutions that support sustainable agricultural development across Africa and emerging markets — with a growing portfolio of platforms and programs.",
     highlighted: true,
@@ -61,52 +65,54 @@ export default function OurStorySection() {
 
         {/* 2x2 story cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {storyCards.map(({ icon: Icon, tag, title, description, highlighted }) => (
-            <div
-              key={tag}
-              className={`rounded-2xl border p-6 md:p-8 transition-colors ${
-                highlighted
-                  ? "border-transparent bg-green-800 text-white shadow-lg"
-                  : "border-green-100 bg-white"
-              }`}
-            >
-              {/* Tag with icon */}
-              <div className="mb-6 flex items-center gap-2">
-                <div
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-                    highlighted ? "bg-green-700" : "bg-green-50"
-                  }`}
-                >
-                  <Icon
-                    size={18}
-                    className={highlighted ? "text-brand" : "text-brand"}
-                  />
+          {storyCards.map(
+            ({ icon: Icon, tag, title, description, highlighted }) => (
+              <MotionCard
+                key={tag}
+                className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
+                  highlighted
+                    ? "border-transparent bg-green-800 text-white shadow-lg"
+                    : "border-green-100 bg-white"
+                }`}
+              >
+                {/* Tag with icon */}
+                <div className="mb-6 flex items-center gap-2">
+                  <div
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
+                      highlighted ? "bg-green-700" : "bg-green-50"
+                    }`}
+                  >
+                    <Icon
+                      size={18}
+                      className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                    />
+                  </div>
+                  <span
+                    className={`text-xs font-bold tracking-widest uppercase ${
+                      highlighted ? "text-brand" : "text-brand"
+                    }`}
+                  >
+                    {tag}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs font-bold tracking-widest uppercase ${
-                    highlighted ? "text-brand" : "text-brand"
+
+                <h3
+                  className={`text-lg font-bold md:text-xl ${
+                    highlighted ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  {tag}
-                </span>
-              </div>
-
-              <h3
-                className={`text-lg font-bold md:text-xl ${
-                  highlighted ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {title}
-              </h3>
-              <p
-                className={`mt-3 text-sm md:text-base ${
-                  highlighted ? "text-green-50" : "text-gray-600"
-                }`}
-              >
-                {description}
-              </p>
-            </div>
-          ))}
+                  {title}
+                </h3>
+                <p
+                  className={`mt-3 text-sm md:text-base ${
+                    highlighted ? "text-green-50" : "text-gray-600"
+                  }`}
+                >
+                  {description}
+                </p>
+              </MotionCard>
+            ),
+          )}
         </div>
       </div>
     </section>

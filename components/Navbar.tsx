@@ -112,10 +112,18 @@ export default function Navbar() {
           ${isOpen ? "max-h-96 border-t border-gray-800" : "max-h-0"}`}
         >
           <ul className="flex flex-col px-6 py-4 gap-4">
-            {navLinks.map((link) => {
+            {navLinks.map((link, index) => {
               const isActive = pathname === link.href;
               return (
-                <li key={link.label}>
+                <li
+                  key={link.label}
+                  className={`transition-opacity duration-150 ease-in-out ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{
+                    transitionDelay: isOpen ? `${index * 30}ms` : "0ms",
+                  }}
+                >
                   <Link
                     href={link.href}
                     // Close the menu when a link is tapped
@@ -132,13 +140,22 @@ export default function Navbar() {
               );
             })}
             {/* Mobile CTA button */}
-            <Button
-              href="/get-started"
-              variant="solid"
-              onClick={() => setIsOpen(false)}
+            <li
+              className={`transition-opacity duration-150 ease-in-out ${
+                isOpen ? "opacity-100" : "opacity-0"
+              }`}
+              style={{
+                transitionDelay: isOpen ? `${navLinks.length * 30}ms` : "0ms",
+              }}
             >
-              Get Started
-            </Button>
+              <Button
+                href="/get-started"
+                variant="solid"
+                onClick={() => setIsOpen(false)}
+              >
+                Get Started
+              </Button>
+            </li>
           </ul>
         </div>
       </div>

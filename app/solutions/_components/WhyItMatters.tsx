@@ -1,4 +1,5 @@
 import { Store, Link2, Boxes } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // The three problems PAGEX addresses
 const problems = [
@@ -41,9 +42,10 @@ export default function WhyItMatters() {
 
         {/* Problem cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {problems.map(({ icon: Icon, title, description }) => (
-            <div
+          {problems.map(({ icon: Icon, title, description }, index) => (
+            <MotionCard
               key={title}
+              delay={index * 0.06}
               className="rounded-2xl bg-gray-50 p-6 transition-colors hover:bg-green-50"
             >
               {/* Icon badge */}
@@ -52,7 +54,7 @@ export default function WhyItMatters() {
               </div>
               <h3 className="text-base font-semibold text-gray-900">{title}</h3>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

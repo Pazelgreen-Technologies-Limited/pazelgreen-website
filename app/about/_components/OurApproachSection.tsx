@@ -1,4 +1,5 @@
 import { Send, Layers, Sprout } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 const principles = [
   {
@@ -49,9 +50,9 @@ export default function OurApproachSection() {
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {principles.map(
             ({ icon: Icon, title, description, highlighted, footerTag }) => (
-              <div
+              <MotionCard
                 key={title}
-                className={`flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
+                className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
                     ? "border-transparent bg-green-800 text-white shadow-lg"
                     : "border-green-100 bg-white"
@@ -64,7 +65,7 @@ export default function OurApproachSection() {
                 >
                   <Icon
                     size={22}
-                    className={highlighted ? "text-brand" : "text-brand"}
+                    className="text-brand transition-transform duration-300 group-hover:-rotate-12"
                   />
                 </div>
                 {/* Green accent bar — only the highlighted middle card has the dark bar */}
@@ -102,7 +103,7 @@ export default function OurApproachSection() {
                     </p>
                   </>
                 )}
-              </div>
+              </MotionCard>
             ),
           )}
         </div>

@@ -1,4 +1,5 @@
 import { Target, Eye } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 const cards = [
   {
@@ -32,9 +33,9 @@ export default function MissionVisionSection() {
         {/* Two cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
           {cards.map(({ icon: Icon, tag, body, highlighted }) => (
-            <div
+            <MotionCard
               key={tag}
-              className={`rounded-2xl p-6 md:p-10 transition-colors ${
+              className={`group rounded-2xl p-6 md:p-10 transition-colors ${
                 highlighted
                   ? "bg-green-800 text-white shadow-lg"
                   : "border border-green-100 bg-white"
@@ -47,7 +48,7 @@ export default function MissionVisionSection() {
               >
                 <Icon
                   size={22}
-                  className={highlighted ? "text-brand" : "text-brand"}
+                  className="text-brand transition-transform duration-300 group-hover:-rotate-12"
                 />
               </div>
               <p
@@ -64,7 +65,7 @@ export default function MissionVisionSection() {
               >
                 {body}
               </p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { Network, TrendingUp, Leaf } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Three pillars of the connected ecosystem
 const pillars = [
@@ -40,15 +41,15 @@ export default function EcosystemSection() {
 
         {/* Pillar cards */}
         <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {pillars.map(({ icon: Icon, title, description }) => (
-            <div key={title}>
+          {pillars.map(({ icon: Icon, title, description }, index) => (
+            <MotionCard key={title} delay={index * 0.06}>
               {/* Icon with light green background */}
               <div className="mb-4 inline-flex rounded-xl bg-green-50 p-3">
                 <Icon size={24} className="text-green-600" />
               </div>
               <h3 className="text-base font-semibold text-gray-900">{title}</h3>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

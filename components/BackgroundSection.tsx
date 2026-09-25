@@ -19,12 +19,17 @@ export default function BackgroundSection({
   return (
     <section className={`relative ${height} w-full overflow-hidden`}>
       {/* Background image */}
-      <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
+      <Image
+        src={imageSrc}
+        alt={imageAlt}
+        fill
+        className="hero-image-enter object-cover"
+      />
       {/* Configurable dark overlay */}
       <div className={`absolute inset-0 ${overlayColor}`} />
 
       {/* Centered content slot */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+      <div className="hero-enter hero-enter-2 relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
         {children}
       </div>
     </section>

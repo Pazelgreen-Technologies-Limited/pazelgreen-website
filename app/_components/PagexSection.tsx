@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, PlayCircle, CheckCircle } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Feature checkmarks displayed below the PAGEX description
 const pagexFeatures = [
@@ -31,16 +32,17 @@ export default function PagexSection() {
 
         {/* Feature checklist */}
         <div className="mt-8 flex flex-col items-center gap-4 justify-between md:flex-row ">
-          {pagexFeatures.map((feature) => (
-            <div
+          {pagexFeatures.map((feature, index) => (
+            <MotionCard
               key={feature}
+              delay={index * 0.06}
               className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-brand px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
             >
               <div className="flex items-start gap-2 px-2 justify-center">
                 <CheckCircle size={16} className="text-green-800" />
                 {feature}
               </div>
-            </div>
+            </MotionCard>
           ))}
         </div>
 

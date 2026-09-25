@@ -6,6 +6,7 @@ import {
   LineChart,
   ArrowRight,
 } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Core capability cards
 const capabilities = [
@@ -65,9 +66,10 @@ export default function CoreCapabilities() {
 
         {/* Capability cards grid */}
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {capabilities.map(({ icon: Icon, title, description }) => (
-            <div
+          {capabilities.map(({ icon: Icon, title, description }, index) => (
+            <MotionCard
               key={title}
+              delay={index * 0.06}
               className="rounded-xl bg-green-50 p-6 md:pr-16 transition-colors"
             >
               <div className="mb-3 inline-flex rounded-xl bg-white p-2">
@@ -79,7 +81,7 @@ export default function CoreCapabilities() {
               </div>
 
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

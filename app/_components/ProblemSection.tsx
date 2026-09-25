@@ -7,6 +7,7 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Feature grid items with their icon, title, and description
 const features = [
@@ -69,7 +70,7 @@ export default function ProblemSection() {
         </p>
 
         {/* Problem statement card */}
-        <div className="mt-10 rounded-2xl bg-white p-8 text-center shadow-sm">
+        <MotionCard className="mt-10 rounded-2xl bg-white p-8 text-center shadow-sm">
           <h3 className="text-xl font-extrabold tracking-wide text-orange-500">
             Problem Statement
           </h3>
@@ -80,12 +81,16 @@ export default function ProblemSection() {
             gaps represent significant opportunities to unlock value, strengthen
             resilience, and accelerate sustainable agricultural development.
           </p>
-        </div>
+        </MotionCard>
 
         {/* Feature grid */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {features.map(({ icon: Icon, tag, title, description }) => (
-            <div key={title} className="rounded-xl bg-white p-6 shadow-sm">
+          {features.map(({ icon: Icon, tag, title, description }, index) => (
+            <MotionCard
+              key={title}
+              delay={index * 0.05}
+              className="rounded-xl bg-white p-6 shadow-sm"
+            >
               <Icon className="mb-3 text-green-500" size={28} />
               <p className="text-xs text-gray-400">{tag}</p>
               <h4 className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-900">
@@ -95,7 +100,7 @@ export default function ProblemSection() {
                 {title}
               </h4>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

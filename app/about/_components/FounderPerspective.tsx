@@ -1,17 +1,20 @@
 import Image from "next/image";
 import { Send, Lightbulb, Quote } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // Two bottom cards highlighting the founder's approach
 const approachCards = [
   {
     icon: Send,
     title: "Systems Thinking",
-    description: "Understanding every actor and connection before designing solutions.",
+    description:
+      "Understanding every actor and connection before designing solutions.",
   },
   {
     icon: Lightbulb,
     title: "Practical Innovation",
-    description: "Building solutions that work in real-world agricultural contexts.",
+    description:
+      "Building solutions that work in real-world agricultural contexts.",
   },
 ];
 
@@ -105,16 +108,19 @@ export default function FounderPerspective() {
         {/* Bottom — two small approach cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:max-w-3xl">
           {approachCards.map(({ icon: Icon, title, description }) => (
-            <div
+            <MotionCard
               key={title}
-              className="rounded-2xl border border-green-100 bg-white p-6 transition-colors hover:border-green-200"
+              className="group rounded-2xl border border-green-100 bg-white p-6 transition-colors hover:border-green-200"
             >
               <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
-                <Icon size={20} className="text-brand" />
+                <Icon
+                  size={20}
+                  className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                />
               </div>
               <h3 className="text-base font-bold text-gray-900">{title}</h3>
               <p className="mt-2 text-sm text-gray-600">{description}</p>
-            </div>
+            </MotionCard>
           ))}
         </div>
       </div>

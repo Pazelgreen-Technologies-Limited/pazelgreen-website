@@ -2,6 +2,7 @@ import { Briefcase, HeartHandshake, Handshake } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import MotionCard from "@/components/MotionCard";
 
 // The three ways someone can join Pazelgreen
 const roles = [
@@ -46,43 +47,48 @@ export default function RolesSection() {
 
         {/* Role cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {roles.map(({ icon: Icon, tag, title, description, cta, href }) => (
-            <div
-              key={title}
-              className="flex flex-col rounded-2xl border border-gray-100 p-6"
-            >
-              {/* Icon */}
-              <div className="mb-3 inline-flex rounded-xl bg-green-50 p-3 w-fit">
-                <Icon size={22} className="text-green-600" />
-              </div>
+          {roles.map(
+            ({ icon: Icon, tag, title, description, cta, href }, index) => (
+              <MotionCard
+                key={title}
+                delay={index * 0.06}
+                className="flex flex-col rounded-2xl border border-gray-100 p-6"
+              >
+                {/* Icon */}
+                <div className="mb-3 inline-flex rounded-xl bg-green-50 p-3 w-fit">
+                  <Icon size={22} className="text-green-600" />
+                </div>
 
-              {/* Tag */}
-              <p className="text-xs text-gray-400">{tag}</p>
+                {/* Tag */}
+                <p className="text-xs text-gray-400">{tag}</p>
 
-              {/* Title with orange plus prefix */}
-              <h3 className="mt-1 flex items-center gap-1 text-base font-semibold text-gray-900">
-                <span className="text-orange-500">
-                  {" "}
-                  <ArrowRight size={14} />{" "}
-                </span>{" "}
-                {title}
-              </h3>
+                {/* Title with orange plus prefix */}
+                <h3 className="mt-1 flex items-center gap-1 text-base font-semibold text-gray-900">
+                  <span className="text-orange-500">
+                    {" "}
+                    <ArrowRight size={14} />{" "}
+                  </span>{" "}
+                  {title}
+                </h3>
 
-              <p className="mt-2 flex-1 text-sm text-gray-600">{description}</p>
+                <p className="mt-2 flex-1 text-sm text-gray-600">
+                  {description}
+                </p>
 
-              {/* CTA button at bottom of card */}
-              <div className="mt-6">
-                <Button
-                  href={href}
-                  variant="solid"
-                  showArrow
-                  className="w-full justify-center"
-                >
-                  {cta}
-                </Button>
-              </div>
-            </div>
-          ))}
+                {/* CTA button at bottom of card */}
+                <div className="mt-6">
+                  <Button
+                    href={href}
+                    variant="solid"
+                    showArrow
+                    className="w-full justify-center"
+                  >
+                    {cta}
+                  </Button>
+                </div>
+              </MotionCard>
+            ),
+          )}
         </div>
       </div>
     </section>

@@ -36,7 +36,7 @@ export default function Button({
   type = "button",
 }: ButtonProps) {
   const base =
-    "flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-colors";
+    "flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97]";
   const styles = `${base} ${variantStyles[variant]} ${className}`;
 
   // Render as a link if href is provided

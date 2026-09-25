@@ -11,30 +11,30 @@ export default function Hero() {
         alt="Sustainable agriculture field"
         fill
         priority
-        className="object-cover"
+        className="hero-image-enter object-cover"
       />
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        <span className="mb-4 rounded-full bg-white/20 px-4 py-1 text-xs font-medium tracking-wide text-white">
+        <span className="hero-enter hero-enter-1 mb-4 rounded-full bg-white/20 px-4 py-1 text-xs font-medium tracking-wide text-white">
           PAZELGREEN TECHNOLOGIES
         </span>
 
-        <h1 className="max-w-3xl text-4xl font-bold md:text-5xl">
+        <h1 className="hero-enter hero-enter-2 max-w-3xl text-4xl font-bold md:text-5xl">
           Innovating the Future of{" "}
           <span className="text-brand">Sustainable</span> Agriculture
         </h1>
 
-        <p className="mt-4 max-w-2xl text-sm  md:text-base">
+        <p className="hero-enter hero-enter-3 mt-4 max-w-2xl text-sm md:text-base">
           Transforming agricultural inefficiencies into opportunities for
           growth, resilience, and sustainable development across emerging
           markets worldwide.
         </p>
 
         {/* CTA buttons */}
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+        <div className="hero-enter hero-enter-4 mt-8 flex flex-col gap-4 sm:flex-row">
           <Button href="/pagex" variant="solid" showArrow>
             Explore PAGEX
           </Button>
