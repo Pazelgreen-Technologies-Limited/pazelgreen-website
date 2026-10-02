@@ -62,26 +62,26 @@ export default function WhoWeAreSection() {
             ({ icon: Icon, title, description, highlighted, footerTag }) => (
               <MotionCard
                 key={title}
+                tiltOnHover
                 className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
                     ? "border-transparent bg-green-800 text-white shadow-lg"
-                    : "border-green-100 bg-white hover:border-green-200"
+                    : "border-green-100 bg-green-50 hover:border-green-200"
                 }`}
               >
                 {/* Icon bubble */}
                 <div
-                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                    highlighted ? "bg-green-700" : "bg-green-50"
+                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:rotate-6 ${
+                    highlighted
+                      ? "bg-white/5 border border-white/50"
+                      : "bg-green-800/15"
                   }`}
                 >
-                  <Icon
-                    size={22}
-                    className="text-brand transition-transform duration-300 group-hover:-rotate-12"
-                  />
+                  <Icon size={22} className="text-brand" />
                 </div>
 
                 <h3
-                  className={`text-base font-bold md:text-lg ${
+                  className={`text-base font-semibold transition-[font-weight] group-hover:font-bold md:text-lg ${
                     highlighted ? "text-white" : "text-gray-900"
                   }`}
                 >
