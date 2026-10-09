@@ -6,7 +6,7 @@ export default function FutureBanner() {
     <BackgroundSection
       imageSrc="/future-bg.jpg"
       imageAlt="Drone flying over agricultural field with a humanoid robot"
-      overlayColor="bg-gradient-to-b from-[#052E16]/10 to-[#14532D]/90"
+      overlayColor="bg-gradient-to-b from-primary-darker/10 to-primary-darker/90"
       height="h-[500px]"
     >
       <h2 className="max-w-xl text-4xl font-bold text-background md:text-3xl">

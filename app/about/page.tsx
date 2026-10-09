@@ -9,21 +9,42 @@ import OurApproachSection from "./_components/OurApproachSection";
 import WhatWeBuildSection from "./_components/WhatWeBuildSection";
 import PagexSection from "./_components/PagexSection";
 import CommitmentSection from "./_components/CommitmentSection";
+import { FadeIn } from "@/components/FadeIn";
 
 export default function AboutPage() {
   return (
     <main>
       <AboutHero />
-      <WhoWeAreSection />
-      <OurStorySection />
-      <FounderPerspective />
-      <MissionVisionSection />
-      <CoreValuesSection />
-      <WhyWeExistSection />
-      <OurApproachSection />
-      <WhatWeBuildSection />
-      <PagexSection />
-      <CommitmentSection />
+      <FadeIn as="div">
+        <WhoWeAreSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <OurStorySection />
+      </FadeIn>
+      <FadeIn as="div">
+        <FounderPerspective />
+      </FadeIn>
+      <FadeIn as="div">
+        <MissionVisionSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <CoreValuesSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <WhyWeExistSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <OurApproachSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <WhatWeBuildSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <PagexSection />
+      </FadeIn>
+      <FadeIn as="div">
+        <CommitmentSection />
+      </FadeIn>
     </main>
   );
 }

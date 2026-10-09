@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PrivacyPolicyContent from "./_components/PrivacyPolicyContent";
+import { FadeIn } from "@/components/FadeIn";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Pazelgreen Technologies",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <main className="space-y-16 pt-28 pb-12 md:pt-32 md:pb-20">
-      <PrivacyPolicyContent />
+      <FadeIn as="div">
+        <PrivacyPolicyContent />
+      </FadeIn>
     </main>
   );
 }

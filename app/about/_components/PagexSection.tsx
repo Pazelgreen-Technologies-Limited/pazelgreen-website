@@ -20,24 +20,24 @@ const pagexFeatures = [
 
 export default function PagexSection() {
   return (
-    <section className="bg-green-50 px-6 py-16 md:py-24 font-sans text-gray-900">
+    <section className="bg-primary-lighter px-6 py-16 md:py-24 font-sans text-foreground">
       <div className="mx-auto max-w-6xl">
-        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-green-50 to-green-100 p-6 md:p-12">
+        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-primary-lighter to-primary-surface p-6 md:p-12">
           <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
             {/* LEFT — copy column */}
             <div>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-bold tracking-widest text-primary uppercase">
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-bold tracking-widest text-primary uppercase">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Flagship Product
               </p>
-              <h2 className="text-5xl font-extrabold leading-none text-green-900 md:text-6xl lg:text-7xl">
+              <h2 className="text-5xl font-extrabold leading-none text-primary-darker md:text-6xl lg:text-7xl">
                 PAGEX
               </h2>
               <p className="mt-3 text-base font-medium text-primary md:text-lg">
                 Ecosystem Coordination &amp; Market Intelligence Platform
               </p>
 
-              <div className="mt-6 space-y-4 text-sm text-gray-700 md:text-base">
+              <div className="mt-6 space-y-4 text-sm text-muted-foreground md:text-base">
                 <p>
                   PAGEX is Pazelgreen&apos;s flagship platform designed to
                   support ecosystem coordination, market intelligence, and value
@@ -54,10 +54,10 @@ export default function PagexSection() {
               <ul className="mt-6 space-y-3">
                 {pagexFeatures.map(({ icon: Icon, label }) => (
                   <li key={label} className="flex items-center gap-3">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green-100">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary-surface">
                       <Icon size={18} className="text-primary" />
                     </span>
-                    <span className="text-sm font-medium text-gray-800 md:text-base">
+                    <span className="text-sm font-medium text-foreground md:text-base">
                       {label}
                     </span>
                   </li>

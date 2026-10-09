@@ -30,17 +30,17 @@ const principles = [
 
 export default function OurApproachSection() {
   return (
-    <section className="bg-background px-6 py-16 md:py-24 font-sans text-gray-900">
+    <section className="bg-background px-6 py-16 md:py-24 font-sans text-foreground">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-primary-lighter px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <span>🌱</span> Our Approach
           </p>
-          <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
             Three principles guide how we build.
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-600 md:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
             We approach agricultural development as a systems challenge, not a
             single-problem solution.
           </p>
@@ -52,18 +52,17 @@ export default function OurApproachSection() {
             ({ icon: Icon, title, description, highlighted, footerTag }) => (
               <MotionCard
                 key={title}
-                tiltOnHover
                 className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-background shadow-lg"
-                    : "border-green-100 bg-green-50"
+                    ? "border-transparent bg-primary-darker text-inverse-foreground shadow-lg"
+                    : "border-border bg-primary-lighter"
                 }`}
               >
                 <div
-                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:rotate-8 ${
+                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
                     highlighted
                       ? "bg-background/5 border border-background/50"
-                      : "bg-green-800/15"
+                      : "bg-primary-darker/15"
                   }`}
                 >
                   <Icon size={22} className="text-primary" />
@@ -75,15 +74,17 @@ export default function OurApproachSection() {
                   }`}
                 />
                 <h3
-                  className={`text-base font-semibold transition-[font-weight] group-hover:font-bold md:text-lg ${
-                    highlighted ? "text-background" : "text-gray-900"
+                  className={`text-base font-semibold md:text-lg ${
+                    highlighted ? "text-inverse-foreground" : "text-foreground"
                   }`}
                 >
                   {title}
                 </h3>
                 <p
                   className={`mt-3 text-sm md:text-base ${
-                    highlighted ? "text-green-50" : "text-gray-600"
+                    highlighted
+                      ? "text-inverse-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {description}
@@ -94,7 +95,7 @@ export default function OurApproachSection() {
                     <div className="mt-auto pt-6">
                       <div
                         className={`h-px w-full ${
-                          highlighted ? "bg-background/20" : "bg-gray-200"
+                          highlighted ? "bg-inverse-foreground/20" : "bg-border"
                         }`}
                       />
                     </div>

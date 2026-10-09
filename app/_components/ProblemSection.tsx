@@ -85,10 +85,9 @@ export default function ProblemSection() {
 
         {/* Feature grid */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {features.map(({ icon: Icon, tag, title, description }, index) => (
+          {features.map(({ icon: Icon, tag, title, description }) => (
             <MotionCard
               key={title}
-              delay={index * 0.05}
               className="rounded-xl bg-background p-6 shadow-sm"
             >
               <Icon className="mb-3 text-green-500" size={28} />

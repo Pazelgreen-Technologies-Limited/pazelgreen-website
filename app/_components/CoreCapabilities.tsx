@@ -66,10 +66,9 @@ export default function CoreCapabilities() {
 
         {/* Capability cards grid */}
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {capabilities.map(({ icon: Icon, title, description }, index) => (
+          {capabilities.map(({ icon: Icon, title, description }) => (
             <MotionCard
               key={title}
-              delay={index * 0.06}
               className="rounded-xl bg-green-50 p-6 md:pr-16 transition-colors"
             >
               <div className="mb-3 inline-flex rounded-xl bg-background p-2">

@@ -7,7 +7,7 @@ export default function JoinHero() {
     <BackgroundSection
       imageSrc="/join-hero-bg.jpg"
       imageAlt="People working in a greenhouse"
-      overlayColor="bg-[#041A08]/60"
+      overlayColor="bg-primary-darker/60"
       height="h-screen"
     >
       <h1 className="max-w-3xl text-4xl font-bold text-background md:text-5xl">

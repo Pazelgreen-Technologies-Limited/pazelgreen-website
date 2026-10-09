@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import ContactHeader from "./_components/ContactHeader";
-import ContactForm, {
-  type StakeholderType,
-} from "./_components/ContactForm";
+import ContactForm, { type StakeholderType } from "./_components/ContactForm";
 import ContactAside from "./_components/ContactAside";
+import { FadeIn } from "@/components/FadeIn";
 
 export const metadata: Metadata = {
   title: "Talk to Us | Pazelgreen Technologies",
@@ -45,12 +44,12 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
     <main className="space-y-16 pt-28 pb-12 md:pt-32 md:pb-20">
       <ContactHeader />
 
-      <section className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <FadeIn as="section" className="mx-auto max-w-300 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
           <ContactForm initialStakeholderType={initialStakeholderType} />
           <ContactAside />
         </div>
-      </section>
+      </FadeIn>
     </main>
   );
 }

@@ -43,17 +43,17 @@ const values = [
 
 export default function CoreValuesSection() {
   return (
-    <section className="bg-background px-6 py-16 md:py-24 font-sans text-gray-900">
+    <section className="bg-background px-6 py-16 md:py-24 font-sans text-foreground">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-primary-lighter px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <span>★</span> Core Values
           </p>
-          <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
             Core values that guide how we build.
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-600 md:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
             Our values guide every decision, every solution, and every system we
             build at Pazelgreen.
           </p>
@@ -68,30 +68,29 @@ export default function CoreValuesSection() {
                 key={title}
                 className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-background shadow-lg"
-                    : "border-green-100 bg-background"
+                    ? "border-transparent bg-primary-darker text-inverse-foreground shadow-lg"
+                    : "border-border bg-background"
                 }`}
               >
                 <div
                   className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                    highlighted ? "bg-green-700" : "bg-green-50"
+                    highlighted ? "bg-primary-dark" : "bg-primary-lighter"
                   }`}
                 >
-                  <Icon
-                    size={22}
-                    className="text-primary transition-transform duration-300 group-hover:-rotate-12"
-                  />
+                  <Icon size={22} className="text-primary" />
                 </div>
                 <h3
                   className={`text-base font-bold md:text-lg ${
-                    highlighted ? "text-background" : "text-gray-900"
+                    highlighted ? "text-inverse-foreground" : "text-foreground"
                   }`}
                 >
                   {title}
                 </h3>
                 <p
                   className={`mt-3 text-sm md:text-base ${
-                    highlighted ? "text-green-50" : "text-gray-600"
+                    highlighted
+                      ? "text-inverse-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {description}
@@ -105,18 +104,15 @@ export default function CoreValuesSection() {
           {values.slice(3).map(({ icon: Icon, title, description }) => (
             <MotionCard
               key={title}
-              className="group rounded-2xl border border-green-100 bg-background p-6 md:p-8 transition-colors hover:border-green-200"
+              className="group rounded-2xl border border-border bg-background p-6 md:p-8 transition-colors hover:border-primary-surface"
             >
-              <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-50">
-                <Icon
-                  size={22}
-                  className="text-primary transition-transform duration-300 group-hover:-rotate-12"
-                />
+              <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-lighter">
+                <Icon size={22} className="text-primary" />
               </div>
-              <h3 className="text-base font-bold text-gray-900 md:text-lg">
+              <h3 className="text-base font-bold text-foreground md:text-lg">
                 {title}
               </h3>
-              <p className="mt-3 text-sm text-gray-600 md:text-base">
+              <p className="mt-3 text-sm text-muted-foreground md:text-base">
                 {description}
               </p>
             </MotionCard>

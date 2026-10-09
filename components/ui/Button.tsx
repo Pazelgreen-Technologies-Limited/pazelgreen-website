@@ -39,7 +39,7 @@ export default function Button({
   disabled = false,
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-[color,background-color,border-color,transform,opacity] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60";
+    "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-colors duration-150 ease-out disabled:pointer-events-none disabled:opacity-60";
   const styles = `${base} ${variantStyles[variant]} ${className}`;
 
   // Render as a link if href is provided
@@ -54,7 +54,12 @@ export default function Button({
 
   // Otherwise render as a button element
   return (
-    <button type={type} onClick={onClick} disabled={disabled} className={styles}>
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={styles}
+    >
       {children}
       {showArrow && <ArrowRight size={16} />}
     </button>

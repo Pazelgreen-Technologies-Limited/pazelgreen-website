@@ -6,7 +6,7 @@ export default function ImpactBanner() {
     <BackgroundSection
       imageSrc="/impact-bg.jpg"
       imageAlt="Close-up of green leaves"
-      overlayColor="bg-gradient-to-b from-[#052E16]/0 to-[#14532D]/70"
+      overlayColor="bg-gradient-to-b from-primary-darker/0 to-primary-darker/70"
       height="h-[500px]"
     >
       <h2 className="max-w-xl text-4xl font-bold text-background md:text-3xl">

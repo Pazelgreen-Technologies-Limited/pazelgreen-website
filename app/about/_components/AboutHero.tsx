@@ -17,7 +17,7 @@ export default function AboutHero() {
         className="hero-image-enter object-cover"
       />
       {/* Dark green overlay for text readability, mirrors ContactHero/JoinHero */}
-      <div className="absolute inset-0 bg-green-950/85" />
+      <div className="absolute inset-0 bg-primary-darker/85" />
 
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
@@ -31,7 +31,7 @@ export default function AboutHero() {
           About Pazelgreen
         </h1>
 
-        <p className="hero-enter hero-enter-3 mt-5 max-w-2xl text-sm text-gray-200 md:text-base">
+        <p className="hero-enter hero-enter-3 mt-5 max-w-2xl text-sm text-inverse-foreground/80 md:text-base">
           Pazelgreen is an agritech innovation company creating solutions that
           strengthen agricultural systems, reduce inefficiencies, and drive
           sustainable development across emerging markets.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import InsightsExplorer from "./_components/InsightsExplorer";
+import { FadeIn } from "@/components/FadeIn";
 
 export const metadata: Metadata = {
   title: "Agricultural Market Insights | Pazelgreen Technologies",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function InsightsPage() {
   return (
     <main className="space-y-16 pt-28 pb-12 md:pt-32 md:pb-20">
-      <section className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <FadeIn as="section" className="mx-auto max-w-300 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl space-y-5">
           <span className="text-xs font-bold uppercase tracking-wider text-primary/70">
             Research & Intelligence
@@ -27,9 +28,11 @@ export default function InsightsPage() {
             publication.
           </p>
         </div>
-      </section>
+      </FadeIn>
 
-      <InsightsExplorer />
+      <FadeIn as="div">
+        <InsightsExplorer />
+      </FadeIn>
     </main>
   );
 }

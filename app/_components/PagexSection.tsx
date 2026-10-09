@@ -32,10 +32,9 @@ export default function PagexSection() {
 
         {/* Feature checklist */}
         <div className="mt-8 flex flex-col items-center gap-4 justify-between md:flex-row ">
-          {pagexFeatures.map((feature, index) => (
+          {pagexFeatures.map((feature) => (
             <MotionCard
               key={feature}
-              delay={index * 0.06}
               className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-primary px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
             >
               <div className="flex items-start gap-2 px-2 justify-center">

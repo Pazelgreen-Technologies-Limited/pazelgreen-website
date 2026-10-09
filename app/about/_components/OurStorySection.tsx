@@ -44,19 +44,19 @@ export default function OurStorySection() {
   return (
     <section
       id="our-story"
-      className="bg-green-50 px-6 py-16 md:py-24 font-sans text-gray-900"
+      className="bg-primary-lighter px-6 py-16 md:py-24 font-sans text-foreground"
     >
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             Our Story
           </p>
-          <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
             From a critical observation to a broader innovation journey.
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-600 md:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
             Pazelgreen began with a simple but important question: how can
             agricultural systems become more efficient, coordinated, and
             valuable?
@@ -71,21 +71,18 @@ export default function OurStorySection() {
                 key={tag}
                 className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-background shadow-lg"
-                    : "border-green-100 bg-background"
+                    ? "border-transparent bg-primary-darker text-inverse-foreground shadow-lg"
+                    : "border-border bg-background"
                 }`}
               >
                 {/* Tag with icon */}
                 <div className="mb-6 flex items-center gap-2">
                   <div
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-                      highlighted ? "bg-green-700" : "bg-green-50"
+                      highlighted ? "bg-primary-dark" : "bg-primary-lighter"
                     }`}
                   >
-                    <Icon
-                      size={18}
-                      className="text-primary transition-transform duration-300 group-hover:-rotate-12"
-                    />
+                    <Icon size={18} className="text-primary" />
                   </div>
                   <span
                     className={`text-xs font-bold tracking-widest uppercase ${
@@ -98,14 +95,16 @@ export default function OurStorySection() {
 
                 <h3
                   className={`text-lg font-bold md:text-xl ${
-                    highlighted ? "text-background" : "text-gray-900"
+                    highlighted ? "text-inverse-foreground" : "text-foreground"
                   }`}
                 >
                   {title}
                 </h3>
                 <p
                   className={`mt-3 text-sm md:text-base ${
-                    highlighted ? "text-green-50" : "text-gray-600"
+                    highlighted
+                      ? "text-inverse-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {description}

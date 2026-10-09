@@ -69,7 +69,7 @@ export const FadeIn: React.FC<FadeInProps> = ({
     );
   }
 
-  const initialTransform = direction === "up" ? "translate-y-6" : "";
+  const initialTransform = direction === "up" ? "translate-y-4" : "";
 
   return (
     <Component
@@ -78,7 +78,7 @@ export const FadeIn: React.FC<FadeInProps> = ({
         transitionDuration: `${duration}ms`,
         transitionDelay: `${delay}ms`,
       }}
-      className={`transition-all ease-out ${
+      className={`transition-[opacity,transform] ease-out ${
         isVisible
           ? "opacity-100 translate-y-0"
           : `opacity-0 ${initialTransform}`

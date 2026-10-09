@@ -13,7 +13,7 @@ export default function CommitmentSection() {
         className="object-cover"
       />
       {/* Dark green overlay for text readability */}
-      <div className="absolute inset-0 bg-green-950/75" />
+      <div className="absolute inset-0 bg-primary-darker/75" />
 
       {/* Section content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">

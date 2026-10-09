@@ -22,16 +22,16 @@ const whyJoinUs = [
 export default function CareersSection() {
   return (
     <section className="bg-background px-6 py-16">
-      <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
+      <div className="mx-auto max-w-5xl rounded-2xl bg-background-alt p-8 shadow-md shadow-primary-darker/10 md:p-12">
         {/* Section heading */}
         <div className="text-center">
-          <h3 className="text-normal font-extrabold tracking-wide text-orange-500">
+          <h3 className="text-normal font-extrabold tracking-wide text-accent">
             Join the core team
           </h3>
-          <h2 className="mt-2 text-2xl font-extrabold text-gray-900 md:text-4xl">
+          <h2 className="mt-2 text-2xl font-extrabold text-foreground md:text-4xl">
             Careers at Pazelgreen
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
             We&apos;re building a team of innovators, technologists, and
             agriculture enthusiasts who share our passion for sustainable
             farming. We offer competitive compensation, professional growth, and
@@ -40,10 +40,10 @@ export default function CareersSection() {
           {/* View positions CTA */}
           <Link
             href="/join-us/careers"
-            className="mt-4 inline-flex items-center gap-1 text-2xl font-bold text-green-800 hover:underline"
+            className="mt-4 inline-flex items-center gap-1 text-2xl font-bold text-primary-darker hover:underline"
           >
             View Open Positions{" "}
-            <span className="bg-[#17913B33] p-2 rounded-full">
+            <span className="rounded-full bg-primary/20 p-2">
               <ArrowRight size={16} />
             </span>
           </Link>
@@ -52,12 +52,12 @@ export default function CareersSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Current Openings card */}
-          <MotionCard className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
+          <MotionCard className="rounded-xl bg-primary-lighter p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-background p-2">
-              <Briefcase size={24} className="text-green-600" />
+              <Briefcase size={24} className="text-primary" />
             </div>
             <div className="pr-20">
-              <h4 className="text-normal font-bold text-gray-900">
+              <h4 className="text-normal font-bold text-foreground">
                 Current Openings
               </h4>
             </div>
@@ -66,9 +66,9 @@ export default function CareersSection() {
               {openings.map((role) => (
                 <li
                   key={role}
-                  className="flex items-center gap-2 text-sm text-gray-600"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   {role}
                 </li>
               ))}
@@ -76,23 +76,20 @@ export default function CareersSection() {
           </MotionCard>
 
           {/* Why Join Us card */}
-          <MotionCard
-            delay={0.06}
-            className="rounded-xl bg-green-50 p-6 pr-16 transition-colors"
-          >
+          <MotionCard className="rounded-xl bg-primary-lighter p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-background p-2">
-              <Star size={24} className="text-green-600" />
+              <Star size={24} className="text-primary" />
             </div>
-            <h3 className="text-normal font-bold text-gray-900">
+            <h3 className="text-normal font-bold text-foreground">
               Why Join Us?
             </h3>
             <ul className="mt-2 space-y-2">
               {whyJoinUs.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-2 text-sm text-gray-600"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   {item}
                 </li>
               ))}

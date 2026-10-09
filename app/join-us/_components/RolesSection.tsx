@@ -40,55 +40,52 @@ export default function RolesSection() {
     <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Tagline */}
-        <h2 className="text-center text-5xl font-bold text-gray-900 md:text-3xl">
+        <h2 className="text-center text-5xl font-bold text-foreground md:text-3xl">
           Whether you&apos;re an innovator, creator, or advocate, there&apos;s a
           place for you here.
         </h2>
 
         {/* Role cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-          {roles.map(
-            ({ icon: Icon, tag, title, description, cta, href }, index) => (
-              <MotionCard
-                key={title}
-                delay={index * 0.06}
-                className="flex flex-col rounded-2xl border border-gray-100 p-6"
-              >
-                {/* Icon */}
-                <div className="mb-3 inline-flex rounded-xl bg-green-50 p-3 w-fit">
-                  <Icon size={22} className="text-green-600" />
-                </div>
+          {roles.map(({ icon: Icon, tag, title, description, cta, href }) => (
+            <MotionCard
+              key={title}
+              className="flex flex-col rounded-2xl border border-border p-6"
+            >
+              {/* Icon */}
+              <div className="mb-3 inline-flex w-fit rounded-xl bg-primary-lighter p-3">
+                <Icon size={22} className="text-primary" />
+              </div>
 
-                {/* Tag */}
-                <p className="text-xs text-gray-400">{tag}</p>
+              {/* Tag */}
+              <p className="text-xs text-border-strong">{tag}</p>
 
-                {/* Title with orange plus prefix */}
-                <h3 className="mt-1 flex items-center gap-1 text-base font-semibold text-gray-900">
-                  <span className="text-orange-500">
-                    {" "}
-                    <ArrowRight size={14} />{" "}
-                  </span>{" "}
-                  {title}
-                </h3>
+              {/* Title with orange plus prefix */}
+              <h3 className="mt-1 flex items-center gap-1 text-base font-semibold text-foreground">
+                <span className="text-accent">
+                  {" "}
+                  <ArrowRight size={14} />{" "}
+                </span>{" "}
+                {title}
+              </h3>
 
-                <p className="mt-2 flex-1 text-sm text-gray-600">
-                  {description}
-                </p>
+              <p className="mt-2 flex-1 text-sm text-muted-foreground">
+                {description}
+              </p>
 
-                {/* CTA button at bottom of card */}
-                <div className="mt-6">
-                  <Button
-                    href={href}
-                    variant="solid"
-                    showArrow
-                    className="w-full justify-center"
-                  >
-                    {cta}
-                  </Button>
-                </div>
-              </MotionCard>
-            ),
-          )}
+              {/* CTA button at bottom of card */}
+              <div className="mt-6">
+                <Button
+                  href={href}
+                  variant="solid"
+                  showArrow
+                  className="w-full justify-center"
+                >
+                  {cta}
+                </Button>
+              </div>
+            </MotionCard>
+          ))}
         </div>
       </div>
     </section>

@@ -4,11 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Search, Clock, ArrowRight, X, BookOpen } from "lucide-react";
 import Button from "@/components/ui/Button";
-import {
-  categories,
-  insights,
-  type InsightArticle,
-} from "./insights-data";
+import { categories, insights, type InsightArticle } from "./insights-data";
 
 export default function InsightsExplorer() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -29,7 +25,7 @@ export default function InsightsExplorer() {
   return (
     <>
       {/* Filter & search */}
-      <section className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <section className="mx-auto mt-12 max-w-300 px-4 sm:px-6 lg:px-8">
         <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-primary-darker/10 bg-card p-4 shadow-sm sm:flex-row">
           <div className="flex w-full flex-wrap items-center gap-1.5 sm:w-auto">
             {categories.map((cat) => (
@@ -62,7 +58,7 @@ export default function InsightsExplorer() {
       </section>
 
       {/* Articles grid */}
-      <section className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-300 px-4 sm:px-6 lg:px-8">
         {filteredArticles.length === 0 ? (
           <div className="rounded-2xl border border-primary-darker/10 bg-card p-8 py-16 text-center text-sm text-muted-foreground">
             No insights found matching your search criteria.
@@ -81,16 +77,16 @@ export default function InsightsExplorer() {
                 }}
                 tabIndex={0}
                 role="button"
-                className="group flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-primary-darker/10 bg-card shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+                className="group flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-primary-darker/10 bg-card transition-colors hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 <div className="space-y-4">
-                  <div className="relative aspect-[16/10] overflow-hidden">
+                  <div className="relative aspect-16/10 overflow-hidden">
                     <Image
                       src={article.image}
                       alt={article.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     />
                   </div>
 
@@ -208,7 +204,9 @@ function ArticleModal({
                 <div className="font-bold text-primary-darker">
                   {article.author.name}
                 </div>
-                <div className="text-muted-foreground">{article.author.role}</div>
+                <div className="text-muted-foreground">
+                  {article.author.role}
+                </div>
               </div>
             </div>
           </div>
