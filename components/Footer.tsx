@@ -22,7 +22,7 @@ const solutionLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-background px-6 py-12 text-gray-900">
+    <footer className="bg-foreground px-6 py-12 text-inverse-foreground">
       <div className="mx-auto max-w-7xl">
         {/* Top grid: brand, company links, solutions, newsletter */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
@@ -35,30 +35,30 @@ export default function Footer() {
                 width={32}
                 height={32}
               />
-              <span className="text-base font-extrabold text-foreground">
+              <span className="text-base font-extrabold text-primary-light">
                 Pazelgreen
               </span>
             </div>
-            <p className="mb-4 text-sm">
+            <p className="mb-4 text-sm text-inverse-foreground/90">
               Transforming agricultural value chains through innovative
               technology solutions. Building a sustainable future for farmers
               worldwide.
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
-                <span className="bg-primary/20 text-primary p-2 rounded-md">
+                <span className="rounded-md bg-primary-light p-2 text-foreground">
                   <Mail size={16} />
                 </span>{" "}
                 Pazelgreentech@gmail.com
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-primary/20 text-primary p-2 rounded-md">
+                <span className="rounded-md bg-primary-light p-2 text-foreground">
                   <Phone size={16} />
                 </span>{" "}
                 +234 813 381 1594
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-primary/20 text-primary p-2 rounded-md">
+                <span className="rounded-md bg-primary-light p-2 text-foreground">
                   <MapPin size={16} />
                 </span>{" "}
                 Ikorodu, Lagos Nigeria
@@ -68,13 +68,16 @@ export default function Footer() {
 
           {/* Company links */}
           <div>
-            <h3 className="mb-3 text-base font-extrabold text-foreground">
+            <h3 className="mb-3 text-base font-extrabold text-primary-light">
               Company
             </h3>
             <ul className="space-y-2 text-sm">
               {companyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="hover:text-green-400">
+                  <Link
+                    href={link.href}
+                    className="transition-colors hover:text-primary-light"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -84,13 +87,16 @@ export default function Footer() {
 
           {/* Solutions links */}
           <div>
-            <h3 className="mb-3 text-base font-extrabold text-foreground">
+            <h3 className="mb-3 text-base font-extrabold text-primary-light">
               Solutions
             </h3>
             <ul className="space-y-2 text-sm">
               {solutionLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="hover:text-green-400">
+                  <Link
+                    href={link.href}
+                    className="transition-colors hover:text-primary-light"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -100,10 +106,10 @@ export default function Footer() {
 
           {/* Newsletter signup */}
           <div>
-            <h3 className="mb-3 text-base font-extrabold text-foreground">
+            <h3 className="mb-3 text-base font-extrabold text-primary-light">
               Stay Connected
             </h3>
-            <p className="mb-3 text-sm">
+            <p className="mb-3 text-sm text-inverse-foreground/90">
               Get the latest insights, reports and infrastructure updates for
               investors, agribusinesses, and ecosystem partners.
             </p>
@@ -111,17 +117,16 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full rounded-l-xl bg-gray-200 px-3 py-2 text-sm text-gray-800 outline-none"
+                className="w-full rounded-l-xl bg-card px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
               <button
                 type="submit"
-                /* Changed rounded-md to rounded-r-md (right corners only) */
-                className="rounded-r-xl bg-green-500 px-4 py-2 text-sm font-medium text-background hover:bg-green-600 flex items-center justify-center"
+                className="flex items-center justify-center rounded-r-xl bg-primary px-4 py-2 text-sm font-medium text-inverse-foreground transition-colors hover:bg-primary-hover"
               >
                 →
               </button>
             </form>
-            <p className="mt-3 text-xs">
+            <p className="mt-3 text-xs text-inverse-foreground/60">
               Trusted by agricultural investors, trade networks and
               sustainability leaders
             </p>
@@ -129,9 +134,9 @@ export default function Footer() {
         </div>
 
         {/* Social icons */}
-        <div className="flex flex-col items-center justify-between gap-4 mt-10 pt-6 border-t border-primary md:flex-row">
-          <div className="">
-            <p className="mb-3 text-sm font-extrabold text-foreground">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-inverse-foreground/15 pt-6 md:flex-row">
+          <div>
+            <p className="mb-3 text-sm font-extrabold text-primary-light">
               CONNECT WITH US
             </p>
             <div className="flex gap-4">
@@ -140,7 +145,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="rounded-full bg-primary/10 p-2 hover:bg-primary/20 text-primary transition-colors"
+                  className="rounded-full bg-primary-light p-2.5 text-foreground transition-colors hover:bg-primary-hover"
                 >
                   <Icon size={16} />
                 </Link>
@@ -148,52 +153,62 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="text-foreground flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-700">
+          <div className="flex flex-col items-center justify-between gap-6 divide-y divide-inverse-foreground/15 text-primary-light sm:flex-row sm:gap-0 sm:divide-x sm:divide-y-0">
             {/* Item 1: ISO Certified */}
-            <div className="w-full sm:w-1/3 flex items-center justify-center gap-2 px-4">
-              <span className="text-3xl font-foreground tracking-tighter text-primary leading-none">
+            <div className="flex w-full items-center justify-center gap-2 px-4 sm:w-1/3">
+              <span className="text-3xl leading-none tracking-tighter text-primary-light">
                 ISO
               </span>
               <div className="flex flex-col text-left leading-tight">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                <span className="text-xs font-bold tracking-wider text-primary-light uppercase">
                   Certified
                 </span>
-                <span className="text-[10px]  font-medium">9001:2015</span>
+                <span className="text-[10px] font-medium text-inverse-foreground/80">
+                  9001:2015
+                </span>
               </div>
             </div>
 
             {/* Item 2: 100% Secure */}
-            <div className="w-full sm:w-1/3 flex items-center justify-center gap-3 px-4 pt-4 sm:pt-0">
-              {/* Optional: Add a lock icon here from lucide-react if you want */}
+            <div className="flex w-full items-center justify-center gap-3 px-4 pt-4 sm:w-1/3 sm:pt-0">
               <div className="flex flex-col text-center sm:text-left">
-                <span className="text-sm font-bold tracking-wide uppercase text-primary">
+                <span className="text-sm font-bold tracking-wide text-primary-light uppercase">
                   100% Secure
                 </span>
-                <span className="text-xs ">Encrypted Payments</span>
+                <span className="text-xs text-inverse-foreground/80">
+                  Encrypted Payments
+                </span>
               </div>
             </div>
 
             {/* Item 3: 24/7 Support */}
-            <div className="w-full sm:w-1/3 flex items-center justify-center gap-3 px-4 pt-4 sm:pt-0">
+            <div className="flex w-full items-center justify-center gap-3 px-4 pt-4 sm:w-1/3 sm:pt-0">
               <div className="flex flex-col text-center sm:text-left">
-                <span className="text-sm font-bold tracking-wide uppercase text-primary">
+                <span className="text-sm font-bold tracking-wide text-primary-light uppercase">
                   24/7 Support
                 </span>
-                <span className="text-xs ">Dedicated Assistance</span>
+                <span className="text-xs text-inverse-foreground/80">
+                  Dedicated Assistance
+                </span>
               </div>
             </div>
-            {/* hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh */}
           </div>
         </div>
 
         {/* Bottom bar: copyright + legal links */}
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-primary-dark pt-6 text-xs text-gray-500 md:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-inverse-foreground/15 pt-6 text-xs text-inverse-foreground/60 md:flex-row">
           <p>© 2026 Pazelgreen Technologies. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/privacy-policy" className="hover:text-green-400">
+            <Link
+              href="/privacy-policy"
+              className="transition-colors hover:text-primary-light"
+            >
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:text-green-400">
+            <Link
+              href="/terms-of-service"
+              className="transition-colors hover:text-primary-light"
+            >
               Terms of Service
             </Link>
           </div>
