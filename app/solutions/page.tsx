@@ -1,17 +1,22 @@
-import SolutionHero from "./_components/SolutionHero";
-import EcosystemSection from "./_components/EcosystemSection";
-import PagexFeature from "./_components/PagexFeature";
-import WhyItMatters from "./_components/WhyItMatters";
-import SolutionCTA from "./_components/SolutionCTA";
+import type { Metadata } from "next";
+import SolutionsHeader from "./_components/SolutionsHeader";
+import SolutionPillars from "./_components/SolutionPillars";
+import SolutionsCTA from "./_components/SolutionsCTA";
+
+export const metadata: Metadata = {
+  title: "Strategic Solutions | Pazelgreen Technologies",
+  description:
+    "Explore Pazelgreen's comprehensive solutions: Market Coordination, Post-Harvest Waste Reduction, Capacity Building, and Data & Intelligence for African agriculture.",
+};
 
 export default function SolutionPage() {
   return (
-    <main>
-      <SolutionHero />
-      <EcosystemSection />
-      <PagexFeature />
-      <WhyItMatters />
-      <SolutionCTA />
+    <main className="space-y-20 pt-28 pb-12 md:pt-32 md:pb-20">
+      <SolutionsHeader />
+      <SolutionPillars />
+      <div className="bg-primary-surface/40 p-8 sm:p-12">
+        <SolutionsCTA />
+      </div>
     </main>
   );
 }
