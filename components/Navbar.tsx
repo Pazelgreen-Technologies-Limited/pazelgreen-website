@@ -3,30 +3,47 @@
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 // Nav links shown on desktop
 const navLinks = [
-  { label: "Home", href: "/" },
   { label: "Solution", href: "/solutions" },
   { label: "About Us", href: "/about" },
   { label: "Insight", href: "/insights" },
   { label: "Join Us", href: "/join-us" },
-  { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   // Controls whether the mobile menu is open or closed
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 w-full mt-4 z-50 text-background font-sans">
+    <header
+      className={`fixed top-0 z-50 w-full font-sans text-background transition-[margin] duration-300 ease-out ${
+        isScrolled ? "mt-0" : "mt-4"
+      }`}
+    >
       <div className="bg-[#041a0899] px-6 py-4 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between">
           {/* Logo + brand name */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2"
+            onClick={() => setIsOpen(false)}
+          >
             <Image
               src="/logo.png"
               alt="Pazelgreen logo"
@@ -59,8 +76,8 @@ export default function Navbar() {
               );
             })}
             {/* CTA button */}
-            <Button href="/get-started" variant="solid">
-              Get Started
+            <Button href="/contact" variant="solid">
+              Talk to Us
             </Button>
           </ul>
           {/* ── Hamburger button — visible only on mobile ── */}
@@ -109,7 +126,7 @@ export default function Navbar() {
         {/* ========================================= */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden
-          ${isOpen ? "max-h-96 border-t border-gray-800" : "max-h-0"}`}
+          ${isOpen ? "max-h-96 " : "max-h-0"}`}
         >
           <ul className="flex flex-col px-6 py-4 gap-4">
             {navLinks.map((link, index) => {
@@ -149,11 +166,11 @@ export default function Navbar() {
               }}
             >
               <Button
-                href="/get-started"
+                href="/contact"
                 variant="solid"
                 onClick={() => setIsOpen(false)}
               >
-                Get Started
+                Talk to Us
               </Button>
             </li>
           </ul>
