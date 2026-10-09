@@ -17,13 +17,14 @@ interface ButtonProps {
 // Variant styles map
 const variantStyles: Record<ButtonVariant, string> = {
   // Green filled — primary CTA
-  solid: "bg-brand text-white hover:bg-brand-dark",
+  solid: "bg-primary text-background hover:bg-primary-dark",
   // White filled — on dark backgrounds
-  white: "bg-white text-gray-900 hover:bg-gray-100",
+  white: "bg-background text-gray-900 hover:bg-gray-100",
   // White border — secondary on dark backgrounds
-  outline: "border border-white text-white hover:bg-white/10",
+  outline: "border border-background text-background hover:bg-background/10",
   // Light border — secondary on light backgrounds
-  ghost: "bg-[#FFFFFF3D] border border-gray-300 text-white hover:bg-gray-500",
+  ghost:
+    "bg-[#FFFFFF3D] border border-gray-300 text-background hover:bg-gray-500",
 };
 
 export default function Button({

@@ -30,11 +30,11 @@ const principles = [
 
 export default function OurApproachSection() {
   return (
-    <section className="bg-white px-6 py-16 md:py-24 font-sans text-gray-900">
+    <section className="bg-background px-6 py-16 md:py-24 font-sans text-gray-900">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-brand uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <span>🌱</span> Our Approach
           </p>
           <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
@@ -55,28 +55,28 @@ export default function OurApproachSection() {
                 tiltOnHover
                 className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-white shadow-lg"
+                    ? "border-transparent bg-green-800 text-background shadow-lg"
                     : "border-green-100 bg-green-50"
                 }`}
               >
                 <div
                   className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:rotate-8 ${
                     highlighted
-                      ? "bg-white/5 border border-white/50"
+                      ? "bg-background/5 border border-background/50"
                       : "bg-green-800/15"
                   }`}
                 >
-                  <Icon size={22} className="text-brand" />
+                  <Icon size={22} className="text-primary" />
                 </div>
                 {/* Green accent bar — only the highlighted middle card has the dark bar */}
                 <div
                   className={`mb-4 h-1 w-12 rounded-full ${
-                    highlighted ? "bg-brand" : "bg-brand"
+                    highlighted ? "bg-primary" : "bg-primary"
                   }`}
                 />
                 <h3
                   className={`text-base font-semibold transition-[font-weight] group-hover:font-bold md:text-lg ${
-                    highlighted ? "text-white" : "text-gray-900"
+                    highlighted ? "text-background" : "text-gray-900"
                   }`}
                 >
                   {title}
@@ -94,11 +94,11 @@ export default function OurApproachSection() {
                     <div className="mt-auto pt-6">
                       <div
                         className={`h-px w-full ${
-                          highlighted ? "bg-white/20" : "bg-gray-200"
+                          highlighted ? "bg-background/20" : "bg-gray-200"
                         }`}
                       />
                     </div>
-                    <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-brand">
+                    <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-primary">
                       <span>⚡</span> {footerTag}
                     </p>
                   </>

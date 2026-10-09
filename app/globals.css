@@ -1,21 +1,122 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #121212;
+@layer base {
+  :root {
+    /* --- Raw Color Palette --- */
+    /* Primary Brand Green Scale */
+    --raw-primary-50: #f0fdf4;
+    --raw-primary-100: #e1f8e3;
+    --raw-primary-200: #c8efcb; /* Sage Surface */
+    --raw-primary-300: #7dd684;
+    --raw-primary-500: #12ab17; /* Designer Primary Green */
+    --raw-primary-600: #0f9a14;
+    --raw-primary-700: #0b7a10;
+    --raw-primary-900: #0a4d1c; /* Designer Deep Dark Green */
+
+    /* Accent Orange Scale */
+    --raw-accent-50: #fffbf5;
+    --raw-accent-100: #fef0d9;
+    --raw-accent-500: #d97706; /* Designer Accent Orange */
+    --raw-accent-600: #cc6c05;
+    --raw-accent-700: #9a4d04;
+
+    /* Neutral Base Scale */
+    --raw-neutral-50: #fcfbf8; /* Elevated Card Surface */
+    --raw-neutral-100: #f7f5ef; /* Sand Body Canvas */
+    --raw-neutral-200: #ece9de; /* Muted Sand Container Surface */
+    --raw-neutral-300: #c9dccb; /* Sage Border Line */
+    --raw-neutral-500: #7c8b82;
+    --raw-neutral-700: #4f5e56; /* Charcoal Muted Text */
+    --raw-neutral-900: #14201a; /* Charcoal Main Text */
+
+    /* --- Semantic Design Tokens --- */
+    --primary: var(--raw-primary-500);
+    --primary-hover: var(--raw-primary-600);
+    --primary-light: var(--raw-primary-300);
+    --primary-lighter: var(--raw-primary-50);
+    --primary-dark: var(--raw-primary-700);
+    --primary-darker: var(--raw-primary-900); /* #0A4D1C */
+    --primary-surface: var(--raw-primary-200); /* Sage surface */
+
+    --accent: var(--raw-accent-500);
+    --accent-hover: var(--raw-accent-600);
+    --accent-light: var(--raw-accent-100);
+    --accent-dark: var(--raw-accent-700);
+    --accent-surface: var(--raw-neutral-100); /* Sand surface */
+
+    /* Next.js / Tailwind Classic Dual Neutral Tokens */
+    --background: var(--raw-neutral-100); /* Sand canvas */
+    --background-alt: var(--raw-neutral-200); /* Muted sand surface */
+    --card: var(--raw-neutral-50); /* Card fill */
+
+    --foreground: var(--raw-neutral-900); /* Charcoal body text */
+    --muted-foreground: var(--raw-neutral-700); /* Charcoal muted text */
+    --inverse-foreground: var(--raw-neutral-100); /* Light text on dark bg */
+
+    --on-primary: var(--raw-neutral-900);
+    --on-accent: var(--raw-neutral-900);
+
+    --border: var(--raw-neutral-300); /* Sage border */
+    --border-strong: var(--raw-neutral-500);
+
+    /* Feedback Status Tokens */
+    --success: #0b7d58;
+    --warning: #f2c230;
+    --error: #c62a2a;
+    --info: #2563c8;
+  }
+
+  /* Optional Dark Theme Overrides */
+  /* .dark {
+    --background:         var(--raw-primary-900);
+    --background-alt:     #073B15;
+    --card:               #0D5B22;
+    --foreground:         var(--raw-neutral-100);
+    --muted-foreground:   var(--raw-primary-300);
+    --inverse-foreground: var(--raw-primary-900);
+    --border:             var(--raw-primary-700);
+  } */
 }
 
 @theme {
+  /* Colors -> Creates bg-*, text-*, border-*, ring-* utilities */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-primary-lighter: var(--primary-lighter);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-darker: var(--primary-darker);
+  --color-primary-surface: var(--primary-surface);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-surface: var(--accent-surface);
+
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-card: var(--card);
+
   --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-inverse-foreground: var(--inverse-foreground);
+
+  --color-on-primary: var(--on-primary);
+  --color-on-accent: var(--on-accent);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
   --font-sans: var(--font-nunito), sans-serif;
   --font-inter: var(--font-inter), sans-serif;
   --font-mono: var(--font-geist-mono);
-  --color-brand: #12ab17;
-  --color-brand-dark: #379e23;
-  --color-dark-bg: #0a0a0a;
-  --color-dark-card: #171717;
-  --color-navbar: #041a0899;
+
   /* Custom aspect-ratio values used by the About page */
   --aspect-3\/4: 3 / 4;
   --aspect-4\/5: 4 / 5;
@@ -23,17 +124,36 @@
   --aspect-5\/4: 5 / 4;
 }
 
+/* ==========================================================================
+   3. GLOBAL BASE RESETS
+   ========================================================================== */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--primary-surface);
+    color: var(--primary-darker);
+  }
+}
+
+/* ======================================================================== */
+
 /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 } */
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-}
 
 @keyframes hero-enter {
   from {

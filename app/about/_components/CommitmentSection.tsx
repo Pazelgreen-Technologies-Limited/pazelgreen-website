@@ -4,7 +4,7 @@ import { BookOpen, Mail } from "lucide-react";
 
 export default function CommitmentSection() {
   return (
-    <section className="relative h-[420px] w-full overflow-hidden md:h-[500px] font-sans text-white">
+    <section className="relative h-[420px] w-full overflow-hidden md:h-[500px] font-sans text-background">
       {/* Background image — replace /about-commitment-bg.png with the exported Figma asset */}
       <Image
         src="/about-commitment-bg.png"
@@ -17,10 +17,10 @@ export default function CommitmentSection() {
 
       {/* Section content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-bold tracking-widest text-white uppercase">
+        <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-background/20 bg-background/10 px-4 py-1.5 text-xs font-bold tracking-widest text-background uppercase">
           <span>🌱</span> Our Commitment
         </p>
-        <h2 className="max-w-3xl text-3xl font-extrabold text-white md:text-4xl lg:text-5xl">
+        <h2 className="max-w-3xl text-3xl font-extrabold text-background md:text-4xl lg:text-5xl">
           Shaping a more connected and resilient agricultural future.
         </h2>
 

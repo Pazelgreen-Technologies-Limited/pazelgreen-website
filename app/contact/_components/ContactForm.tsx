@@ -39,7 +39,7 @@ export default function ContactForm() {
       <div className="mx-auto max-w-5xl">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* ── Left column: contact form ── */}
-          <div className="rounded-2xl bg-white p-8 shadow-sm">
+          <div className="rounded-2xl bg-background p-8 shadow-sm">
             {/* Form header */}
             <p className="mb-1 flex items-center gap-2 text-xs font-semibold text-green-500">
               <span className="h-px w-6 bg-green-400" /> GET IN TOUCH
@@ -164,7 +164,7 @@ export default function ContactForm() {
                 key={title}
                 className="flex gap-4 rounded-xl bg-green-50 p-4"
               >
-                <div className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                <div className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background">
                   <Icon size={16} className="text-green-900" />
                 </div>
                 <div>
@@ -181,7 +181,7 @@ export default function ContactForm() {
             ))}
 
             {/* Connect with Pazelgreen dark card */}
-            <div className="rounded-xl bg-green-900 p-6 text-white">
+            <div className="rounded-xl bg-green-900 p-6 text-background">
               <p className="mb-1 flex items-center gap-2 text-xs font-semibold text-green-300">
                 <span className="h-px w-6 bg-green-400" /> FOLLOW US
               </p>
@@ -199,8 +199,8 @@ export default function ContactForm() {
                     aria-label={label}
                     className={`rounded-full p-2 transition-colors hover:bg-green-800/50 focus:outline-none focus:ring-2 focus:ring-green-400`}
                   >
-                    <div className=" rounded-full border border-white p-3">
-                      <Icon size={16} className="text-white" />
+                    <div className=" rounded-full border border-background p-3">
+                      <Icon size={16} className="text-background" />
                     </div>
                   </Link>
                 ))}

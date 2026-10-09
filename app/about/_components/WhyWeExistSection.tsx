@@ -53,7 +53,7 @@ export default function WhyWeExistSection() {
         <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2 md:gap-16">
           {/* LEFT — copy column */}
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-4 py-1.5 text-xs font-semibold tracking-widest text-brand uppercase">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
               <span>🔍</span> Why We Exist
             </p>
             <h2 className="text-3xl font-extrabold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
@@ -63,16 +63,16 @@ export default function WhyWeExistSection() {
               Agricultural systems across emerging markets continue to face
               structural inefficiencies including fragmented markets, limited
               coordination, post-harvest losses, and underutilized resources.
-              These challenges limit productivity, reduce value capture, and slow
-              sustainable development across the sector.
+              These challenges limit productivity, reduce value capture, and
+              slow sustainable development across the sector.
             </p>
 
             {/* Issue list */}
             <ul className="mt-8 space-y-5">
               {issues.map(({ icon: Icon, title, description }) => (
                 <li key={title} className="flex items-start gap-3">
-                  <div className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm">
-                    <Icon size={18} className="text-brand" />
+                  <div className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background shadow-sm">
+                    <Icon size={18} className="text-primary" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-gray-900 md:text-base">
@@ -85,9 +85,9 @@ export default function WhyWeExistSection() {
             </ul>
 
             {/* Dark green callout */}
-            <div className="mt-8 flex items-start gap-3 rounded-2xl bg-green-800 p-5 text-white shadow-lg md:p-6">
+            <div className="mt-8 flex items-start gap-3 rounded-2xl bg-green-800 p-5 text-background shadow-lg md:p-6">
               <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-700">
-                <Send size={16} className="text-brand" />
+                <Send size={16} className="text-primary" />
               </div>
               <p className="text-sm text-green-50 md:text-base">
                 Pazelgreen exists to address these gaps through innovation-led
@@ -146,9 +146,9 @@ function InsightCard({
 }) {
   return (
     <div
-      className={`rounded-xl bg-green-800/95 p-3 text-white shadow-lg backdrop-blur-sm md:p-4 ${className}`}
+      className={`rounded-xl bg-green-800/95 p-3 text-background shadow-lg backdrop-blur-sm md:p-4 ${className}`}
     >
-      <p className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-brand uppercase md:text-xs">
+      <p className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-primary uppercase md:text-xs">
         <span>📊</span> System Insight
       </p>
       <h4 className="text-sm font-bold md:text-base">{title}</h4>

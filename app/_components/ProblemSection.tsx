@@ -57,7 +57,7 @@ const features = [
 
 export default function ProblemSection() {
   return (
-    <section className="bg-gray-50 px-6 py-8 my-8 font-sans text-gray-900 md:py-16 md:my-16">
+    <section className="bg-background px-6 py-8 my-8 font-sans text-gray-900 md:py-16 md:my-16">
       <div className="mx-auto max-w-6xl">
         {/* Section heading */}
         <h1 className="text-center text-2xl font-extrabold text-gray-900 md:text-5xl">
@@ -70,7 +70,7 @@ export default function ProblemSection() {
         </p>
 
         {/* Problem statement card */}
-        <MotionCard className="mt-10 rounded-2xl bg-white p-8 text-center shadow-sm">
+        <MotionCard className="mt-10 rounded-2xl bg-background p-8 text-center shadow-sm">
           <h3 className="text-xl font-extrabold tracking-wide text-orange-500">
             Problem Statement
           </h3>
@@ -89,7 +89,7 @@ export default function ProblemSection() {
             <MotionCard
               key={title}
               delay={index * 0.05}
-              className="rounded-xl bg-white p-6 shadow-sm"
+              className="rounded-xl bg-background p-6 shadow-sm"
             >
               <Icon className="mb-3 text-green-500" size={28} />
               <p className="text-xs text-gray-400">{tag}</p>

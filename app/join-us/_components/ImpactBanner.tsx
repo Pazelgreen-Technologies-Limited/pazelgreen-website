@@ -9,10 +9,10 @@ export default function ImpactBanner() {
       overlayColor="bg-gradient-to-b from-[#052E16]/0 to-[#14532D]/70"
       height="h-[500px]"
     >
-      <h2 className="max-w-xl text-4xl font-bold text-white md:text-3xl">
+      <h2 className="max-w-xl text-4xl font-bold text-background md:text-3xl">
         Ready to Make an Impact?
       </h2>
-      <p className="mt-3 max-w-lg text-sm text-white">
+      <p className="mt-3 max-w-lg text-sm text-background">
         Get in touch with our team to explore how you can contribute to the
         future of sustainable agriculture.
       </p>

@@ -25,7 +25,7 @@ const problems = [
 
 export default function WhyItMatters() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
@@ -49,7 +49,7 @@ export default function WhyItMatters() {
               className="rounded-2xl bg-gray-50 p-6 transition-colors hover:bg-green-50"
             >
               {/* Icon badge */}
-              <div className="mb-4 inline-flex rounded-xl bg-white p-3 shadow-sm">
+              <div className="mb-4 inline-flex rounded-xl bg-background p-3 shadow-sm">
                 <Icon size={22} className="text-green-600" />
               </div>
               <h3 className="text-base font-semibold text-gray-900">{title}</h3>

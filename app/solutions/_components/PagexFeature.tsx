@@ -8,7 +8,7 @@ export default function PagexFeature() {
     <section className="bg-gray-50 px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Rounded card */}
-        <MotionCard className="rounded-3xl bg-white p-8 shadow-sm md:p-12">
+        <MotionCard className="rounded-3xl bg-background p-8 shadow-sm md:p-12">
           <div className="flex flex-col gap-10 md:flex-row md:items-center">
             {/* Left: text content */}
             <div className="flex-1">
@@ -17,7 +17,7 @@ export default function PagexFeature() {
                 ★ Featured Solution
               </span>
 
-              <h2 className="text-4xl font-black text-gray-900">PAGEX</h2>
+              <h2 className="text-4xl font-foreground text-gray-900">PAGEX</h2>
               <p className="mt-1 text-sm font-medium text-gray-700">
                 Ecosystem Coordination & Market Intelligence Platform
               </p>
@@ -30,7 +30,7 @@ export default function PagexFeature() {
 
               <Link
                 href="/pagex"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-medium text-white hover:bg-green-600"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-medium text-background hover:bg-green-600"
               >
                 Explore PAGEX <ArrowRight size={16} />
               </Link>

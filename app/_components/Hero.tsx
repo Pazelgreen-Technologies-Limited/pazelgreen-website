@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 
 export default function Hero() {
   return (
-    <section className="relative h-screen w-full overflow-hidden font-sans text-white">
+    <section className="relative h-screen w-full overflow-hidden font-sans text-background">
       {/* Background image */}
       <Image
         src="/hero-bg.jpg"
@@ -14,17 +14,17 @@ export default function Hero() {
         className="hero-image-enter object-cover"
       />
       {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-foreground/40" />
 
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        <span className="hero-enter hero-enter-1 mb-4 rounded-full bg-white/20 px-4 py-1 text-xs font-medium tracking-wide text-white">
+        <span className="hero-enter hero-enter-1 mb-4 rounded-full bg-background/20 px-4 py-1 text-xs font-medium tracking-wide text-background">
           PAZELGREEN TECHNOLOGIES
         </span>
 
         <h1 className="hero-enter hero-enter-2 max-w-3xl text-4xl font-bold md:text-5xl">
           Innovating the Future of{" "}
-          <span className="text-brand">Sustainable</span> Agriculture
+          <span className="text-primary">Sustainable</span> Agriculture
         </h1>
 
         <p className="hero-enter hero-enter-3 mt-4 max-w-2xl text-sm md:text-base">
@@ -39,7 +39,7 @@ export default function Hero() {
             Explore PAGEX
           </Button>
           <Button href="/contact" variant="white">
-            <span className="text-brand">
+            <span className="text-primary">
               <Phone size={16} />
             </span>
             Contact Us

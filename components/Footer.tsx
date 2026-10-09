@@ -22,7 +22,7 @@ const solutionLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-white px-6 py-12 text-gray-900">
+    <footer className="bg-background px-6 py-12 text-gray-900">
       <div className="mx-auto max-w-7xl">
         {/* Top grid: brand, company links, solutions, newsletter */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
@@ -46,19 +46,19 @@ export default function Footer() {
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
-                <span className="bg-brand/20 text-brand p-2 rounded-md">
+                <span className="bg-primary/20 text-primary p-2 rounded-md">
                   <Mail size={16} />
                 </span>{" "}
                 Pazelgreentech@gmail.com
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-brand/20 text-brand p-2 rounded-md">
+                <span className="bg-primary/20 text-primary p-2 rounded-md">
                   <Phone size={16} />
                 </span>{" "}
                 +234 813 381 1594
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-brand/20 text-brand p-2 rounded-md">
+                <span className="bg-primary/20 text-primary p-2 rounded-md">
                   <MapPin size={16} />
                 </span>{" "}
                 Ikorodu, Lagos Nigeria
@@ -116,7 +116,7 @@ export default function Footer() {
               <button
                 type="submit"
                 /* Changed rounded-md to rounded-r-md (right corners only) */
-                className="rounded-r-xl bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 flex items-center justify-center"
+                className="rounded-r-xl bg-green-500 px-4 py-2 text-sm font-medium text-background hover:bg-green-600 flex items-center justify-center"
               >
                 →
               </button>
@@ -129,7 +129,7 @@ export default function Footer() {
         </div>
 
         {/* Social icons */}
-        <div className="flex flex-col items-center justify-between gap-4 mt-10 pt-6 border-t border-brand md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 mt-10 pt-6 border-t border-primary md:flex-row">
           <div className="">
             <p className="mb-3 text-sm font-extrabold text-foreground">
               CONNECT WITH US
@@ -140,7 +140,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="rounded-full bg-brand/10 p-2 hover:bg-brand/20 text-brand transition-colors"
+                  className="rounded-full bg-primary/10 p-2 hover:bg-primary/20 text-primary transition-colors"
                 >
                   <Icon size={16} />
                 </Link>
@@ -151,11 +151,11 @@ export default function Footer() {
           <div className="text-foreground flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-700">
             {/* Item 1: ISO Certified */}
             <div className="w-full sm:w-1/3 flex items-center justify-center gap-2 px-4">
-              <span className="text-3xl font-black tracking-tighter text-brand leading-none">
+              <span className="text-3xl font-foreground tracking-tighter text-primary leading-none">
                 ISO
               </span>
               <div className="flex flex-col text-left leading-tight">
-                <span className="text-xs font-bold uppercase tracking-wider text-brand">
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
                   Certified
                 </span>
                 <span className="text-[10px]  font-medium">9001:2015</span>
@@ -166,7 +166,7 @@ export default function Footer() {
             <div className="w-full sm:w-1/3 flex items-center justify-center gap-3 px-4 pt-4 sm:pt-0">
               {/* Optional: Add a lock icon here from lucide-react if you want */}
               <div className="flex flex-col text-center sm:text-left">
-                <span className="text-sm font-bold tracking-wide uppercase text-brand">
+                <span className="text-sm font-bold tracking-wide uppercase text-primary">
                   100% Secure
                 </span>
                 <span className="text-xs ">Encrypted Payments</span>
@@ -176,7 +176,7 @@ export default function Footer() {
             {/* Item 3: 24/7 Support */}
             <div className="w-full sm:w-1/3 flex items-center justify-center gap-3 px-4 pt-4 sm:pt-0">
               <div className="flex flex-col text-center sm:text-left">
-                <span className="text-sm font-bold tracking-wide uppercase text-brand">
+                <span className="text-sm font-bold tracking-wide uppercase text-primary">
                   24/7 Support
                 </span>
                 <span className="text-xs ">Dedicated Assistance</span>
@@ -187,7 +187,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar: copyright + legal links */}
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-brand-dark pt-6 text-xs text-gray-500 md:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-primary-dark pt-6 text-xs text-gray-500 md:flex-row">
           <p>© 2026 Pazelgreen Technologies. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="/privacy-policy" className="hover:text-green-400">

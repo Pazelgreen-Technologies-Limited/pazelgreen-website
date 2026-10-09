@@ -22,7 +22,7 @@ export default function MissionVisionSection() {
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-4 py-1.5 text-xs font-semibold tracking-widest text-brand uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <Target size={12} /> Mission &amp; Vision
           </p>
           <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
@@ -37,8 +37,8 @@ export default function MissionVisionSection() {
               key={tag}
               className={`group rounded-2xl p-6 md:p-10 transition-colors ${
                 highlighted
-                  ? "bg-green-800 text-white shadow-lg"
-                  : "border border-green-100 bg-white"
+                  ? "bg-green-800 text-background shadow-lg"
+                  : "border border-green-100 bg-background"
               }`}
             >
               <div
@@ -48,19 +48,19 @@ export default function MissionVisionSection() {
               >
                 <Icon
                   size={22}
-                  className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                  className="text-primary transition-transform duration-300 group-hover:-rotate-12"
                 />
               </div>
               <p
                 className={`mb-4 text-xs font-bold tracking-widest uppercase ${
-                  highlighted ? "text-brand" : "text-brand"
+                  highlighted ? "text-primary" : "text-primary"
                 }`}
               >
                 {tag}
               </p>
               <p
                 className={`text-base font-medium md:text-lg ${
-                  highlighted ? "text-white" : "text-gray-700"
+                  highlighted ? "text-background" : "text-gray-700"
                 }`}
               >
                 {body}

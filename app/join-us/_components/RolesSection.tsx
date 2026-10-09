@@ -37,7 +37,7 @@ const roles = [
 
 export default function RolesSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Tagline */}
         <h2 className="text-center text-5xl font-bold text-gray-900 md:text-3xl">

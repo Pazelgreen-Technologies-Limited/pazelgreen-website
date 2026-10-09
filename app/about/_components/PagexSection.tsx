@@ -26,22 +26,22 @@ export default function PagexSection() {
           <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
             {/* LEFT — copy column */}
             <div>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-4 py-1.5 text-xs font-bold tracking-widest text-brand uppercase">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-bold tracking-widest text-primary uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Flagship Product
               </p>
               <h2 className="text-5xl font-extrabold leading-none text-green-900 md:text-6xl lg:text-7xl">
                 PAGEX
               </h2>
-              <p className="mt-3 text-base font-medium text-brand md:text-lg">
+              <p className="mt-3 text-base font-medium text-primary md:text-lg">
                 Ecosystem Coordination &amp; Market Intelligence Platform
               </p>
 
               <div className="mt-6 space-y-4 text-sm text-gray-700 md:text-base">
                 <p>
                   PAGEX is Pazelgreen&apos;s flagship platform designed to
-                  support ecosystem coordination, market intelligence, and
-                  value creation across agricultural systems.
+                  support ecosystem coordination, market intelligence, and value
+                  creation across agricultural systems.
                 </p>
                 <p>
                   PAGEX connects stakeholders across agricultural value chains,
@@ -55,7 +55,7 @@ export default function PagexSection() {
                 {pagexFeatures.map(({ icon: Icon, label }) => (
                   <li key={label} className="flex items-center gap-3">
                     <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green-100">
-                      <Icon size={18} className="text-brand" />
+                      <Icon size={18} className="text-primary" />
                     </span>
                     <span className="text-sm font-medium text-gray-800 md:text-base">
                       {label}
@@ -72,7 +72,7 @@ export default function PagexSection() {
                 <Button
                   href="/solutions"
                   variant="outline"
-                  className="border-brand text-brand hover:bg-brand/10"
+                  className="border-primary text-primary hover:bg-primary/10"
                 >
                   <BookOpen size={16} /> View Solutions
                 </Button>

@@ -25,7 +25,7 @@ const pillars = [
 
 export default function EcosystemSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">

@@ -43,11 +43,11 @@ const values = [
 
 export default function CoreValuesSection() {
   return (
-    <section className="bg-white px-6 py-16 md:py-24 font-sans text-gray-900">
+    <section className="bg-background px-6 py-16 md:py-24 font-sans text-gray-900">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-brand uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
             <span>★</span> Core Values
           </p>
           <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
@@ -68,8 +68,8 @@ export default function CoreValuesSection() {
                 key={title}
                 className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-white shadow-lg"
-                    : "border-green-100 bg-white"
+                    ? "border-transparent bg-green-800 text-background shadow-lg"
+                    : "border-green-100 bg-background"
                 }`}
               >
                 <div
@@ -79,12 +79,12 @@ export default function CoreValuesSection() {
                 >
                   <Icon
                     size={22}
-                    className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                    className="text-primary transition-transform duration-300 group-hover:-rotate-12"
                   />
                 </div>
                 <h3
                   className={`text-base font-bold md:text-lg ${
-                    highlighted ? "text-white" : "text-gray-900"
+                    highlighted ? "text-background" : "text-gray-900"
                   }`}
                 >
                   {title}
@@ -105,12 +105,12 @@ export default function CoreValuesSection() {
           {values.slice(3).map(({ icon: Icon, title, description }) => (
             <MotionCard
               key={title}
-              className="group rounded-2xl border border-green-100 bg-white p-6 md:p-8 transition-colors hover:border-green-200"
+              className="group rounded-2xl border border-green-100 bg-background p-6 md:p-8 transition-colors hover:border-green-200"
             >
               <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-50">
                 <Icon
                   size={22}
-                  className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                  className="text-primary transition-transform duration-300 group-hover:-rotate-12"
                 />
               </div>
               <h3 className="text-base font-bold text-gray-900 md:text-lg">

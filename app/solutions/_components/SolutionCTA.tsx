@@ -6,11 +6,11 @@ export default function SolutionCTA() {
     <BackgroundSection
       imageSrc="/solution-cta-bg.jpg"
       imageAlt="Agricultural field at golden hour"
-      overlayColor="bg-black/50"
+      overlayColor="bg-foreground/50"
       height="h-[360px]"
     >
       {/* CTA content */}
-      <h2 className="max-w-xl text-2xl font-bold text-white md:text-3xl">
+      <h2 className="max-w-xl text-2xl font-bold text-background md:text-3xl">
         Get started today for a better future in agriculture
       </h2>
 

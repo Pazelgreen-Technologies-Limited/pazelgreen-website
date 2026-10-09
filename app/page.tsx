@@ -18,7 +18,7 @@ export default function Home() {
     <main>
       <div className="relative">
         <Hero />
-        <div className="relative z-10 -mt-6 rounded-t-3xl bg-white">
+        <div className="relative z-10 -mt-6 rounded-t-3xl bg-background">
           <ProblemSection />
           <VisionSection />
           <CoreCapabilities />

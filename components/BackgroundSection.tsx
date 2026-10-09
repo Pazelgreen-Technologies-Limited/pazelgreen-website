@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 interface BackgroundSectionProps {
   imageSrc: string;
   imageAlt: string;
-  overlayColor?: string; // Tailwind class e.g. "bg-black/50" or "bg-green-950/60"
+  overlayColor?: string; // Tailwind class e.g. "bg-foreground/50" or "bg-green-950/60"
   height?: string; // Tailwind class e.g. "h-[400px]"
   children: ReactNode;
 }
@@ -12,7 +12,7 @@ interface BackgroundSectionProps {
 export default function BackgroundSection({
   imageSrc,
   imageAlt,
-  overlayColor = "bg-black/50",
+  overlayColor = "bg-foreground/50",
   height = "h-[400px]",
   children,
 }: BackgroundSectionProps) {

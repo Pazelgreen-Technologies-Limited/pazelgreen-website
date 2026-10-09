@@ -9,10 +9,10 @@ export default function FutureBanner() {
       overlayColor="bg-gradient-to-b from-[#052E16]/10 to-[#14532D]/90"
       height="h-[500px]"
     >
-      <h2 className="max-w-xl text-4xl font-bold text-white md:text-3xl">
+      <h2 className="max-w-xl text-4xl font-bold text-background md:text-3xl">
         Let&apos;s Build the Future Together
       </h2>
-      <p className="mt-3 max-w-lg text-sm text-white">
+      <p className="mt-3 max-w-lg text-sm text-background">
         Reach out to discuss your interests, ask questions, or propose new
         opportunities. We&apos;d love to hear from you.
       </p>

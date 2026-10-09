@@ -21,7 +21,7 @@ const benefits = [
 
 export default function VolunteerSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl rounded-2xl bg-green-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
         {/* Section heading */}
         <div className="text-center">
@@ -54,7 +54,7 @@ export default function VolunteerSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Ways to Contribute */}
-          <MotionCard className="rounded-xl bg-white p-6 pr-16 transition-colors">
+          <MotionCard className="rounded-xl bg-background p-6 pr-16 transition-colors">
             <div className="mb-3 inline-flex rounded-xl bg-green-50 p-2">
               <GitMerge size={24} className="text-green-600" />
             </div>
@@ -79,7 +79,7 @@ export default function VolunteerSection() {
           {/* Benefits */}
           <MotionCard
             delay={0.06}
-            className="rounded-xl bg-white p-6 pr-16 transition-colors"
+            className="rounded-xl bg-background p-6 pr-16 transition-colors"
           >
             <div className="mb-3 inline-flex rounded-xl bg-green-50 p-2">
               <Gift size={24} className="text-green-600" />

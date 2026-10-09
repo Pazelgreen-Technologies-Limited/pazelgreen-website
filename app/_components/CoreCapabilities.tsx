@@ -38,7 +38,7 @@ const capabilities = [
 
 export default function CoreCapabilities() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto md:max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 md:shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
         {/* Section heading */}
         <div className="text-center">
@@ -72,7 +72,7 @@ export default function CoreCapabilities() {
               delay={index * 0.06}
               className="rounded-xl bg-green-50 p-6 md:pr-16 transition-colors"
             >
-              <div className="mb-3 inline-flex rounded-xl bg-white p-2">
+              <div className="mb-3 inline-flex rounded-xl bg-background p-2">
                 <Icon size={24} className="text-green-600" />
               </div>
 

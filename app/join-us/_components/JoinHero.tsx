@@ -10,11 +10,11 @@ export default function JoinHero() {
       overlayColor="bg-[#041A08]/60"
       height="h-screen"
     >
-      <h1 className="max-w-3xl text-4xl font-bold text-white md:text-5xl">
-        Join the Pazelgreen <span className="text-brand">Ecosystem</span>
+      <h1 className="max-w-3xl text-4xl font-bold text-background md:text-5xl">
+        Join the Pazelgreen <span className="text-primary">Ecosystem</span>
       </h1>
 
-      <p className="mt-4 max-w-xl text-sm text-white md:text-base">
+      <p className="mt-4 max-w-xl text-sm text-background md:text-base">
         Become part of the ecosystem shaping agricultural innovation. We&apos;re
         building the future of sustainable farming, and we need you.
       </p>

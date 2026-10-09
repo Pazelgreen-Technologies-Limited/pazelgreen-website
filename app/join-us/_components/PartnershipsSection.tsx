@@ -21,7 +21,7 @@ const whatWeLookFor = [
 
 export default function PartnershipsSection() {
   return (
-    <section className="bg-white px-6 py-16">
+    <section className="bg-background px-6 py-16">
       <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
         {/* Section heading */}
         <div className="text-center">
@@ -53,7 +53,7 @@ export default function PartnershipsSection() {
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Partnership Types */}
           <MotionCard className="rounded-xl bg-green-50 p-6 pr-16 transition-colors">
-            <div className="mb-3 inline-flex rounded-xl bg-white p-2">
+            <div className="mb-3 inline-flex rounded-xl bg-background p-2">
               <Puzzle size={24} className="text-green-600" />
             </div>
             <div className="pr-20">

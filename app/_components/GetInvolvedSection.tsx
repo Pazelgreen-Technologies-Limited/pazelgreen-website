@@ -16,10 +16,10 @@ export default function GetInvolvedSection() {
 
       {/* Section content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        <span className="mb-4 rounded-full bg-white/20 px-4 py-1 text-xs font-medium tracking-wide text-white">
+        <span className="mb-4 rounded-full bg-background/20 px-4 py-1 text-xs font-medium tracking-wide text-background">
           Get Involved
         </span>
-        <h2 className="max-w-2xl text-2xl font-bold text-white md:text-3xl">
+        <h2 className="max-w-2xl text-2xl font-bold text-background md:text-3xl">
           Building the future of agricultural systems requires collaboration.
         </h2>
 
@@ -27,13 +27,13 @@ export default function GetInvolvedSection() {
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
           <Link
             href="/join-us"
-            className="rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-100"
+            className="rounded-full bg-background px-6 py-3 text-sm font-medium text-gray-900 hover:bg-gray-100"
           >
             Join Us
           </Link>
           <Link
             href="/contact"
-            className="rounded-full border border-white px-6 py-3 text-sm font-medium text-white hover:bg-white/10"
+            className="rounded-full border border-background px-6 py-3 text-sm font-medium text-background hover:bg-background/10"
           >
             Contact Us
           </Link>

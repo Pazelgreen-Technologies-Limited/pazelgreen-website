@@ -19,7 +19,7 @@ export default function ContactHero() {
         <span className="h-px w-8 bg-green-400" />
       </div>
 
-      <h1 className="max-w-2xl text-4xl font-bold text-white md:text-5xl">
+      <h1 className="max-w-2xl text-4xl font-bold text-background md:text-5xl">
         Contact <span className="text-green-400">Pazelgreen</span>
       </h1>
 

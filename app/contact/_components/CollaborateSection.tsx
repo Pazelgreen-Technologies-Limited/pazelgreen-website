@@ -78,10 +78,10 @@ export default function CollaborateSection() {
                 ${
                   index % 2 !== 0
                     ? "border-gray-200"
-                    : "bg-white border-green-100 hover:border-green-100"
+                    : "bg-background border-green-100 hover:border-green-100"
                 }`}
             >
-              <div className="mb-4 inline-flex rounded-xl bg-white p-3 shadow-sm">
+              <div className="mb-4 inline-flex rounded-xl bg-background p-3 shadow-sm">
                 <Icon size={20} className="text-green-600" />
               </div>
               <h3 className="text-sm font-semibold text-gray-900">{title}</h3>

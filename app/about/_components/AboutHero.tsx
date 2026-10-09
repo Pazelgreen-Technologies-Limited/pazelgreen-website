@@ -7,7 +7,7 @@ const trustBadges = ["Innovation-Led", "Systems-Focused", "Global Reach"];
 
 export default function AboutHero() {
   return (
-    <section className="relative h-screen w-full overflow-hidden font-sans text-white">
+    <section className="relative h-screen w-full overflow-hidden font-sans text-background">
       {/* Background image — replace /about-hero-bg.jpg with the exported Figma asset */}
       <Image
         src="/about-hero-bg.jpg"
@@ -22,12 +22,12 @@ export default function AboutHero() {
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
         {/* Pill label */}
-        <span className="hero-enter hero-enter-1 mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-white uppercase">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+        <span className="hero-enter hero-enter-1 mb-4 inline-flex items-center gap-2 rounded-full border border-background/20 bg-background/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-background uppercase">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
           About Pazelgreen
         </span>
 
-        <h1 className="hero-enter hero-enter-2 max-w-3xl text-4xl font-extrabold leading-tight text-white md:text-5xl lg:text-6xl">
+        <h1 className="hero-enter hero-enter-2 max-w-3xl text-4xl font-extrabold leading-tight text-background md:text-5xl lg:text-6xl">
           About Pazelgreen
         </h1>
 
@@ -48,16 +48,16 @@ export default function AboutHero() {
         </div>
 
         {/* Divider */}
-        <div className="hero-enter hero-enter-5 mt-12 w-full max-w-md border-t border-white/15" />
+        <div className="hero-enter hero-enter-5 mt-12 w-full max-w-md border-t border-background/15" />
 
         {/* Trust badges */}
         <ul className="hero-enter hero-enter-6 mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           {trustBadges.map((label) => (
             <li
               key={label}
-              className="flex items-center gap-2 text-xs font-medium text-white md:text-sm"
+              className="flex items-center gap-2 text-xs font-medium text-background md:text-sm"
             >
-              <CheckCircle2 size={16} className="text-brand" />
+              <CheckCircle2 size={16} className="text-primary" />
               {label}
             </li>
           ))}

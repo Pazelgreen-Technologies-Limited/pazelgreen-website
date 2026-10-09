@@ -49,8 +49,8 @@ export default function OurStorySection() {
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-4 py-1.5 text-xs font-semibold tracking-widest text-brand uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-green-200 bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             Our Story
           </p>
           <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
@@ -71,8 +71,8 @@ export default function OurStorySection() {
                 key={tag}
                 className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
                   highlighted
-                    ? "border-transparent bg-green-800 text-white shadow-lg"
-                    : "border-green-100 bg-white"
+                    ? "border-transparent bg-green-800 text-background shadow-lg"
+                    : "border-green-100 bg-background"
                 }`}
               >
                 {/* Tag with icon */}
@@ -84,12 +84,12 @@ export default function OurStorySection() {
                   >
                     <Icon
                       size={18}
-                      className="text-brand transition-transform duration-300 group-hover:-rotate-12"
+                      className="text-primary transition-transform duration-300 group-hover:-rotate-12"
                     />
                   </div>
                   <span
                     className={`text-xs font-bold tracking-widest uppercase ${
-                      highlighted ? "text-brand" : "text-brand"
+                      highlighted ? "text-primary" : "text-primary"
                     }`}
                   >
                     {tag}
@@ -98,7 +98,7 @@ export default function OurStorySection() {
 
                 <h3
                   className={`text-lg font-bold md:text-xl ${
-                    highlighted ? "text-white" : "text-gray-900"
+                    highlighted ? "text-background" : "text-gray-900"
                   }`}
                 >
                   {title}

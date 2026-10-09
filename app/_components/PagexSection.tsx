@@ -12,7 +12,7 @@ const pagexFeatures = [
 
 export default function PagexSection() {
   return (
-    <section className="bg-white px-6 py-16 font-sans text-gray-900">
+    <section className="bg-background px-6 py-16 font-sans text-gray-900">
       <div className="mx-auto max-w-5xl text-center">
         {/* Section heading */}
         <h3 className="text-2xl font-extrabold tracking-wide text-orange-500">
@@ -36,7 +36,7 @@ export default function PagexSection() {
             <MotionCard
               key={feature}
               delay={index * 0.06}
-              className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-brand px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
+              className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-primary px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
             >
               <div className="flex items-start gap-2 px-2 justify-center">
                 <CheckCircle size={16} className="text-green-800" />
@@ -50,13 +50,13 @@ export default function PagexSection() {
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             href="/pagex"
-            className="flex items-center gap-2 rounded-2xl bg-green-500 px-6 py-3 text-base font-extrabold text-white hover:bg-brand-dark"
+            className="flex items-center gap-2 rounded-2xl bg-green-500 px-6 py-3 text-base font-extrabold text-background hover:bg-primary-dark"
           >
             Explore PAGEX <ArrowRight size={16} />
           </Link>
           <Link
             href="/demo"
-            className="flex items-center gap-2 rounded-2xl border border-gray-300 px-6 py-3 text-base font-extrabold text-brand hover:bg-gray-200"
+            className="flex items-center gap-2 rounded-2xl border border-gray-300 px-6 py-3 text-base font-extrabold text-primary hover:bg-gray-200"
           >
             <PlayCircle size={16} /> Watch Demo
           </Link>

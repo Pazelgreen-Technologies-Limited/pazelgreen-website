@@ -22,8 +22,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 w-full mt-4 z-50 text-white font-sans">
-      <div className="bg-navbar px-6 py-4 backdrop-blur-md">
+    <header className="fixed top-0 w-full mt-4 z-50 text-background font-sans">
+      <div className="bg-primary-darker/35 px-6 py-4 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between">
           {/* Logo + brand name */}
           <Link href="/" className="flex items-center gap-2">
@@ -33,7 +33,7 @@ export default function Navbar() {
               width={36}
               height={36}
             />
-            <span className="text-lg font-semibold text-brand md:text-white">
+            <span className="text-lg font-semibold text-primary md:text-background">
               Pazelgreen
             </span>
           </Link>
@@ -49,8 +49,8 @@ export default function Navbar() {
                     href={link.href}
                     className={`text-base font-normal transition-colors ${
                       isActive
-                        ? "text-brand"
-                        : "text-white hover:text-brand-dark"
+                        ? "text-primary"
+                        : "text-background hover:text-primary-dark"
                     }`}
                   >
                     {link.label}
@@ -88,19 +88,19 @@ export default function Navbar() {
 
             {/* Top bar */}
             <span
-              className={`block h-0.5 w-8 rounded-full bg-brand transition-all duration-300
+              className={`block h-0.5 w-8 rounded-full bg-primary transition-all duration-300
               ${isOpen ? "translate-y-2 rotate-45" : ""}`}
             />
 
             {/* Middle bar — fades out when open */}
             <span
-              className={`my-1.5 block h-0.5 w-4 rounded-full bg-brand transition-all duration-300
+              className={`my-1.5 block h-0.5 w-4 rounded-full bg-primary transition-all duration-300
               ${isOpen ? "opacity-0" : ""}`}
             />
 
             {/* Bottom bar */}
             <span
-              className={`block h-0.5 w-2 rounded-full bg-brand transition-all duration-300
+              className={`block h-0.5 w-2 rounded-full bg-primary transition-all duration-300
               ${isOpen ? "-translate-y-2 w-8 -rotate-45" : ""}`}
             />
           </button>
@@ -130,8 +130,8 @@ export default function Navbar() {
                     onClick={() => setIsOpen(false)}
                     className={`text-base font-normal transition-colors ${
                       isActive
-                        ? "text-brand"
-                        : "text-white hover:text-brand-dark"
+                        ? "text-primary"
+                        : "text-background hover:text-primary-dark"
                     }`}
                   >
                     {link.label}
