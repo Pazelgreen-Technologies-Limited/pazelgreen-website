@@ -23,7 +23,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 w-full mt-4 z-50 text-background font-sans">
-      <div className="bg-primary-darker/35 px-6 py-4 backdrop-blur-md">
+      <div className="bg-[#041a0899] px-6 py-4 backdrop-blur-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-between">
           {/* Logo + brand name */}
           <Link href="/" className="flex items-center gap-2">
