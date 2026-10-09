@@ -1,214 +1,317 @@
-import { Mail, Building2, Handshake, Sprout, User } from "lucide-react";
+"use client";
+
+import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { socialLinks } from "@/lib/social-links";
-import Link from "next/link";
+import {
+  CheckCircle2,
+  Send,
+  AlertCircle,
+} from "lucide-react";
 
-// Direct contact cards shown on the right column
-const contactCards = [
-  {
-    icon: Mail,
-    title: "General Inquiries",
-    email: "hello@pazelgreen.com",
-    description: "For any general questions or information.",
-  },
-  {
-    icon: Handshake,
-    title: "Partnerships",
-    email: "partners@pazelgreen.com",
-    description: "Explore partnership and collaboration opportunities.",
-  },
-  {
-    icon: Sprout,
-    title: "PAGEX Inquiry",
-    email: "pagex@pazelgreen.com",
-    description:
-      "Want to learn more about Pazelgreen's flagship platform? Request a product conversation.",
-  },
-];
+export type StakeholderType =
+  | "Farmer"
+  | "Buyer"
+  | "Investor"
+  | "Partner"
+  | "Job seeker";
 
-// Dropdown options for the Inquiry Type field
-const inquiryOptions = [
-  "General Question",
-  "Partnership Opportunity",
-  "PAGEX Product Demo",
-];
+type ContactFormProps = {
+  initialStakeholderType?: StakeholderType;
+};
 
-export default function ContactForm() {
+const inputClassName =
+  "w-full rounded-xl border border-primary-darker/20 px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary";
+
+export default function ContactForm({
+  initialStakeholderType = "Farmer",
+}: ContactFormProps) {
+  const [stakeholderType, setStakeholderType] = useState<StakeholderType>(
+    initialStakeholderType,
+  );
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    organization: "",
+    locationState: "Lagos",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    if (!formData.fullName.trim()) {
+      setErrorMessage("Please provide your full name.");
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes("@")) {
+      setErrorMessage("Please provide a valid work or personal email address.");
+      return;
+    }
+    if (!formData.message.trim() || formData.message.trim().length < 10) {
+      setErrorMessage(
+        "Please provide a brief message describing your value chain or inquiry (at least 10 characters).",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    // Preview-only submit until a backend endpoint is wired.
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+    }, 450);
+  };
+
+  const handleReset = () => {
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      organization: "",
+      locationState: "Lagos",
+      message: "",
+    });
+    setIsSuccess(false);
+    setErrorMessage("");
+  };
+
   return (
-    <section id="contact-form" className="bg-gray-50 px-6 py-16">
-      <div className="mx-auto max-w-5xl">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {/* ── Left column: contact form ── */}
-          <div className="rounded-2xl bg-background p-8 shadow-sm">
-            {/* Form header */}
-            <p className="mb-1 flex items-center gap-2 text-xs font-semibold text-green-500">
-              <span className="h-px w-6 bg-green-400" /> GET IN TOUCH
-            </p>
-            <h2 className="mb-6 text-2xl font-bold text-gray-900">
-              Send us a message
-            </h2>
-
-            {/*
-              Pure frontend form — no backend wired yet.
-              Add an onSubmit handler + API call when ready.
-            */}
-            <form className="space-y-4">
-              {/* Full Name + Email row */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-700">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2">
-                    <User size={14} className="text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Jane Doe"
-                      required
-                      className="w-full text-sm text-gray-900 outline-none placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-700">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2">
-                    <Mail size={14} className="text-gray-400" />
-                    <input
-                      type="email"
-                      placeholder="jane@company.com"
-                      required
-                      className="w-full text-sm text-gray-900 outline-none placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Organisation */}
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-700">
-                  Organisation{" "}
-                  <span className="text-gray-400 font-normal">(Optional)</span>
-                </label>
-                <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2">
-                  <Building2 size={14} className="text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Company or Institution Name"
-                    className="w-full text-sm text-gray-900 outline-none placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
-              {/* Inquiry type dropdown */}
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-700">
-                  Inquiry Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  required
-                  defaultValue=""
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none"
-                >
-                  <option value="" disabled>
-                    Select an option...
-                  </option>
-                  {inquiryOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Message textarea */}
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-700">
-                  Message <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="How can we help you?"
-                  required
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-400 resize-none"
-                />
-              </div>
-
-              {/* Submit button */}
-              <Button
-                type="submit"
-                variant="solid"
-                className="w-full justify-center"
-              >
-                <Mail size={15} /> Send Message
-              </Button>
-            </form>
+    <div className="rounded-3xl border border-primary-darker/10 bg-card p-8 shadow-sm sm:p-10 lg:col-span-7">
+      {isSuccess ? (
+        <div className="animate-[hero-enter_300ms_ease-in-out] space-y-5 py-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-surface text-primary-darker">
+            <CheckCircle2 className="h-9 w-9" />
           </div>
 
-          {/* ── Right column: direct contacts + social card ── */}
-          <div className="flex flex-col gap-6">
-            {/* Direct Contact header */}
-            <div>
-              <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-green-500">
-                <span className="h-px w-6 bg-green-400" /> REACH OUT
-              </p>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Direct Contact
-              </h2>
-            </div>
+          <div className="space-y-2">
+            <h3 className="font-sans text-2xl font-bold text-primary-darker">
+              Inquiry preview complete
+            </h3>
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
+              Thanks, <strong>{formData.fullName}</strong>. This is a preview
+              form; your <strong>{stakeholderType}</strong> inquiry has not been
+              sent.
+            </p>
+          </div>
 
-            {/* Contact cards */}
-            {contactCards.map(({ icon: Icon, title, email, description }) => (
-              <div
-                key={title}
-                className="flex gap-4 rounded-xl bg-green-50 p-4"
-              >
-                <div className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background">
-                  <Icon size={16} className="text-green-900" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">{title}</p>
-                  <a
-                    href={`mailto:${email}`}
-                    className="text-sm font-medium text-green-600 hover:underline"
-                  >
-                    {email}
-                  </a>
-                  <p className="mt-1 text-xs text-gray-500">{description}</p>
-                </div>
-              </div>
-            ))}
-
-            {/* Connect with Pazelgreen dark card */}
-            <div className="rounded-xl bg-green-900 p-6 text-background">
-              <p className="mb-1 flex items-center gap-2 text-xs font-semibold text-green-300">
-                <span className="h-px w-6 bg-green-400" /> FOLLOW US
-              </p>
-              <h3 className="text-lg font-bold">Connect with Pazelgreen</h3>
-              <p className="mt-1 mb-4 text-sm text-green-200">
-                Follow our journey transforming agricultural technology across
-                emerging markets.
-              </p>
-              {/* Shared social links component */}
-              <div className="flex gap-3">
-                {socialLinks.map(({ icon: Icon, href, label }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    aria-label={label}
-                    className={`rounded-full p-2 transition-colors hover:bg-green-800/50 focus:outline-none focus:ring-2 focus:ring-green-400`}
-                  >
-                    <div className=" rounded-full border border-background p-3">
-                      <Icon size={16} className="text-background" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
+          <div className="mx-auto max-w-md space-y-1 rounded-2xl border border-primary-darker/10 bg-background p-4 text-left text-xs text-foreground">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Category:</span>
+              <span className="font-semibold">{stakeholderType}</span>
             </div>
+            {formData.organization && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Organization:</span>
+                <span className="font-semibold">{formData.organization}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Location:</span>
+              <span className="font-semibold">
+                {formData.locationState} State
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Response SLA:</span>
+              <span className="font-semibold text-primary">Under 24 hours</span>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <Button variant="solid" onClick={handleReset} className="mx-auto">
+              Submit another inquiry
+            </Button>
           </div>
         </div>
-      </div>
-    </section>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <h2 className="font-sans text-xl font-bold text-primary-darker">
+              Tell us how we can collaborate
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Fill out the fields below and our value chain specialists will be
+              in touch.
+            </p>
+          </div>
+
+          {errorMessage && (
+            <div className="flex items-center gap-2 rounded-xl border border-error/30 bg-error/10 p-3.5 text-xs text-error">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-primary-darker">
+              I am a... <span className="text-error">*</span>
+            </label>
+            <select
+              value={stakeholderType}
+              onChange={(e) =>
+                setStakeholderType(e.target.value as StakeholderType)
+              }
+              className={`${inputClassName} bg-background font-medium focus:bg-card`}
+            >
+              <option value="Farmer">
+                Farmer (Smallholder, Commercial Grower or Cooperative)
+              </option>
+              <option value="Buyer">
+                Buyer (Food Processor, Feed Mill, FMCG or Exporter)
+              </option>
+              <option value="Investor">
+                Investor (Impact Fund, Venture Capital or Ag-Fintech)
+              </option>
+              <option value="Partner">
+                Partner (Development Agency, Government Board or Logistics)
+              </option>
+              <option value="Job seeker">
+                Job seeker (Engineering, Operations or Agronomy)
+              </option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-foreground">
+                Full Name <span className="text-error">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
+                placeholder="e.g. Babatunde Lawal"
+                className={inputClassName}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-foreground">
+                Email Address <span className="text-error">*</span>
+              </label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="name@organization.com"
+                className={inputClassName}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-foreground">
+                Phone Number (WhatsApp friendly)
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                placeholder="+234 800 000 0000"
+                className={inputClassName}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-foreground">
+                Organization / Farm Name
+              </label>
+              <input
+                type="text"
+                value={formData.organization}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    organization: e.target.value,
+                  })
+                }
+                placeholder="e.g. Savannah Millers Ltd"
+                className={inputClassName}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-foreground">
+              Primary Operational State in Nigeria
+            </label>
+            <select
+              value={formData.locationState}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  locationState: e.target.value,
+                })
+              }
+              className={`${inputClassName} bg-card`}
+            >
+              <option value="Lagos">
+                Lagos State (Commercial / Headquarters)
+              </option>
+              <option value="Kano">Kano State (Grains & Sesame)</option>
+              <option value="Benue">
+                Benue State (Tubers, Cassava & Soybeans)
+              </option>
+              <option value="Oyo">Oyo State (Maize & Poultry Belt)</option>
+              <option value="Kwara">Kwara State (Grains & Aggregation)</option>
+              <option value="Kaduna">Kaduna State (Grains & Ginger)</option>
+              <option value="Niger">Niger State (Paddy Rice & Sesame)</option>
+              <option value="Ogun">Ogun State (Agro-Industrial)</option>
+              <option value="Other">Other / International</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-foreground">
+              Message / Inquiry Details <span className="text-error">*</span>
+            </label>
+            <textarea
+              rows={4}
+              required
+              value={formData.message}
+              onChange={(e) =>
+                setFormData({ ...formData, message: e.target.value })
+              }
+              placeholder="Tell us about the crops you grow or procure, current monthly tonnage, or questions regarding PAGEX..."
+              className={inputClassName}
+            />
+          </div>
+
+          <div className="pt-2">
+            <Button
+              variant="solid"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full font-semibold shadow-md"
+            >
+              <Send className="h-4 w-4" />
+              {isSubmitting
+                ? "Submitting inquiry..."
+                : "Send message to Pazelgreen"}
+            </Button>
+          </div>
+
+          <div className="text-center text-[11px] text-muted-foreground">
+            We respect your data privacy under the Nigeria Data Protection Act.
+          </div>
+        </form>
+      )}
+    </div>
   );
 }
