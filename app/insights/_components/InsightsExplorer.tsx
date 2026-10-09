@@ -25,7 +25,7 @@ export default function InsightsExplorer() {
   return (
     <>
       {/* Filter & search */}
-      <section className="mx-auto mt-12 max-w-300 px-4 sm:px-6 lg:px-8">
+      <section className="mx-auto my-12 max-w-300 px-4 sm:px-6 lg:px-8">
         <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-primary-darker/10 bg-card p-4 shadow-sm sm:flex-row">
           <div className="flex w-full flex-wrap items-center gap-1.5 sm:w-auto">
             {categories.map((cat) => (

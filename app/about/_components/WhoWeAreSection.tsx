@@ -31,7 +31,7 @@ const pillars = [
 
 export default function WhoWeAreSection() {
   return (
-    <section className="bg-background px-6 py-16 md:py-24 font-sans text-foreground">
+    <section className="bg-primary-surface/50 px-6 py-16 md:py-24 font-sans text-foreground">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
