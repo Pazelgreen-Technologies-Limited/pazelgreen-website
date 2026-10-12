@@ -208,6 +208,23 @@
   animation: hero-image-enter 700ms ease-in-out both;
 }
 
+.streaming-text[data-visible="false"] .streaming-text__character {
+  opacity: 0;
+}
+
+.streaming-text[data-visible="true"] .streaming-text__character {
+  animation: streaming-character-in 80ms ease-out both;
+}
+
+@keyframes streaming-character-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-enter {
     animation: none;
@@ -218,5 +235,10 @@
   .hero-image-enter {
     animation: none;
     transform: none;
+  }
+
+  .streaming-text__character {
+    animation: none !important;
+    opacity: 1 !important;
   }
 }

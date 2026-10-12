@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Phone } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { FadeIn } from "@/components/FadeIn";
+import { StreamingText } from "@/components/StreamingText";
 
 export default function Hero() {
   return (
@@ -27,9 +28,12 @@ export default function Hero() {
           PAZELGREEN TECHNOLOGIES
         </span>
 
-        <h1 className="max-w-4xl text-4xl font-extrabold sm:text-5xl lg:text-6xl">
+        <StreamingText
+          as="h1"
+          className="max-w-4xl text-4xl font-extrabold sm:text-5xl lg:text-6xl"
+        >
           Innovating the future of sustainable agriculture.
-        </h1>
+        </StreamingText>
 
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-background/90 md:text-lg">
           Transforming agricultural inefficiencies into opportunities for

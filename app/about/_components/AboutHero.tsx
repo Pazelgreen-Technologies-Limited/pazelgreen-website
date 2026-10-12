@@ -1,6 +1,7 @@
 import Button from "@/components/ui/Button";
 import { CheckCircle2, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { StreamingText } from "@/components/StreamingText";
 
 // Trust badges displayed below the CTA buttons
 const trustBadges = ["Innovation-Led", "Systems-Focused", "Global Reach"];
@@ -13,9 +14,12 @@ export default function AboutHero() {
           <p className="mb-4 text-xs font-bold uppercase tracking-wider text-primary/70">
             About Pazelgreen
           </p>
-          <h1 className="text-4xl font-extrabold text-primary-darker sm:text-5xl lg:text-6xl">
+          <StreamingText
+            as="h1"
+            className="text-4xl font-extrabold text-primary-darker sm:text-5xl lg:text-6xl"
+          >
             Building systems for agricultural transformation.
-          </h1>
+          </StreamingText>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Pazelgreen is an agritech innovation company creating solutions that
             strengthen agricultural systems, reduce inefficiencies, and drive

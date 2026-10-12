@@ -1,6 +1,7 @@
 import Button from "@/components/ui/Button";
 import { ArrowRight, Phone } from "lucide-react";
 import Link from "next/link";
+import { StreamingText } from "@/components/StreamingText";
 
 export default function JoinHero() {
   return (
@@ -10,9 +11,12 @@ export default function JoinHero() {
           <span className="text-xs font-bold uppercase tracking-wider text-primary/70">
             Build with us
           </span>
-          <h1 className="font-sans text-4xl font-extrabold text-primary-darker sm:text-5xl lg:text-6xl">
+          <StreamingText
+            as="h1"
+            className="font-sans text-4xl font-extrabold text-primary-darker sm:text-5xl lg:text-6xl"
+          >
             Join the Pazelgreen Ecosystem
-          </h1>
+          </StreamingText>
           <p className="text-lg leading-relaxed text-muted-foreground">
             Become part of the ecosystem shaping agricultural innovation.
             We&apos;re building the future of sustainable farming, and we need
