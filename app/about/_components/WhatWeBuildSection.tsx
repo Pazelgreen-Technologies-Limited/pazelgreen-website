@@ -61,14 +61,14 @@ const solutions: SolutionCard[] = [
 
 export default function WhatWeBuildSection() {
   return (
-    <section className="bg-background-alt px-6 py-16 md:py-24 font-sans text-foreground">
+    <section className="bg-background px-6 py-16 font-sans text-foreground md:py-24">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
-            <span>🛠️</span> What We Build
+          <p className="mb-3 text-xs font-bold tracking-wider text-primary/70 uppercase">
+            What We Build
           </p>
-          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-primary-darker md:text-4xl lg:text-5xl">
             Solutions built for real agricultural scale
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
@@ -99,9 +99,9 @@ function SolutionCardItem({
   visual,
 }: SolutionCard) {
   return (
-    <MotionCard className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors hover:border-primary-surface">
+    <MotionCard className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary-surface hover:shadow-lg">
       {/* Visual header area */}
-      <div className="relative flex h-44 items-end justify-start bg-primary-lighter p-6 md:h-48">
+      <div className="relative flex h-44 items-end justify-start bg-background-alt p-6 md:h-48">
         {/* Top-left icon */}
         <div className="absolute top-5 left-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-background shadow-sm">
           <Icon size={20} className="text-primary" />
@@ -133,7 +133,7 @@ function SolutionCardItem({
           <span className="h-1.5 w-1.5 rounded-full bg-primary" />
           {tag}
         </p>
-        <h3 className="text-base font-bold text-foreground md:text-lg">
+        <h3 className="text-base font-bold text-primary-darker md:text-lg">
           {title}
         </h3>
         <p className="mt-3 text-sm text-muted-foreground md:text-base">
@@ -147,7 +147,11 @@ function SolutionCardItem({
             href="/solutions"
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-dark"
           >
-            <ArrowRight size={16} /> Learn More
+            <ArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-1"
+            />{" "}
+            Learn More
           </Link>
         </div>
       </div>

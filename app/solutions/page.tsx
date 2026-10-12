@@ -14,12 +14,8 @@ export default function SolutionPage() {
   return (
     <main className="space-y-20 pt-28 pb-12 md:pt-32 md:pb-20">
       <SolutionsHeader />
-      <FadeIn as="div">
-        <SolutionPillars />
-      </FadeIn>
-      <FadeIn as="div" className="bg-primary-surface/40 p-8 sm:p-12">
-        <SolutionsCTA />
-      </FadeIn>
+      <SolutionPillars />
+      <SolutionsCTA />
     </main>
   );
 }

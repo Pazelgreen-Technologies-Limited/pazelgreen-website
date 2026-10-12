@@ -21,17 +21,17 @@ const whatWeLookFor = [
 
 export default function PartnershipsSection() {
   return (
-    <section className="bg-background px-6 py-16">
-      <div className="mx-auto max-w-5xl rounded-2xl bg-background-alt p-8 shadow-md shadow-primary-darker/10 md:p-12">
+    <section className="bg-background px-6 py-16 md:py-20">
+      <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <h3 className="text-normal font-extrabold tracking-wide text-accent">
+          <p className="text-xs font-bold uppercase tracking-wider text-primary/70">
             Collaborate on an agricultural transformation
-          </h3>
-          <h2 className="mt-2 text-2xl font-extrabold text-foreground md:text-4xl">
+          </p>
+          <h2 className="mt-2 font-sans text-3xl font-extrabold text-primary-darker sm:text-4xl">
             Strategic Partnerships
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             We believe in the power of collaboration. Whether you&apos;re a
             technology provider, research institution, or agricultural
             organization, let&apos;s explore how we can work together to create
@@ -40,24 +40,21 @@ export default function PartnershipsSection() {
           {/* View positions CTA */}
           <Link
             href="/join-us/careers"
-            className="mt-4 inline-flex items-center gap-1 text-2xl font-bold text-primary-darker hover:underline"
+            className="mt-5 inline-flex items-center gap-2 text-base font-semibold text-primary-darker hover:underline"
           >
-            View all openings{" "}
-            <span className="rounded-full bg-primary/20 p-2">
-              <ArrowRight size={16} />
-            </span>
+            View all openings <ArrowRight size={16} />
           </Link>
         </div>
 
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Partnership Types */}
-          <MotionCard className="rounded-xl bg-primary-lighter p-6 pr-16 transition-colors">
-            <div className="mb-3 inline-flex rounded-xl bg-background p-2">
+          <MotionCard className="rounded-lg border border-border bg-card p-6 transition-colors">
+            <div className="mb-3 inline-flex rounded-lg bg-primary-surface/60 p-2">
               <Puzzle size={24} className="text-primary" />
             </div>
             <div className="pr-20">
-              <h4 className="text-normal font-bold text-foreground">
+              <h4 className="text-lg font-bold text-primary-darker">
                 Partnership Types
               </h4>
             </div>
@@ -65,7 +62,7 @@ export default function PartnershipsSection() {
               {partnershipTypes.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                  className="flex items-center gap-2 text-sm leading-relaxed text-muted-foreground"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   {item}
@@ -75,12 +72,12 @@ export default function PartnershipsSection() {
           </MotionCard>
 
           {/* What We Look For */}
-          <MotionCard className="rounded-2xl border border-border bg-background-alt p-6">
-            <div className="mb-4 inline-flex rounded-xl bg-primary-lighter p-3">
+          <MotionCard className="rounded-lg border border-border bg-card p-6">
+            <div className="mb-3 inline-flex rounded-lg bg-primary-surface/60 p-2">
               <Search size={24} className="text-primary" />
             </div>
             <div className="pr-20">
-              <h4 className="text-normal font-bold text-foreground">
+              <h4 className="text-lg font-bold text-primary-darker">
                 What We Look For
               </h4>
             </div>

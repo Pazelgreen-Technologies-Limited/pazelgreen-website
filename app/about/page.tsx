@@ -15,34 +15,34 @@ export default function AboutPage() {
   return (
     <main>
       <AboutHero />
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <WhoWeAreSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <OurStorySection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <FounderPerspective />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <MissionVisionSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <CoreValuesSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <WhyWeExistSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <OurApproachSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <WhatWeBuildSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <PagexSection />
       </FadeIn>
-      <FadeIn as="div">
+      <FadeIn as="div" duration={450}>
         <CommitmentSection />
       </FadeIn>
     </main>

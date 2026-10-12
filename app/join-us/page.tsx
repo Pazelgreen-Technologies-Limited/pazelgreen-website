@@ -9,26 +9,14 @@ import { FadeIn } from "@/components/FadeIn";
 
 export default function JoinUsPage() {
   return (
-    <main>
+    <main className="space-y-20 pt-28 pb-12 md:pt-32 md:pb-20">
       <JoinHero />
-      <FadeIn as="div">
-        <RolesSection />
-      </FadeIn>
-      <FadeIn as="div">
-        <ImpactBanner />
-      </FadeIn>
-      <FadeIn as="div">
-        <CareersSection />
-      </FadeIn>
-      <FadeIn as="div">
-        <VolunteerSection />
-      </FadeIn>
-      <FadeIn as="div">
-        <PartnershipsSection />
-      </FadeIn>
-      <FadeIn as="div">
-        <FutureBanner />
-      </FadeIn>
+      <RolesSection />
+      <ImpactBanner />
+      <CareersSection />
+      <VolunteerSection />
+      <PartnershipsSection />
+      <FutureBanner />
     </main>
   );
 }

@@ -1,6 +1,5 @@
 import { Briefcase, HeartHandshake, Handshake } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import MotionCard from "@/components/MotionCard";
 
@@ -37,10 +36,9 @@ const roles = [
 
 export default function RolesSection() {
   return (
-    <section className="bg-background px-6 py-16">
+    <section className="bg-background px-6 py-16 md:py-20">
       <div className="mx-auto max-w-5xl">
-        {/* Tagline */}
-        <h2 className="text-center text-5xl font-bold text-foreground md:text-3xl">
+        <h2 className="mx-auto max-w-4xl text-center font-sans text-3xl font-bold text-primary-darker sm:text-4xl">
           Whether you&apos;re an innovator, creator, or advocate, there&apos;s a
           place for you here.
         </h2>
@@ -50,26 +48,21 @@ export default function RolesSection() {
           {roles.map(({ icon: Icon, tag, title, description, cta, href }) => (
             <MotionCard
               key={title}
-              className="flex flex-col rounded-2xl border border-border p-6"
+              className="flex flex-col rounded-lg border border-border bg-card p-6"
             >
               {/* Icon */}
-              <div className="mb-3 inline-flex w-fit rounded-xl bg-primary-lighter p-3">
+              <div className="mb-3 inline-flex w-fit rounded-lg bg-primary-surface/60 p-3">
                 <Icon size={22} className="text-primary" />
               </div>
 
-              {/* Tag */}
-              <p className="text-xs text-border-strong">{tag}</p>
+              <p className="text-xs font-medium text-muted-foreground">{tag}</p>
 
-              {/* Title with orange plus prefix */}
-              <h3 className="mt-1 flex items-center gap-1 text-base font-semibold text-foreground">
-                <span className="text-accent">
-                  {" "}
-                  <ArrowRight size={14} />{" "}
-                </span>{" "}
+              <h3 className="mt-2 flex items-center gap-2 text-lg font-semibold text-primary-darker">
+                <ArrowRight size={16} className="shrink-0 text-primary" />
                 {title}
               </h3>
 
-              <p className="mt-2 flex-1 text-sm text-muted-foreground">
+              <p className="mt-3 flex-1 text-base leading-relaxed text-muted-foreground">
                 {description}
               </p>
 

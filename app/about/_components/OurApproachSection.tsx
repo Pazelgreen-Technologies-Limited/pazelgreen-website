@@ -30,14 +30,14 @@ const principles = [
 
 export default function OurApproachSection() {
   return (
-    <section className="bg-background px-6 py-16 md:py-24 font-sans text-foreground">
+    <section className="bg-background-alt px-6 py-16 font-sans text-foreground md:py-24">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-primary-lighter px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
-            <span>🌱</span> Our Approach
+          <p className="mb-3 text-xs font-bold tracking-wider text-primary/70 uppercase">
+            Our Approach
           </p>
-          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-primary-darker md:text-4xl lg:text-5xl">
             Three principles guide how we build.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
@@ -52,18 +52,12 @@ export default function OurApproachSection() {
             ({ icon: Icon, title, description, highlighted, footerTag }) => (
               <MotionCard
                 key={title}
-                className={`group flex flex-col rounded-2xl border p-6 md:p-8 transition-colors ${
-                  highlighted
-                    ? "border-transparent bg-primary-darker text-inverse-foreground shadow-lg"
-                    : "border-border bg-primary-lighter"
+                className={`group flex flex-col rounded-lg border bg-card p-6 transition-colors hover:border-primary-surface md:p-8 ${
+                  highlighted ? "border-primary/40" : "border-border"
                 }`}
               >
                 <div
-                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                    highlighted
-                      ? "bg-background/5 border border-background/50"
-                      : "bg-primary-darker/15"
-                  }`}
+                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${"bg-primary-surface/60 transition-transform duration-300 group-hover:scale-110"}`}
                 >
                   <Icon size={22} className="text-primary" />
                 </div>
@@ -73,20 +67,10 @@ export default function OurApproachSection() {
                     highlighted ? "bg-primary" : "bg-primary"
                   }`}
                 />
-                <h3
-                  className={`text-base font-semibold md:text-lg ${
-                    highlighted ? "text-inverse-foreground" : "text-foreground"
-                  }`}
-                >
+                <h3 className="text-base font-semibold text-primary-darker md:text-lg">
                   {title}
                 </h3>
-                <p
-                  className={`mt-3 text-sm md:text-base ${
-                    highlighted
-                      ? "text-inverse-foreground"
-                      : "text-muted-foreground"
-                  }`}
-                >
+                <p className="mt-3 text-sm text-muted-foreground md:text-base">
                   {description}
                 </p>
 

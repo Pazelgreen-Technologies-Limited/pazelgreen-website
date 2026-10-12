@@ -21,19 +21,18 @@ const benefits = [
 
 export default function VolunteerSection() {
   return (
-    <section className="bg-background px-6 py-16">
-      <div className="mx-auto max-w-5xl rounded-2xl bg-primary-lighter p-8 shadow-md shadow-primary-darker/10 md:p-12">
+    <section className="bg-background px-6 py-16 md:py-20">
+      <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          {/* Section heading */}
-          <div className="text-center">
-            <h3 className="text-normal font-extrabold tracking-wide text-accent">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-primary/70">
               Support innovation initiatives
-            </h3>
-            <h2 className="mt-2 text-2xl font-extrabold text-foreground md:text-4xl">
+            </p>
+            <h2 className="mt-2 font-sans text-3xl font-extrabold text-primary-darker sm:text-4xl">
               Volunteer & Contribute
             </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
               You don&apos;t need to be on our team to help shape the future of
               agriculture. We welcome contributions from developers, designers,
               researchers, and agriculture professionals worldwide.
@@ -41,12 +40,9 @@ export default function VolunteerSection() {
             {/* View positions CTA */}
             <Link
               href="/join-us/careers"
-              className="mt-4 inline-flex items-center gap-1 text-2xl font-bold text-primary-darker hover:underline"
+              className="mt-5 inline-flex items-center gap-2 text-base font-semibold text-primary-darker hover:underline"
             >
-              View all openings{" "}
-              <span className="rounded-full bg-primary/20 p-2">
-                <ArrowRight size={16} />
-              </span>
+              View all openings <ArrowRight size={16} />
             </Link>
           </div>
         </div>
@@ -54,12 +50,12 @@ export default function VolunteerSection() {
         {/* Two info cards */}
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Ways to Contribute */}
-          <MotionCard className="rounded-xl bg-background p-6 pr-16 transition-colors">
-            <div className="mb-3 inline-flex rounded-xl bg-primary-lighter p-2">
+          <MotionCard className="rounded-lg border border-border bg-card p-6 transition-colors">
+            <div className="mb-3 inline-flex rounded-lg bg-primary-surface/60 p-2">
               <GitMerge size={24} className="text-primary" />
             </div>
             <div className="pr-20">
-              <h4 className="text-normal font-bold text-foreground">
+              <h4 className="text-lg font-bold text-primary-darker">
                 Ways to Contribute
               </h4>
             </div>
@@ -67,7 +63,7 @@ export default function VolunteerSection() {
               {ways.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                  className="flex items-center gap-2 text-sm leading-relaxed text-muted-foreground"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   {item}
@@ -77,12 +73,12 @@ export default function VolunteerSection() {
           </MotionCard>
 
           {/* Benefits */}
-          <MotionCard className="rounded-xl bg-background p-6 pr-16 transition-colors">
-            <div className="mb-3 inline-flex rounded-xl bg-primary-lighter p-2">
+          <MotionCard className="rounded-lg border border-border bg-card p-6 transition-colors">
+            <div className="mb-3 inline-flex rounded-lg bg-primary-surface/60 p-2">
               <Gift size={24} className="text-primary" />
             </div>
             <div className="pr-20">
-              <h4 className="text-normal font-bold text-foreground">
+              <h4 className="text-lg font-bold text-primary-darker">
                 Benefits
               </h4>
             </div>

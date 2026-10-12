@@ -44,16 +44,15 @@ export default function OurStorySection() {
   return (
     <section
       id="our-story"
-      className="bg-primary-lighter px-6 py-16 md:py-24 font-sans text-foreground"
+      className="bg-background px-6 py-16 font-sans text-foreground md:py-24"
     >
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <p className="mb-3 text-xs font-bold tracking-wider text-primary/70 uppercase">
             Our Story
           </p>
-          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-primary-darker md:text-4xl lg:text-5xl">
             From a critical observation to a broader innovation journey.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
@@ -69,44 +68,24 @@ export default function OurStorySection() {
             ({ icon: Icon, tag, title, description, highlighted }) => (
               <MotionCard
                 key={tag}
-                className={`group rounded-2xl border p-6 md:p-8 transition-colors ${
-                  highlighted
-                    ? "border-transparent bg-primary-darker text-inverse-foreground shadow-lg"
-                    : "border-border bg-background"
+                className={`group rounded-lg border bg-card p-6 transition-colors hover:border-primary-surface md:p-8 ${
+                  highlighted ? "border-primary/40" : "border-border"
                 }`}
               >
                 {/* Tag with icon */}
                 <div className="mb-6 flex items-center gap-2">
-                  <div
-                    className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-                      highlighted ? "bg-primary-dark" : "bg-primary-lighter"
-                    }`}
-                  >
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary-surface/60 transition-transform duration-300 group-hover:scale-110">
                     <Icon size={18} className="text-primary" />
                   </div>
-                  <span
-                    className={`text-xs font-bold tracking-widest uppercase ${
-                      highlighted ? "text-primary" : "text-primary"
-                    }`}
-                  >
+                  <span className="text-xs font-bold tracking-widest text-primary uppercase">
                     {tag}
                   </span>
                 </div>
 
-                <h3
-                  className={`text-lg font-bold md:text-xl ${
-                    highlighted ? "text-inverse-foreground" : "text-foreground"
-                  }`}
-                >
+                <h3 className="text-lg font-bold text-primary-darker md:text-xl">
                   {title}
                 </h3>
-                <p
-                  className={`mt-3 text-sm md:text-base ${
-                    highlighted
-                      ? "text-inverse-foreground"
-                      : "text-muted-foreground"
-                  }`}
-                >
+                <p className="mt-3 text-sm text-muted-foreground md:text-base">
                   {description}
                 </p>
               </MotionCard>

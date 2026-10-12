@@ -18,14 +18,14 @@ const cards = [
 
 export default function MissionVisionSection() {
   return (
-    <section className="bg-background-alt px-6 py-16 md:py-24 font-sans text-foreground">
+    <section className="bg-background px-6 py-16 font-sans text-foreground md:py-24">
       <div className="mx-auto max-w-5xl">
         {/* Section heading */}
         <div className="text-center">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+          <p className="mb-3 inline-flex items-center gap-2 text-xs font-bold tracking-wider text-primary/70 uppercase">
             <Target size={12} /> Mission &amp; Vision
           </p>
-          <h2 className="text-3xl font-extrabold text-foreground md:text-4xl lg:text-5xl">
+          <h2 className="text-3xl font-extrabold text-primary-darker md:text-4xl lg:text-5xl">
             Mission &amp; Vision
           </h2>
         </div>
@@ -35,33 +35,17 @@ export default function MissionVisionSection() {
           {cards.map(({ icon: Icon, tag, body, highlighted }) => (
             <MotionCard
               key={tag}
-              className={`group rounded-2xl p-6 md:p-10 transition-colors ${
-                highlighted
-                  ? "bg-primary-darker text-inverse-foreground shadow-lg"
-                  : "border border-border bg-background"
+              className={`group rounded-lg border bg-card p-6 transition-colors hover:border-primary-surface md:p-10 ${
+                highlighted ? "border-primary/40" : "border-border"
               }`}
             >
-              <div
-                className={`mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl ${
-                  highlighted ? "bg-primary-dark" : "bg-primary-lighter"
-                }`}
-              >
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary-surface/60 transition-transform duration-300 group-hover:scale-110">
                 <Icon size={22} className="text-primary" />
               </div>
-              <p
-                className={`mb-4 text-xs font-bold tracking-widest uppercase ${
-                  highlighted ? "text-primary" : "text-primary"
-                }`}
-              >
+              <p className="mb-4 text-xs font-bold tracking-widest text-primary uppercase">
                 {tag}
               </p>
-              <p
-                className={`text-base font-medium md:text-lg ${
-                  highlighted
-                    ? "text-inverse-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
+              <p className="text-base font-medium text-muted-foreground md:text-lg">
                 {body}
               </p>
             </MotionCard>

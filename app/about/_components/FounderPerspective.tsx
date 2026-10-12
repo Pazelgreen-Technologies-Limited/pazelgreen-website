@@ -26,11 +26,11 @@ export default function FounderPerspective() {
         <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-2 md:gap-12">
           {/* LEFT — copy column */}
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-primary-lighter px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
+            <p className="mb-3 inline-flex items-center gap-2 text-xs font-bold tracking-wider text-primary/70 uppercase">
               <Quote size={12} /> Founder&apos;s Perspective
             </p>
 
-            <h2 className="text-3xl font-extrabold leading-tight text-foreground md:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-extrabold leading-tight text-primary-darker md:text-4xl lg:text-5xl">
               Building systems, not just products.
             </h2>
 
@@ -54,7 +54,7 @@ export default function FounderPerspective() {
             </div>
 
             {/* Pull-quote with green left border */}
-            <blockquote className="mt-8 border-l-4 border-primary bg-primary-lighter/40 px-5 py-4">
+            <blockquote className="mt-8 border-l-4 border-primary bg-background-alt px-5 py-4">
               <p className="text-base font-semibold italic text-primary-darker md:text-lg">
                 &ldquo;Pazelgreen exists to build practical systems that help
                 agriculture become more coordinated, efficient, and
@@ -89,7 +89,7 @@ export default function FounderPerspective() {
                     <Lightbulb size={18} className="text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-foreground">
+                    <p className="text-sm font-bold text-primary-darker">
                       Founder, Pazelgreen Technologies
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
@@ -110,12 +110,14 @@ export default function FounderPerspective() {
           {approachCards.map(({ icon: Icon, title, description }) => (
             <MotionCard
               key={title}
-              className="group rounded-2xl border border-border bg-background p-6 transition-colors hover:border-primary-surface"
+              className="group rounded-lg border border-border bg-card p-6 transition-colors hover:border-primary-surface"
             >
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-lighter">
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary-surface/60 transition-transform duration-300 group-hover:scale-110">
                 <Icon size={20} className="text-primary" />
               </div>
-              <h3 className="text-base font-bold text-foreground">{title}</h3>
+              <h3 className="text-base font-bold text-primary-darker">
+                {title}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 {description}
               </p>

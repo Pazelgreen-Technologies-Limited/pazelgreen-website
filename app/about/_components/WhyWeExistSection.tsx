@@ -47,16 +47,16 @@ const insightCards = [
 
 export default function WhyWeExistSection() {
   return (
-    <section className="bg-primary-lighter px-6 py-16 md:py-24 font-sans text-foreground">
+    <section className="bg-background px-6 py-16 font-sans text-foreground md:py-24">
       <div className="mx-auto max-w-5xl">
         {/* Two-column layout: copy on left, image with overlays on right */}
         <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2 md:gap-16">
           {/* LEFT — copy column */}
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary-surface bg-background px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase">
-              <span>🔍</span> Why We Exist
+            <p className="mb-3 text-xs font-bold tracking-wider text-primary/70 uppercase">
+              Why We Exist
             </p>
-            <h2 className="text-3xl font-extrabold leading-tight text-foreground md:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-extrabold leading-tight text-primary-darker md:text-4xl lg:text-5xl">
               Agriculture&apos;s biggest problem is fragmentation.
             </h2>
             <p className="mt-5 text-sm text-muted-foreground md:text-base">
@@ -75,7 +75,7 @@ export default function WhyWeExistSection() {
                     <Icon size={18} className="text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-foreground md:text-base">
+                    <h4 className="text-sm font-bold text-primary-darker md:text-base">
                       {title}
                     </h4>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -87,11 +87,11 @@ export default function WhyWeExistSection() {
             </ul>
 
             {/* Dark green callout */}
-            <div className="mt-8 flex items-start gap-3 rounded-2xl bg-primary-darker p-5 text-inverse-foreground shadow-lg md:p-6">
-              <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-dark">
+            <div className="mt-8 flex items-start gap-3 rounded-lg border-l-4 border-primary bg-background-alt p-5 text-foreground md:p-6">
+              <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-surface/60">
                 <Send size={16} className="text-primary" />
               </div>
-              <p className="text-sm text-inverse-foreground md:text-base">
+              <p className="text-sm text-muted-foreground md:text-base">
                 Pazelgreen exists to address these gaps through innovation-led
                 solutions that improve how agricultural systems function,
                 connect, and grow.
@@ -148,13 +148,15 @@ function InsightCard({
 }) {
   return (
     <div
-      className={`rounded-xl bg-primary-darker/95 p-3 text-inverse-foreground shadow-lg backdrop-blur-sm md:p-4 ${className}`}
+      className={`rounded-lg bg-background/95 p-3 text-foreground shadow-lg backdrop-blur-sm md:p-4 ${className}`}
     >
-      <p className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-primary uppercase md:text-xs">
-        <span>📊</span> System Insight
+      <p className="mb-1 text-[10px] font-bold tracking-widest text-primary/70 uppercase md:text-xs">
+        System Insight
       </p>
-      <h4 className="text-sm font-bold md:text-base">{title}</h4>
-      <p className="mt-1 text-xs text-inverse-foreground md:text-sm">{body}</p>
+      <h4 className="text-sm font-bold text-primary-darker md:text-base">
+        {title}
+      </h4>
+      <p className="mt-1 text-xs text-muted-foreground md:text-sm">{body}</p>
     </div>
   );
 }
