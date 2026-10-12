@@ -1,74 +1,58 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, PlayCircle, CheckCircle } from "lucide-react";
-import MotionCard from "@/components/MotionCard";
+import Button from "@/components/ui/Button";
+import { CheckCircle2 } from "lucide-react";
 
-// Feature checkmarks displayed below the PAGEX description
-const pagexFeatures = [
-  "Real-time market intelligence and pricing data",
-  "Secure and transparent transaction facilitation",
-  "End-to-end supply-chain traceability",
+const platformCapabilities = [
+  "Connect farmers, buyers, and service providers",
+  "Coordinate activity across agricultural value chains",
+  "Support more transparent trade and market visibility",
 ];
 
 export default function PagexSection() {
   return (
-    <section className="bg-background px-6 py-16 font-sans text-gray-900">
-      <div className="mx-auto max-w-5xl text-center">
-        {/* Section heading */}
-        <h3 className="text-2xl font-extrabold tracking-wide text-orange-500">
-          Flagship Product
-        </h3>
-        <h2 className="mt-2 text-3xl font-inter font-extrabold text-gray-900 md:text-5xl">
-          PAGEX
-        </h2>
-        <p className="mt-1 text-base font-bold text-green-800">
-          Ecosystem Coordination & Market Intelligence Platform
-        </p>
-        <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
-          PAGEX is an ecosystem coordination platform that connects stakeholders
-          across agricultural value chains, enabling structured coordination,
-          improved transparency, and efficient value exchange.
-        </p>
+    <section className="bg-primary-darker px-6 py-16 text-inverse-foreground md:py-20">
+      <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-8 md:grid-cols-[1.1fr_0.9fr] md:gap-12">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-primary-light">
+            Featured platform
+          </p>
+          <h2 className="mt-2 text-4xl font-extrabold sm:text-5xl">PAGEX</h2>
+          <p className="mt-4 max-w-2xl text-lg font-semibold text-inverse-foreground">
+            Ecosystem coordination and market intelligence for agricultural
+            trade.
+          </p>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-inverse-foreground/80">
+            A platform connecting agricultural value-chain participants to
+            coordinate activity, improve visibility, and enable more efficient
+            exchange.
+          </p>
 
-        {/* Feature checklist */}
-        <div className="mt-8 flex flex-col items-center gap-4 justify-between md:flex-row ">
-          {pagexFeatures.map((feature) => (
-            <MotionCard
-              key={feature}
-              className=" flex-1 rounded-xl border-y-4 border-x-2 border-t-0 border-primary px-4 py-4  text-base font-semibold text-gray-700 max-w-lg"
-            >
-              <div className="flex items-start gap-2 px-2 justify-center">
-                <CheckCircle size={16} className="text-green-800" />
-                {feature}
-              </div>
-            </MotionCard>
-          ))}
-        </div>
+          <ul className="mt-6 space-y-3">
+            {platformCapabilities.map((capability) => (
+              <li key={capability} className="flex items-start gap-3 text-sm">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary-light" />
+                <span>{capability}</span>
+              </li>
+            ))}
+          </ul>
 
-        {/* CTA buttons */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link
+          <Button
             href="/pagex"
-            className="flex items-center gap-2 rounded-2xl bg-green-500 px-6 py-3 text-base font-extrabold text-background hover:bg-primary-dark"
+            variant="white"
+            showArrow
+            className="mt-8 transition-transform duration-200 hover:-translate-y-0.5"
           >
-            Explore PAGEX <ArrowRight size={16} />
-          </Link>
-          <Link
-            href="/demo"
-            className="flex items-center gap-2 rounded-2xl border border-gray-300 px-6 py-3 text-base font-extrabold text-primary hover:bg-gray-200"
-          >
-            <PlayCircle size={16} /> Watch Demo
-          </Link>
+            Open PAGEX
+          </Button>
         </div>
 
-        {/* Dashboard mockup image */}
-        <div className="mt-12 overflow-hidden rounded-2xl shadow-lg">
+        <div className="relative mx-auto aspect-square w-full max-w-md">
           <Image
-            src="/pagex-chart.png"
-            alt="PAGEX dashboard preview"
-            width={1200}
-            height={600}
-            className="w-full object-cover"
+            src="/pagex-network-visual.png"
+            alt="Network illustration showing connected stakeholders and synchronized market data"
+            fill
+            sizes="(max-width: 768px) 100vw, 40vw"
+            className="object-contain"
           />
         </div>
       </div>

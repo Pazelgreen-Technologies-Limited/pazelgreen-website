@@ -38,48 +38,48 @@ const capabilities = [
 
 export default function CoreCapabilities() {
   return (
-    <section className="bg-background px-6 py-16">
-      <div className="mx-auto md:max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 md:shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
-        {/* Section heading */}
-        <div className="text-center">
-          <h3 className="text-normal font-extrabold tracking-wide text-orange-500">
+    <section className="bg-background px-6 py-16 md:py-20">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-primary/70">
             What We Do
-          </h3>
-          <h2 className="mt-2 text-2xl font-extrabold text-gray-900 md:text-4xl">
+          </p>
+          <h2 className="mt-3 text-3xl font-extrabold text-primary-darker sm:text-4xl">
             Core Capabilities
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             We build innovative solutions that address critical gaps across
             agricultural systems, enabling sustainable growth, resilience, and
             value creation across emerging markets.
           </p>
           <Link
-            href="/solution"
-            className="mt-4 inline-flex items-center gap-1 text-2xl font-medium text-green-800 hover:underline"
+            href="/solutions"
+            className="group mt-5 inline-flex items-center gap-2 font-semibold text-primary-darker hover:underline"
           >
-            View all capabilities{" "}
-            <span className="bg-[#17913B33] p-2 rounded-full">
-              <ArrowRight size={16} />
-            </span>
+            Explore all solutions
+            <ArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
         </div>
 
         {/* Capability cards grid */}
-        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
           {capabilities.map(({ icon: Icon, title, description }) => (
             <MotionCard
               key={title}
-              className="rounded-xl bg-green-50 p-6 md:pr-16 transition-colors"
+              className="group rounded-lg border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary-surface hover:shadow-lg md:p-8"
             >
-              <div className="mb-3 inline-flex rounded-xl bg-background p-2">
-                <Icon size={24} className="text-green-600" />
+              <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-primary-surface/60 transition-transform duration-300 group-hover:scale-110">
+                <Icon size={22} className="text-primary" />
               </div>
 
-              <div className="md:pr-20">
-                <h4 className="text-normal font-bold text-gray-900">{title}</h4>
-              </div>
+              <h3 className="text-lg font-bold text-primary-darker">{title}</h3>
 
-              <p className="mt-2 text-sm text-gray-600">{description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {description}
+              </p>
             </MotionCard>
           ))}
         </div>
