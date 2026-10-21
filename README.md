@@ -96,3 +96,19 @@ Language: TypeScript
 Styling: Tailwind CSS
 
 Package Manager: pnpm
+
+## Issue map:
+```text
+                 ┌──> Issue 8 (Docs)  [Immediate]
+                 │
+                 ├──> Issue 9 (UI Fixes) [Immediate]
+                 │
+Issue 1 (Setup) ─┴──> Issue 2 (CMS Schemas)
+                           │
+                           ├──> Issue 3 (Approvals & Email) ──┐
+                           ├──> Issue 4 (Global Layout)     ──┼──> Issue 7 (Launch & E2E)
+                           ├──> Issue 5 (Dynamic Pages)     ──┤
+                           └──> Issue 6 (Forms & Security)  ──┘
+```
+
+
