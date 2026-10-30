@@ -1,11 +1,12 @@
 // src/env.ts
 
-const requiredEnvs = [
-  "DATABASE_URL",
-  "NEXT_PUBLIC_API_URL",
-] as const;
+const requiredEnvs = ["DATABASE_URL", "NEXT_PUBLIC_API_URL"] as const;
 
 function validateEnv() {
+  if (process.env.SKIP_ENV_VALIDATION === "true") {
+    return;
+  }
+
   const missing: string[] = [];
 
   for (const envName of requiredEnvs) {
@@ -17,8 +18,10 @@ function validateEnv() {
   if (missing.length > 0) {
     console.error("❌ Fatal Error: Missing required environment variables:");
     missing.forEach((env) => console.error(`   - ${env}`));
-    console.error("\nPlease check your .env file or environment configuration.");
-    process.exit(1); // Stops the build/app immediately
+    console.error(
+      "\nPlease check your .env file or environment configuration.",
+    );
+    process.exit(1);
   }
 }
 
