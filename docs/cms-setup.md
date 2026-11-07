@@ -1,146 +1,150 @@
-# CMS foundation (T01–T03)
+# CMS setup command reference
+
+This is the short operational reference. New to Payload? Read the
+[team handbook](payload-handbook.md) for the concepts, reasons, editing workflow,
+production responsibilities, recovery and troubleshooting. Commands below reflect
+this repository's scripts; stop and fix errors before continuing to the next step.
 
 ## Local setup
 
-Use Node **24.22.2** (see `.node-version`), pnpm **10.18.1**, and Docker Compose.
-Payload **3.93.0**, Next **16.3.3**, and GraphQL **16.11.0** are pinned together.
-The Node requirement comes from Payload's published package, and Next 16.3.3 is
-the minimum Next 16 release accepted by that package's peer dependencies.
+Use Node **24.22.2**, pnpm **10.18.1**, and running Docker Desktop/Compose.
+On a new checkout, install with `pnpm install --frozen-lockfile`, copy
+`.env.example` to `.env`, and configure:
 
-1. Run `pnpm install --frozen-lockfile`.
-2. Copy `.env.example` to `.env`. Choose a local PostgreSQL password and put the
-   same URL-encoded password in `DEV_DATABASE_URL`. Set `PAYLOAD_SECRET` to a
-   random secret of at least 32 characters. Never commit `.env`.
-3. Run `pnpm dev`. Its predev step starts Docker services, waits for PostgreSQL,
-   and applies committed migrations before starting Next. Schema push is disabled.
-4. Open the website at `http://localhost:3000`, admin at `/admin`, and the local
-   email inbox at `http://localhost:8025`.
+- `APP_ENV=development`.
+- Matching `POSTGRES_PASSWORD` and URL-encoded password in `DEV_DATABASE_URL`.
+- A random `PAYLOAD_SECRET` of at least 32 characters.
+- `SERVER_URL=http://localhost:3000` for the default development port.
 
-PostgreSQL binds only to `127.0.0.1:5433`, avoiding other local databases on 5432.
-The database and Mailpit inbox have named Docker volumes. `pnpm db:stop` stops
-services without deleting data; `pnpm db:up` starts them again. Never use
-`docker compose down -v` unless you intend to permanently erase local data.
-Changing POSTGRES_PASSWORD after initialization does not change an existing
-database role's password; rotate it inside Postgres and update the URL together.
+Keep an existing `.env` instead of overwriting it. See the handbook's
+[setup procedure](payload-handbook.md#first-local-setup) for secret generation,
+password distinctions and why each step matters.
 
-### First administrator and invitations
+```sh
+pnpm dev
+```
 
-There is no public account registration, including Payload's first-user API.
-Temporarily set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` (12–256
-characters) in your untracked environment, then run `pnpm cms:bootstrap`.
-The command accepts only an empty user database and serializes concurrent setup.
-Remove the bootstrap credentials immediately after success.
+`predev` starts Compose services, waits for readiness and runs migrations before
+Next.js. Public site: http://localhost:3000. Admin: http://localhost:3000/admin.
+Local email inbox: http://localhost:8025. PostgreSQL: `127.0.0.1:5433`.
 
-An administrator signs in and creates a record in **Invitations** with the
-recipient's email, name and admin/staff role. The recipient receives a single-use
-link valid for 24 hours, chooses their own password at `/admin/accept-invitation`,
-then signs in. Only a SHA-256 token hash is stored. Redemption and account creation
-share a database transaction and row lock, so simultaneous redemption creates
-one account. Delete an unused invitation to revoke it; create a new invitation
-to resend after expiry. Mailpit receives these emails in development. If SMTP
-fails during invitation creation, the record is rolled back; retry after recovery.
+## First admin and invitations
 
-Only admins manage users and invitations. Staff can edit their own name, email,
-and password; role/status changes are denied on the server. Prefer deactivation
-to deletion. Deactivation and role changes clear existing sessions. Disabled
-users cannot log in or access protected data. Hooks and a PostgreSQL trigger
-protect the final active admin, including concurrent/bulk updates. Audit records
-store immutable user identifiers rather than relationships, preserving historical
-attribution when users are deleted. Database administrators remain responsible
-for access to database credentials and backups.
+After the database is ready and migrated, temporarily set
+`BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) in your
+untracked environment, then run in another terminal:
 
-### Drafts and approvals
+```sh
+pnpm cms:bootstrap
+```
 
-`cms/workflow.ts` supplies `withReview` for collections added in later tasks.
-Public media is the first use. Staff/admins save drafts and set `reviewState` to
-`in-review` when ready. An admin can publish that unchanged submitted draft or
-return it with `reviewState=changes-requested` and a required note. Editing content
-after submission resets review to `draft`. Save edits before submitting again.
+Remove both bootstrap values after success. This command only accepts an empty
+users collection. Existing shared environments use administrator invitations;
+there is no public signup. An invitation expires after 24 hours and can be used
+once. Development email is captured by Mailpit rather than sent to real inboxes.
+See [admin workflows](payload-handbook.md#using-the-admin-panel).
 
-All non-publication writes are forced into draft storage before Payload decides
-which table to write, even if a caller omits `draft=true`. A replacement draft
-does not overwrite published data. Publishing requires an explicit
-`_status=published` with `draft=false` or omitted. Staff cannot publish. Creator,
-modifier, submission, review and publication timestamps/identifiers are set by
-server hooks. Version history is restricted to active staff/admins; restoring
-versions directly is blocked to preserve review. Copy historical values into a
-draft and submit them again instead. Upload new media records for replacement
-images; existing file bytes cannot be replaced behind an approved public URL.
-Admins can archive content without deleting its history by using Unpublish
-(`_status=draft`, `draft=false`); staff requests only save private drafts.
-Editorial review notes and attribution fields are hidden from anonymous reads.
-Concurrent edits and publication are serialized before loading the latest version.
+## Everyday commands
 
-`GET /api/preview/media/:id` returns the latest draft as JSON only to active
-staff/admins, with `private, no-store` and `noindex` headers. Frontend previews
-for blog/jobs will be connected when their public routes exist. Public REST reads
-return only published records; anonymous draft/version/preview access is denied.
+| Command | Effect |
+| --- | --- |
+| `pnpm dev` | Start local services, apply pending migrations and run Next.js/Payload |
+| Ctrl+C in the app terminal | Stop Next.js; leave Docker services running |
+| `pnpm db:stop` | Stop project containers without deleting their volumes |
+| `pnpm db:up` | Start project containers and wait for readiness |
+| `docker compose ps` | Inspect container state |
+| `pnpm cms:migrate` | Apply pending migrations to the database selected by APP_ENV |
+| `pnpm exec payload migrate:status` | Show migration status |
 
-### Storage
+Our database helper scripts refuse non-development APP_ENV values. Local optimized
+build rehearsal: `pnpm db:up`, `pnpm cms:migrate`, `pnpm build`, then `pnpm start`,
+keeping `APP_ENV=development`. Stop any app using port 3000 first.
 
-Local upload bytes live in `storage/public` and `storage/private`, ignored by Git
-and outside Next's `public/` directory. Payload serves them through access-checked
-endpoints; private file downloads require an active staff/admin session and return
-`private, no-store`. Maximum upload size is 5 MB. Public media accepts JPEG, PNG,
-and WebP. Private storage currently provides PDF/DOCX infrastructure only; the
-candidate upload validation, applications, and retention workflow belong to T07.
-Do not point a web server/CDN directly at private storage.
+## Schema changes
 
-## Environment selection and production
+After editing a collection/global definition as part of a feature:
 
-| APP_ENV | Connection | Docker startup |
-| --- | --- | --- |
-| `development` | `DEV_DATABASE_URL` | `pnpm dev` starts local Compose services |
-| `test` | `TEST_DATABASE_URL` | Not started automatically |
-| `production` | `PRODUCTION_DATABASE_URL` | Refused by database scripts |
+```sh
+pnpm cms:types
+pnpm cms:importmap
+pnpm cms:migration:create describe_the_change
+```
 
-When APP_ENV is absent, production NODE_ENV selects production; other runtimes
-default to development. Set APP_ENV explicitly in deployments. Next sets
-NODE_ENV=production during **every** build, so APP_ENV=development intentionally
-supports a local production build against Docker. Do not set NODE_ENV manually
-to invent additional environments.
+Review the generated SQL and snapshot, then apply it with `pnpm cms:migrate`.
+Commit relevant generated types, import-map changes, migration TS/JSON and index.
+Database schema push is disabled. Keep applied migrations append-only and preserve
+custom database triggers. See [developer workflow](payload-handbook.md#developer-workflow).
 
-Production never falls back to development or the legacy DATABASE_URL. It needs:
+## Test database and checks
 
-- `APP_ENV=production`, `PRODUCTION_DATABASE_URL`, and a strong `PAYLOAD_SECRET`.
-- An HTTPS `SERVER_URL`, SMTP credentials and a verified `EMAIL_FROM_ADDRESS`.
-- Absolute `PUBLIC_UPLOAD_DIR` and `PRIVATE_UPLOAD_DIR` on separate persistent
-  mounted directories, with filesystem access for the app's service account.
-
-This foundation supports a server with persistent disks. Ephemeral/serverless
-hosting requires a storage adapter before deployment; no cloud provider has been
-selected. Configure database TLS through the production connection URL/provider,
-and retain certificate verification. Back up Postgres **and** both upload mounts.
-Mailpit is development-only; never use it as the production email service.
-
-Release steps: install locked dependencies, generate types/import map if schemas
-changed, run checks, build, back up the database, run `pnpm cms:migrate`, then
-`pnpm start`. Run migrations as a single deployment job before accepting traffic.
-Keep the same PAYLOAD_SECRET across restarts. No secret is NEXT_PUBLIC_.
-SKIP_ENV_VALIDATION no longer bypasses CMS environment checks.
-
-## Development and verification
-
-- `pnpm cms:types` / `pnpm cms:importmap`: regenerate committed outputs.
-- `pnpm cms:migration:create <name>`: generate a schema migration; review and commit
-  its TS/JSON files and migration index. Keep custom trigger migrations intact.
-- `pnpm cms:migrate`: apply migrations; `pnpm exec payload migrate:status`: inspect.
-- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`: routine checks.
-- `pnpm test:integration`: real PostgreSQL/Mailpit integration checks.
-- After integration tests and a production build, `pnpm test:http` starts a
-  temporary production server on 127.0.0.1:3101 against test fixtures, verifies
-  real REST roles/publication/downloads/session revocation, and stops the server.
-
-Before integration tests, start Docker and create a separate database:
+Start local services with `pnpm db:up`. Once, create a separate disposable database:
 
 ```sh
 docker compose exec -T postgres psql -U pazelgreen -d postgres -c "CREATE DATABASE pazelgreen_test;"
 ```
 
-Set TEST_DATABASE_URL with the local credentials and `/pazelgreen_test` database.
-Tests refuse non-local URLs and names that do not end in `_test`, apply migrations,
-then truncate only that verified test database's CMS records. They also use separate
-`storage/test-public` and `storage/test-private` directories. Never use a real
-development or production database as TEST_DATABASE_URL.
+This example assumes the default local Postgres user. If you changed
+`POSTGRES_USER`, use that value with `-U`. If the database already exists, reuse it
+only if it is genuinely disposable; do not delete another database to resolve the error.
 
-See `.planning/progress.md` for actual validation evidence and remaining tasks.
+Set `TEST_DATABASE_URL` in `.env` using the local credentials and the
+`pazelgreen_test` database. The helpers require localhost/127.0.0.1 and a database
+name ending in `_test`. Integration tests **reset CMS records** in that database
+and use `storage/test-public` and `storage/test-private`.
+
+Run in order, fixing failures before continuing:
+
+```sh
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:integration
+pnpm build
+pnpm test:http
+```
+
+Integration tests use real PostgreSQL and Mailpit. HTTP checks need their fixtures
+and a fresh production build; the script starts/stops its own test server on
+`127.0.0.1:3101`. CI provisions test services and runs these checks; it does not
+provision production or deploy the website.
+
+## Environment selection
+
+| APP_ENV | Database URL | Intended use |
+| --- | --- | --- |
+| `development` | `DEV_DATABASE_URL` | Local Docker database |
+| `test` | `TEST_DATABASE_URL` | Disposable local test database |
+| `production` | `PRODUCTION_DATABASE_URL` | Explicitly configured hosted deployment |
+
+APP_ENV is distinct from Next's NODE_ENV. Production never falls back to the
+local database or legacy DATABASE_URL. For details and every supported variable,
+see [environment configuration](payload-handbook.md#understanding-environment-variables).
+
+## Production release reference
+
+Read the [full production procedure](payload-handbook.md#running-in-production)
+first. The operator must provision PostgreSQL, SMTP, HTTPS hosting and persistent
+upload storage, and configure APP_ENV, the production URL, stable PAYLOAD_SECRET,
+SERVER_URL, SMTP values, and absolute PUBLIC_UPLOAD_DIR/PRIVATE_UPLOAD_DIR paths.
+The current filesystem storage requires persistent mounts; ephemeral/serverless
+hosting needs an implemented storage adapter before deployment.
+
+For a reviewed release, install locked dependencies, run checks in the development/
+CI test environment, and build the release with its required configuration. Back
+up existing production data and apply `pnpm cms:migrate` once in a controlled
+release job before serving code that needs the new schema. Bootstrap a first admin
+only for an empty users collection, then serve the built app with `pnpm start`.
+
+`pnpm start` does not start Docker or apply migrations. Build success does not
+verify SMTP delivery or storage persistence. Verify the deployed HTTPS site,
+login/invitation delivery, approved content and denied private access, and rehearse
+[backup recovery](payload-handbook.md#backups-and-recovery). Coordinate breaking
+schema changes with the running app; code rollback alone does not restore a database.
+
+## Current limits and implementation status
+
+T01–T03 provide the CMS foundation. Visual blog/job previews, company settings,
+SEO, recruitment and other planned features are not all present yet. The current
+media preview is authenticated JSON; private PDF/DOCX storage is not a complete
+application system. See [current functionality](payload-handbook.md#what-is-available-today),
+[task plan](../.planning/task.md) and [progress](../.planning/progress.md).

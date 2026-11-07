@@ -203,3 +203,27 @@ Operational handoff and remaining scope:
   follow their future routes. Private PDF/DOCX storage is foundation only; candidate
   applications, deeper CV validation and retention remain T07.
 - T04–T12 are unchecked. Next: company settings and existing-page SEO (T04).
+
+### 2026-11-07 - Team documentation for the T01–T03 foundation
+
+- Added docs/payload-handbook.md as the first-time Payload/team handbook. It
+  explains the architecture, terminology, current vs planned features, why each
+  local setup action exists, credentials, roles, editing/review, environment
+  selection, migrations/APIs, production provisioning/releases, persistent
+  storage, backups/recovery, team responsibilities and troubleshooting.
+- Reorganized README.md as the project entry point with a documentation map,
+  accurate feature status, local quick start, common commands, architecture and
+  contribution guidance. Reworked docs/cms-setup.md as the shorter command
+  reference, linking to the handbook for explanations instead of duplicating them.
+- Cross-checked instructions against package.json, env.ts, .env.example,
+  compose.yaml, CMS configs/hooks, bootstrap/database scripts, tests and CI.
+  Verified official Payload guidance, including version-matched v3 Local API
+  access defaults, plus SMTP and Postgres initialization references.
+- Documentation validation: local file/heading links and code-fence balance
+  checked; 85 pnpm command references matched package.json; all 20 .env.example
+  variable names are explained; whitespace checks passed for tracked/new docs.
+- No application code/configuration changed. Application tests/build were not
+  rerun for this documentation-only update; prior implementation results above
+  remain historical evidence. No production actions or account setup performed.
+- No CMS scope/status change: T01–T03 remain complete, T04–T12 pending. Next
+  implementation remains company settings and existing-page SEO (T04).
