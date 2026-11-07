@@ -1,13 +1,13 @@
 # CMS implementation progress
 
 Last updated: 2026-11-07.
-Current phase: planning complete; CMS implementation not started.
+Current phase: T01–T03 complete and verified; next planned implementation is T04.
 
 ## Start here
 
 1. Read AGENTS.md and .planning/task.md.
 2. Inspect git status and relevant files; preserve other contributors' work.
-3. Start T01 and read relevant node_modules/next/dist/docs/ guides before code.
+3. Continue with the next unchecked task; read relevant local Next.js guides before code.
 4. Update this record with implementation evidence and the next concrete action.
 
 ## Completed
@@ -19,6 +19,8 @@ Current phase: planning complete; CMS implementation not started.
 - Chose startup-friendly application fields, private CVs, hiring statuses,
   and one visible announcement selected from multiple saved records.
 - Created task.md and progress.md and added handoff rules to AGENTS.md.
+- Completed T01 baseline/runtime checks and T02/T03 CMS foundation, access,
+  invitations, approval workflow, protected storage/previews, migrations and tests.
 
 ## Confirmed decisions
 
@@ -45,9 +47,9 @@ Current phase: planning complete; CMS implementation not started.
 - Multiple saved announcements, one eligible notice visible at a time.
 - Prefer staff deactivation, preserve historical attribution on deletion,
   and protect the final active admin.
-- Postgres is proposed; production provider choices remain unverified.
+- PostgreSQL confirmed by the user; Docker Compose for development. Production provider remains unselected.
 
-## Repository observations to recheck
+## Pre-implementation observations (historical)
 
 - package.json declares Next.js 16.2.9 and React 19.2.4; Payload is absent.
 - Existing pages: Home, About, Solutions, Join Us, Contact.
@@ -64,7 +66,7 @@ Current phase: planning complete; CMS implementation not started.
 - A previous inspection returned Node v22.13.0. Recheck the runtime and current
   Payload requirements rather than assuming compatibility.
 
-## Validation so far
+## Planning-stage validation (historical)
 
 - Documentation-only work: inspected AGENTS.md, package.json, env.ts, and git status.
 - CMS code, dependencies, migrations, forms, and routes have not been implemented.
@@ -82,15 +84,51 @@ Current phase: planning complete; CMS implementation not started.
 
 ## Next concrete action
 
-T01: inspect the working tree and local Next.js guides, verify runtime/Payload
-compatibility, and record baseline lint/type/build results.
-Then implement T02 foundation and T03 access/review before exposing content.
+T04: implement company settings and existing-page SEO without redesigning pages.
+The owner can create the real first administrator with the documented CLI bootstrap
+after setting credentials in an untracked local/server environment. Use supported
+Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
+24.22.2 runtime in Temp was used for all final verification.
 
 ## Future work log
 
 Append dated entries with task ID, implementation summary, changed files,
 commands/results, unresolved blockers, and next action. Never log secrets or
 applicant personal data. A plan or partial implementation is not a completed task.
+
+### 2026-11-07 - T01 baseline; T02/T03 implementation in progress
+
+- Working tree initially clean. Read installed Next route-group, layout,
+  environment-variable and route-handler guides before implementation, and
+  rechecked relevant guides after upgrading Next.
+- Baseline: Node 22.13.0, pnpm 10.18.1, Docker 27.4.0, Compose 2.31.0.
+  Lint passed with four pre-existing unused-import warnings; tsc passed.
+  Build first failed fetching Google fonts under the sandbox, then passed with
+  network access. No baseline application failures were found.
+- Payload 3.93.0 package requires Node ^22.23.4 or >=24.22.1 and its actual
+  published Next peer requires 16.3.3+ on Next 16 (stricter than website docs).
+  Selected Next 16.3.3, Payload packages 3.93.0, GraphQL 16.11.0, Node 24.22.2.
+  Downloaded a portable Node runtime to Temp for validation, without modifying
+  the user's system Node installation. Updated repository runtime/CI requirements.
+- User confirmed Docker PostgreSQL in development, production DB selected by
+  environment. Implemented APP_ENV and separate DEV/PRODUCTION/TEST database URLs;
+  production refuses missing/local DB URLs and has no development fallback.
+- Added compose.yaml (Postgres 17.7 and Mailpit with named volumes), configured
+  untracked local development secrets without logging them, and started healthy
+  services. Created a separate disposable pazelgreen_test database.
+- Added isolated frontend/Payload root layouts, CMS config, generated types/import
+  map, explicit SQL migrations (schema push disabled), persistent filesystem upload
+  directories outside public/, CLI bootstrap, users/invitations, audit records,
+  reusable review hooks, protected previews and private file access.
+- Both schema and last-admin guard migrations applied to development and test DBs.
+  Environment tests: 11 passed. Initial integration run: 9 passed, 6 failed;
+  correcting test expectations/fixtures and investigating publication state.
+  Updated production build and TypeScript passed before final test refinements.
+- Production DB/SMTP/storage providers and initial administrator identity are not
+  supplied. Local Mailpit and persistent disk interface avoid choosing providers.
+  No real admin account or production resources have been created.
+- Next: finish meaningful integration and HTTP checks, review security boundaries,
+  then mark T02/T03 complete only once verification passes.
 
 ### 2026-11-07 - Documentation verification
 
@@ -101,3 +139,67 @@ applicant personal data. A plan or partial implementation is not a completed tas
 - Git reports only AGENTS.md modified and .planning/ newly added.
 - Application checks remain unrun because no application code changed.
 - Next: T01 baseline/runtime checks, then T02 foundation and T03 access control.
+
+### 2026-11-07 - T02/T03 completed and verified
+
+Implementation:
+
+- compose.yaml, env.ts, .env.example and scripts/database.ts provide environment
+  selection and local Postgres/Mailpit with named volumes. Development uses port
+  5433 on localhost. Production requires its own URL, HTTPS origin, SMTP and
+  persistent storage paths, with no fallback to development. Test DB is separate.
+- Public routes/components moved together to app/(frontend); URLs/designs retained.
+  app/(payload) contains isolated admin/API routes, activation/setup pages and
+  prefixed Tailwind utilities without resetting Payload's admin CSS.
+- payload.config.ts, payload-types.ts, generated admin/importMap.js and migrations/
+  provide the pinned Payload/Postgres foundation. Schema push is disabled; initial
+  schema and a concurrent last-admin trigger were migrated to development/test DBs.
+- cms/ contains role/access rules, users, invitations, immutable audit snapshots,
+  review/version hooks, transactional locks, public media/private files and
+  authenticated JSON draft previews. Invitation tokens are hashed, expiring and
+  consumed atomically with account creation. Existing sessions are invalidated by
+  deactivation/role changes. Anonymous/private/draft access is denied server-side.
+- Staff drafts preserve live content, edits invalidate pending review, admin
+  publication requires an unchanged submitted draft, and admins can unpublish
+  without deleting history. Editorial notes/attribution are private. Media bytes
+  cannot be replaced behind an already approved URL. Files live outside public/.
+- scripts/bootstrap-admin.ts controls the first admin; HTTP first-user registration
+  is blocked. Concurrency tests initially found the successful CLI retained
+  background resources after database cleanup. Disabled optional telemetry and
+  added explicit successful CLI exit after cleanup/output flush. Concurrent CLI
+  processes now prove one success and one explicit existing-user refusal.
+- package/lockfile/runtime/CI configuration updated. Added vitest config and unit,
+  integration and real production HTTP checks. Removed four existing unused-import
+  warnings. Documented setup/production/storage/invitations/workflow and custom API
+  contracts in docs/cms-setup.md and docs/cms-api.yaml; README and plans updated.
+
+Final validation (actual results):
+
+- pnpm test: 14 environment tests passed.
+- pnpm test:integration: 19 passed against real local PostgreSQL and Mailpit,
+  including concurrent CLI bootstrap, final-admin changes, invitation redemption,
+  role escalation, expiry, malformed requests, draft/publication/version privacy,
+  private downloads and preserved historical attribution.
+- pnpm test:http: passed against a temporary production server using only the
+  disposable test DB. Verified public/admin routes, denied public registration,
+  staff/admin REST permissions, approved vs draft data, protected previews/files,
+  and revocation of an already-issued staff session. Server stopped afterward.
+- pnpm typecheck passed. pnpm lint passed with zero errors/warnings. Final pnpm
+  build passed after all application changes, including isolated Tailwind styles.
+- Payload types/import map generation succeeded. Both SQL migrations applied.
+  Frozen-lockfile offline install succeeded. Docker reports both services healthy.
+- Git whitespace check passed. CI now provisions Postgres/Mailpit and runs the
+  checks, but no remote GitHub Actions run/deployment was triggered in this session.
+
+Operational handoff and remaining scope:
+
+- No real administrator, production DB, production SMTP account or cloud storage
+  was created. Initial admin identity/password must be supplied securely for CLI
+  bootstrap, never in planning files or logs. Local development secrets are in .env.
+- Production storage currently requires persistent mounted filesystem directories;
+  ephemeral hosting needs a storage adapter before deployment. Provider selection
+  and real production configuration remain launch dependencies, not silently chosen.
+- Preview currently covers media as authenticated JSON; frontend blog/job previews
+  follow their future routes. Private PDF/DOCX storage is foundation only; candidate
+  applications, deeper CV validation and retention remain T07.
+- T04–T12 are unchecked. Next: company settings and existing-page SEO (T04).

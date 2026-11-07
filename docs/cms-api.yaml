@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: Pazelgreen CMS foundation endpoints
+  version: 0.1.0
+  description: Custom T03 endpoints. Payload also generates collection REST APIs; all server access rules apply.
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /invitations/accept:
+    post:
+      summary: Redeem an expiring administrator invitation exactly once
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string, pattern: '^[a-f0-9]{64}$' }
+                password: { type: string, minLength: 12, maxLength: 256, writeOnly: true }
+      responses:
+        '201': { description: Account activated; sign in through Payload login }
+        '400': { description: Invalid input, expired/consumed invitation or failed activation; no account committed }
+        '503': { description: Database transaction unavailable }
+  /preview/{collection}/{id}:
+    get:
+      summary: Read latest draft JSON as authenticated active staff/admin
+      security: [{ payloadCookie: [] }]
+      parameters:
+        - { name: collection, in: path, required: true, schema: { type: string, enum: [media] } }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Draft JSON with private no-store caching and noindex }
+        '403': { description: Authentication required or inactive account }
+        '404': { description: Collection/document not found }
+components:
+  securitySchemes:
+    payloadCookie:
+      type: apiKey
+      in: cookie
+      name: payload-token

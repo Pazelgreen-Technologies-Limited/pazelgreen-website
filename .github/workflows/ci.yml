@@ -10,6 +10,28 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: development
+      DEV_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5433/pazelgreen
+      TEST_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5433/pazelgreen_test
+      PAYLOAD_SECRET: ci-only-secret-not-for-production-at-least-32-characters
+    services:
+      postgres:
+        image: postgres:17.7-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: pazelgreen_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d pazelgreen_test"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+      mailpit:
+        image: axllent/mailpit:v1.27.8
+        ports:
+          - 1025:1025
+          - 8025:8025
 
     steps:
       - name: Checkout repository
@@ -18,12 +40,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: latest
+          version: 10.18.1
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version-file: ".node-version"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -33,9 +55,16 @@ jobs:
         run: pnpm lint
 
       - name: Check TypeScript types
-        run: pnpm tsc --noEmit
+        run: pnpm typecheck
+
+      - name: Run environment tests
+        run: pnpm test
+
+      - name: Run CMS integration tests
+        run: pnpm test:integration
 
       - name: Build Next.js app
         run: pnpm build
-        env:
-          SKIP_ENV_VALIDATION: true
+
+      - name: Check production HTTP routes and CMS permissions
+        run: pnpm test:http

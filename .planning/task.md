@@ -1,7 +1,14 @@
 # Payload CMS implementation plan
 
-Status: planned; implementation has not started.
+Status: T01–T03 implemented and verified. T04–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
+
+Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
+Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
+separate TEST_DATABASE_URL. Production must never fall back to Docker. Local
+email is captured by Mailpit. Production database/SMTP providers remain pending;
+the foundation uses persistent mounted public/private filesystem directories,
+with a storage adapter required before choosing ephemeral hosting.
 
 ## Objective and scope
 
@@ -169,13 +176,14 @@ and sitemaps. Search engines may choose different displayed text.
 
 ## Delivery tasks
 
-- [ ] T01: Inspect current working tree and relevant local Next.js guides. Record
+- [x] T01: Inspect current working tree and relevant local Next.js guides. Record
   Node/pnpm versions, verify current Payload compatibility, and run baseline checks.
-- [ ] T02: Add Payload foundation, isolated frontend/admin layouts, database
+- [x] T02: Add Payload foundation, isolated frontend/admin layouts, database
   migrations, generated types, environment documentation, and persistent public/
-  private storage. Postgres is the initial proposal; verify hosting/storage/email
-  availability before provider-specific choices. Do not expose secrets.
-- [ ] T03: Implement users/invitations, access rules, last-admin protection,
+  private storage. Use Docker PostgreSQL locally and explicit production DB/SMTP/
+  persistent storage settings. Production providers remain a launch dependency.
+  Do not expose secrets.
+- [x] T03: Implement users/invitations, access rules, last-admin protection,
   draft/review/publish behavior, authenticated previews, history, and audit fields.
 - [ ] T04: Implement company settings and existing-page SEO; seed verified data
   and connect footer/contact fields without redesigning the site.
