@@ -197,11 +197,11 @@ Copy-Item .env.example .env
 If `.env` already exists, edit it instead of overwriting it. It may already contain
 the working password for an initialized local database.
 
-Set `APP_ENV=development`. Choose a local `POSTGRES_PASSWORD` and put the same
-password in `DEV_DATABASE_URL`. The example uses database/user `pazelgreen` and
-host `127.0.0.1:5433`; keep those values aligned with the Compose variables.
-The application's URL password must be URL-encoded if it contains special
-characters. A random hexadecimal password avoids that encoding issue.
+Set `APP_ENV=development`. Configure `DEV_DATABASE_URL` with database name,
+username, password and local port. The default is `127.0.0.1:5433`.
+The database helper derives Compose settings from this URL; no separate
+`POSTGRES_*` settings are needed in your `.env`. URL-encode special characters
+in the password. A random hexadecimal password avoids that encoding issue.
 
 Generate a random value locally with:
 
@@ -223,6 +223,9 @@ Keep `SERVER_URL=http://localhost:3000` for the default development server.
 These credentials are different. Changing one does not change the others.
 Never prefix a server secret or database URL with `NEXT_PUBLIC_`.
 
+Before the first start, also set `BOOTSTRAP_ADMIN_EMAIL` and
+`BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters). Step 5 below explains first login.
+
 ### 4. Start the app and initialize the schema
 
 ```sh
@@ -234,11 +237,13 @@ Leave this terminal running. The `predev` script runs before Next.js:
 1. It checks that `APP_ENV` is `development`.
 2. It starts PostgreSQL and Mailpit with `docker compose up -d --wait`.
 3. It applies pending committed migrations with `payload migrate`.
-4. Next.js starts the website, admin and APIs.
+4. It ensures an admin exists using the bootstrap credentials configured below.
+5. Next.js starts the website, admin and APIs.
 
 Migrations create the database tables that Payload needs; starting a PostgreSQL
-container alone does not create our application schema. Starting the app does not
-create a CMS administrator or seed public content.
+container alone does not create our application schema. Startup creates the first
+admin when needed; public content is not seeded. Configure bootstrap credentials
+before the first start.
 
 | Address | Use |
 | --- | --- |
@@ -254,34 +259,33 @@ update `SERVER_URL` to match; invitation links and allowed origins depend on it.
 
 Our public signup and default first-user registration API are blocked. Otherwise,
 the first visitor to a new deployment could try to claim its administrator account.
-We create the first administrator from a trusted terminal instead.
+Startup creates the first administrator from server environment secrets instead.
 
-After the database has started and migrations have finished, temporarily add these
-values to your local `.env`:
+Before the first `pnpm dev` or `pnpm start`, add these to your untracked `.env`
+(or production secret manager):
 
 ```dotenv
 BOOTSTRAP_ADMIN_EMAIL=your-own-email@example.com
 BOOTSTRAP_ADMIN_PASSWORD=replace-with-your-own-strong-password
 ```
 
-Use your real chosen email and a unique password of **12–256 characters**; the
-values above are placeholders. In a second terminal in this project, run:
+Use your chosen email and a unique password of **12–256 characters**. Startup checks
+for an admin in a transaction with a database lock. If one exists, it does nothing,
+even if credentials were removed or changed. It preserves inactive admins too.
+If no admin exists, it creates one; invalid or missing bootstrap credentials stop
+startup with an actionable error. A conflicting staff email is never promoted:
+choose a different bootstrap email. Concurrent starts create only one account.
 
-```sh
-pnpm cms:bootstrap
-```
+Sign in at `/admin`. Newly bootstrapped admins are directed to choose a password
+before using CMS content or administration APIs. They may change their email too.
+Saving the password revokes existing sessions; sign in again with the updated
+credentials. Existing accounts keep their credentials and need no forced change.
+Remove bootstrap secrets after setup. The database stores the account, so later
+restarts do not need those values. Public first-user registration remains blocked.
 
-The command creates one active admin only when the users collection is empty.
-It refuses later setup attempts. Remove both bootstrap variables from `.env`
-after success, then sign in at `/admin` with the email/password you selected.
-Removing the variables does **not** delete the account: it is stored in PostgreSQL.
-
-You do this **once per independent database**, not once per server restart or Git
-branch. Each developer with their own local database can create their own admin.
-For a shared environment that already has users, ask an admin for an invitation.
-
-If you prefer to bootstrap before starting Next.js, run `pnpm db:up`, then
-`pnpm cms:migrate`, then the bootstrap command. All three use the same `.env`.
+`pnpm cms:bootstrap` is an optional manual check after migrations, with the same
+idempotent behavior. Each independent database has its own admin. For a shared
+environment, ask an admin for an invitation.
 
 ## Everyday local development
 
@@ -463,8 +467,7 @@ Restart processes after changing environment values.
 | Variable | What to set and why |
 | --- | --- |
 | `APP_ENV` | Explicit environment from the table above |
-| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Initial credentials/database for our local Docker service |
-| `POSTGRES_PORT` | Host-side Docker database port; default 5433, container port remains 5432 |
+| Local Docker settings | Derived from `DEV_DATABASE_URL` by `pnpm db:up`; no separate `POSTGRES_*` entries |
 | `DEV_DATABASE_URL` | Local connection from Node on your computer; match the Compose credentials/port |
 | `TEST_DATABASE_URL` | Separate local database ending in `_test`; tests reset its CMS records |
 | `PRODUCTION_DATABASE_URL` | Hosted database URL supplied by the operator; never the local Docker address |
@@ -474,7 +477,7 @@ Restart processes after changing environment values.
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | Mailpit locally: `127.0.0.1`, `1025`, `false`; provider-specific values in production |
 | `SMTP_USER`, `SMTP_PASSWORD` | Production SMTP login; blank for local Mailpit |
 | `EMAIL_FROM_ADDRESS` | Local default `cms@pazelgreen.test`; verified sending address in production |
-| `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` | Temporary first-admin CLI inputs; remove after setup |
+| `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` | First-admin startup inputs; remove after setup |
 
 Port 465 commonly uses implicit TLS (`SMTP_SECURE=true`); port 587 commonly uses
 STARTTLS (`SMTP_SECURE=false`). Here, false disables implicit TLS, not necessarily
@@ -483,8 +486,8 @@ The production default is port 465 with secure enabled if you do not override it
 See the [Nodemailer SMTP settings](https://nodemailer.com/smtp) for how implicit TLS
 and STARTTLS differ.
 
-Postgres environment values initialize a **new** Docker data volume. Editing
-`POSTGRES_PASSWORD` later does not change an existing database user's password.
+The URL-derived Postgres settings initialize a **new** Docker data volume. Editing
+the password in `DEV_DATABASE_URL` later does not change an existing database user's password.
 Likewise, changing the app's URL alone does not change the database role. Coordinate
 password rotation in Postgres and in the application configuration.
 The [official Postgres image documentation](https://hub.docker.com/_/postgres)
@@ -686,16 +689,18 @@ review the configured CORS/CSRF origins instead of opening them to every website
    Supply valid production configuration; do not disable validation to hide errors.
 3. Back up any existing data and apply `pnpm cms:migrate` in a controlled release
    job against the production database. Inspect migration status and failures.
-4. For an empty users collection, provide first-admin credentials securely to that
-   environment's CLI and run `pnpm cms:bootstrap` once. Remove those inputs afterward.
+4. If no admin exists, supply bootstrap credentials in that environment's secrets.
+   Startup creates the first admin; change its password at first login and remove
+   the bootstrap secrets afterward.
 5. Start the built application with `pnpm start` under the hosting platform's process
    supervision, then verify public pages and `/admin` through the HTTPS hostname.
 6. Test an invitation/reset email, an approved image, and a private file download;
    verify anonymous/private/draft access is denied. Remove temporary acceptance data.
 7. Confirm backups and an isolated restore test, and complete the launch checks.
 
-`pnpm start` does not install dependencies, build, start Docker, create users, or
-apply migrations. Our Docker helper scripts refuse `APP_ENV=production`.
+`pnpm start` runs the idempotent admin check before Next.js. Use it as the deployment
+command: calling `next start` directly skips the check. It does not install
+dependencies, build, start Docker, or apply migrations. Our Docker helper scripts refuse `APP_ENV=production`.
 Use `pnpm start` for the deployed app; `pnpm dev` is a local development workflow.
 Follow the host's process management rather than leaving an interactive shell open.
 
@@ -775,13 +780,13 @@ dataset between environments; use approved, appropriately sanitized data.
 | Symptom | What it usually means | First action |
 | --- | --- | --- |
 | Node version/engine error | The terminal is using a different Node installation | Run `node --version`; select `.node-version` and reopen the terminal |
-| Docker daemon/pipe unavailable | Docker Desktop is stopped or this user cannot access it | Start Docker Desktop; verify `docker compose ps` from the project |
-| Connection refused on 5433 | Database is not running or the configured port differs | Run `pnpm db:up`; compare `POSTGRES_PORT` and `DEV_DATABASE_URL` |
+| Docker daemon/pipe unavailable | Docker Desktop is stopped or this user cannot access it | Start Docker Desktop; verify `pnpm db:status` from the project |
+| Connection refused on 5433 | Database is not running or the configured port differs | Run `pnpm db:up`; check the port in `DEV_DATABASE_URL` |
 | PostgreSQL password authentication fails | URL credentials do not match the initialized role | Check the selected URL; changing `.env` does not rotate an existing database password |
 | Missing table/column | Migrations have not been applied, or code/DB revisions differ | Check environment, then `pnpm exec payload migrate:status` and `pnpm cms:migrate` |
 | Missing production URL/settings | APP_ENV is production, but deployment configuration is incomplete | Supply that deployment's values; do not work around it by selecting development on a live host |
 | Bootstrap says users already exist | The database has already been initialized | Sign in/reset your password or ask an existing admin for an invitation |
-| Initial setup page appears | No CMS users exist in the selected DB | Confirm the environment, then run the trusted bootstrap procedure |
+| Initial setup page appears | No CMS users exist in the selected DB | Confirm the environment and startup bootstrap configuration |
 | Login is blocked | Wrong password, inactive account, or temporary lockout | Ask an admin to check status; current limit is five failed attempts with a ten-minute lock time |
 | Invitation/reset email is missing locally | Development emails are captured, not delivered | Open Mailpit on port 8025 and check its latest messages |
 | Email link opens the wrong app | SERVER_URL differs from the browser-facing origin | Correct the environment value and create a fresh invitation/link |
@@ -796,14 +801,14 @@ dataset between environments; use approved, appropriately sanitized data.
 | HTTP tests cannot sign in/find fixtures | Integration fixtures are absent or the build is stale | Run integration tests successfully, then build, then HTTP checks |
 | Build cannot fetch Google fonts | This site's font downloads cannot reach Google | Restore build-time network access; this is separate from Payload's database setup |
 
-For service diagnostics, `docker compose ps` and
-`docker compose logs --tail 50 postgres` can help. Check which environment you are
+For service diagnostics, `pnpm db:status` and
+`pnpm db:logs --tail 50 postgres` can help. Check which environment you are
 using before running repair commands. Share the failing command and a redacted
 error message; do not share `.env`, session tokens, passwords or private documents.
 
 ## Common questions
 
-**Do I run bootstrap every morning?** No. Your account survives app/container
+**Do I run bootstrap every morning?** No. Startup checks automatically and preserves your account across app/container
 restarts as long as its database data survives.
 
 **Does an admin account on localhost work in production?** Only if it also exists

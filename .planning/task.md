@@ -225,3 +225,11 @@ and sitemaps. Search engines may choose different displayed text.
 Mark tasks complete only after implementation and verification. Keep decisions,
 changed files, test evidence, blockers, and the next action in progress.md.
 Record scope changes before expanding implementation.
+
+### 2026-11-14 - Startup simplification decision (T02/T03 follow-up)
+
+User approved automatic first-admin creation on application startup using environment
+credentials, with mandatory initial password setup. Existing admins are preserved;
+there is no new super-admin role. Keep separate development/production/test URLs,
+and derive local Docker settings from DEV_DATABASE_URL instead of duplicate POSTGRES
+variables. Blog, careers and other CMS features remain subsequent work (T04–T12).

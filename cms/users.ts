@@ -3,6 +3,7 @@ import { APIError, type CollectionConfig } from "payload";
 import { adminOnly, isAdmin, isStaff } from "./access";
 import { audit } from "./audit";
 import { getEnvironment } from "../env";
+import { matchesStoredPassword } from "./password";
 
 export const Users: CollectionConfig = {
   slug: "users",
@@ -15,8 +16,8 @@ export const Users: CollectionConfig = {
   access: {
     admin: ({ req }) => isStaff(req.user),
     create: ({ req }) => Boolean(req.context.bootstrapAdmin || req.context.acceptInvitation),
-    read: ({ req }) => isAdmin(req.user) || (isStaff(req.user) ? { id: { equals: req.user!.id } } : false),
-    update: ({ req }) => isAdmin(req.user) || (isStaff(req.user) ? { id: { equals: req.user!.id } } : false),
+    read: ({ req }) => isAdmin(req.user) || (req.user?.active ? { id: { equals: req.user.id } } : false),
+    update: ({ req }) => isAdmin(req.user) || (req.user?.active ? { id: { equals: req.user.id } } : false),
     delete: adminOnly,
   },
   fields: [
@@ -26,6 +27,8 @@ export const Users: CollectionConfig = {
     { name: "active", type: "checkbox", defaultValue: true, saveToJWT: true,
       access: { update: ({ req }) => isAdmin(req.user) } },
     { name: "password", type: "text", minLength: 12, maxLength: 256, admin: { hidden: true } },
+    { name: "mustChangePassword", type: "checkbox", defaultValue: false, saveToJWT: true,
+      admin: { hidden: true }, access: { create: () => false, update: () => false } },
   ],
   hooks: {
     beforeLogin: [({ user }) => {
@@ -44,6 +47,16 @@ export const Users: CollectionConfig = {
         // Payload's own reset-token updates bypass access, but must not broaden profile edits.
         if (req.user && req.user.id !== originalDoc.id) throw new APIError("You can only update your own profile.", 403);
       }
+      if (operation === "update" && originalDoc?.mustChangePassword) {
+        data.mustChangePassword = true;
+        if (typeof data.password === "string" && data.password.length >= 12 && data.password.length <= 256) {
+          const stored = await req.payload.findByID({ collection: "users", id: originalDoc.id, overrideAccess: true, showHiddenFields: true, req });
+          if (!stored.hash || !stored.salt) throw new APIError("Unable to verify the initial password.", 409);
+          if (await matchesStoredPassword(data.password, stored.hash, stored.salt)) throw new APIError("Choose a password different from your initial password.", 400);
+          data.mustChangePassword = false;
+          data.sessions = [];
+        }
+      }
       if (originalDoc?.active && (data.active === false || (data.role && data.role !== "admin")) && originalDoc.role === "admin") {
         const admins = await req.payload.count({ collection: "users", where: { and: [{ role: { equals: "admin" } }, { active: { equals: true } }] }, overrideAccess: true, req });
         if (admins.totalDocs <= 1) throw new APIError("The final active administrator cannot be deactivated or demoted.", 409);
@@ -59,6 +72,15 @@ export const Users: CollectionConfig = {
       }
       await audit(req, "user.deleted", `users:${id}`);
     }],
-    afterChange: [async ({ doc, operation, req }) => { await audit(req, `user.${operation}`, `users:${doc.id}`); }],
+    afterChange: [async ({ doc, operation, previousDoc, req }) => {
+      // Payload preserves the caller's session during password updates after
+      // beforeChange. Clear it here, inside the same transaction, for initial setup.
+      if (operation === "update" && previousDoc?.mustChangePassword && !doc.mustChangePassword) {
+        await req.payload.db.updateOne({ collection: "users", id: doc.id, data: { sessions: [] }, req });
+        doc.sessions = [];
+      }
+      await audit(req, `user.${operation}`, `users:${doc.id}`);
+      return doc;
+    }],
   },
 };

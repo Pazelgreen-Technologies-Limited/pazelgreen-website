@@ -7,6 +7,8 @@ import { sql } from "@payloadcms/db-postgres";
 import type { User } from "../../payload-types";
 import { hashInvitation, Invitations } from "../../cms/invitations";
 import { previewEndpoint } from "../../cms/preview";
+import { ensureFirstAdmin } from "../../cms/bootstrap";
+import { isAdmin } from "../../cms/access";
 
 let payload: Payload;
 let admin: User;
@@ -27,7 +29,7 @@ async function request(user?: User): Promise<PayloadRequest> {
 function bootstrap() {
   return new Promise<{ code: number; output: string }>((resolve, reject) => {
     const child = spawn(process.execPath, ["--import", "tsx", "scripts/bootstrap-admin.ts"], {
-      env: { ...process.env, BOOTSTRAP_ADMIN_EMAIL: "admin@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: password },
+      env: { ...process.env, BOOTSTRAP_ADMIN_EMAIL: "admin@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: `${password}-initial` },
       windowsHide: true, timeout: 30000, stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";
@@ -52,19 +54,52 @@ beforeAll(async () => {
   await payload.db.migrate();
   // Only this verified disposable local test database is reset; migrations remain.
   await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files RESTART IDENTITY CASCADE`);
+  await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
+  await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
+  const conflict = await createAccount("conflict@pazelgreen.test", "staff");
+  await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: conflict.email, BOOTSTRAP_ADMIN_PASSWORD: password })).rejects.toThrow("never promoted");
+  await payload.delete({ collection: "users", id: conflict.id, overrideAccess: true });
   bootstrapResults = await Promise.all([bootstrap(), bootstrap()]);
   admin = (await payload.find({ collection: "users", overrideAccess: true, where: { email: { equals: "admin@pazelgreen.test" } } })).docs[0];
   if (!admin) throw new Error("CLI bootstrap did not create the fixture administrator.");
+  // Exercise the mandatory password change before using this admin in other tests.
+  expect(admin.mustChangePassword).toBe(true);
+  expect(isAdmin(asUser(admin))).toBe(false);
+  await expect(payload.create({ collection: "invitations", data: { email: "blocked@pazelgreen.test", name: "Blocked", role: "staff" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow();
+  const attemptedBypass = await payload.update({ collection: "users", id: admin.id, data: { mustChangePassword: false }, overrideAccess: false, user: asUser(admin) });
+  expect(attemptedBypass.mustChangePassword).toBe(true);
+  await expect(payload.update({ collection: "users", id: admin.id, data: { password: "short" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow();
+  await expect(payload.update({ collection: "users", id: admin.id, data: { password: `${password}-initial` }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow("different");
+  const initialLogin = await payload.login({ collection: "users", data: { email: admin.email, password: `${password}-initial` } });
+  const authHeaders = new Headers({ Authorization: `JWT ${initialLogin.token}` });
+  const initialSession = await payload.auth({ headers: authHeaders });
+  admin = await payload.update({ collection: "users", id: admin.id, data: { password }, overrideAccess: false, user: initialSession.user! });
+  expect(admin.mustChangePassword).toBe(false);
+  expect((await payload.auth({ headers: authHeaders })).user).toBeNull();
   staff = await createAccount("staff@pazelgreen.test", "staff");
 });
 
-afterAll(async () => { if (payload) await payload.destroy(); });
+afterAll(async () => {
+  if (!payload) return;
+  try {
+    // HTTP tests exercise this account's first-login redirect and API restrictions.
+    await payload.create({ collection: "users", data: { email: "initial-admin@pazelgreen.test", name: "Initial admin", role: "admin", active: true, password, mustChangePassword: true }, overrideAccess: true, context: { bootstrapAdmin: true } });
+  } finally { await payload.destroy(); }
+});
 
 describe("accounts and access", () => {
   it("bootstraps only one first admin across simultaneous CLI processes", () => {
-    expect(bootstrapResults.map((result) => result.code).sort(), JSON.stringify(bootstrapResults)).toEqual([0, 1]);
-    expect(bootstrapResults.find((result) => result.code === 0)?.output).toContain("First administrator created");
-    expect(bootstrapResults.find((result) => result.code === 1)?.output).toContain("Bootstrap refused");
+    expect(bootstrapResults.map((result) => result.code), JSON.stringify(bootstrapResults)).toEqual([0, 0]);
+    expect(bootstrapResults.filter((result) => result.output.includes("First administrator created"))).toHaveLength(1);
+    expect(bootstrapResults.filter((result) => result.output.includes("Administrator already exists"))).toHaveLength(1);
+  });
+  it("skips existing admins without requiring bootstrap secrets or resetting credentials", async () => {
+    expect(await ensureFirstAdmin(payload, {})).toBe(false);
+    expect(await ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "replacement@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "different-password-123" })).toBe(false);
+    const unchanged = await payload.findByID({ collection: "users", id: admin.id });
+    expect(unchanged.email).toBe(admin.email);
+    expect(unchanged.mustChangePassword).toBe(false);
+    await expect(payload.login({ collection: "users", data: { email: admin.email, password } })).resolves.toHaveProperty("token");
   });
   it("refuses public signup even when a caller tries to bypass access", async () => {
     await expect(payload.create({ collection: "users", data: { email: "attacker@pazelgreen.test", name: "No", password, role: "admin" }, overrideAccess: true })).rejects.toThrow("invitation");

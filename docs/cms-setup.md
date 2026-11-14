@@ -12,7 +12,8 @@ On a new checkout, install with `pnpm install --frozen-lockfile`, copy
 `.env.example` to `.env`, and configure:
 
 - `APP_ENV=development`.
-- Matching `POSTGRES_PASSWORD` and URL-encoded password in `DEV_DATABASE_URL`.
+- `DEV_DATABASE_URL` with the local database name, user, URL-encoded password and port.
+- `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) for first startup.
 - A random `PAYLOAD_SECRET` of at least 32 characters.
 - `SERVER_URL=http://localhost:3000` for the default development port.
 
@@ -24,35 +25,38 @@ password distinctions and why each step matters.
 pnpm dev
 ```
 
-`predev` starts Compose services, waits for readiness and runs migrations before
+`predev` starts Compose services, waits for readiness, runs migrations and ensures an admin exists before
 Next.js. Public site: http://localhost:3000. Admin: http://localhost:3000/admin.
 Local email inbox: http://localhost:8025. PostgreSQL: `127.0.0.1:5433`.
 
 ## First admin and invitations
 
-After the database is ready and migrated, temporarily set
-`BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) in your
-untracked environment, then run in another terminal:
+Set bootstrap credentials before the first start. Both `pnpm dev` and `pnpm start`
+check for an admin and create one only if none exists. Existing admin credentials
+are never reset; an inactive admin is preserved rather than reactivated. Concurrent
+starts are serialized by a database transaction lock. Missing or invalid credentials
+stop startup only when an admin must be created. An existing staff account is never
+promoted if its email conflicts; choose a different bootstrap email.
 
-```sh
-pnpm cms:bootstrap
-```
+Sign in at `/admin`. A newly bootstrapped admin must set a password before accessing
+CMS content, and may update their email. Saving signs out existing sessions; sign
+in again. Existing admins are unaffected by this requirement. Remove bootstrap
+values after setup. `pnpm cms:bootstrap` remains available as an idempotent manual check.
 
-Remove both bootstrap values after success. This command only accepts an empty
-users collection. Existing shared environments use administrator invitations;
-there is no public signup. An invitation expires after 24 hours and can be used
-once. Development email is captured by Mailpit rather than sent to real inboxes.
+Additional users join by administrator invitations, not public signup. Invitations
+expire after 24 hours and can be used once. Development emails go to Mailpit.
 See [admin workflows](payload-handbook.md#using-the-admin-panel).
 
 ## Everyday commands
 
 | Command | Effect |
 | --- | --- |
-| `pnpm dev` | Start local services, apply pending migrations and run Next.js/Payload |
+| `pnpm dev` | Start local services, migrate, ensure an admin and run Next.js/Payload |
 | Ctrl+C in the app terminal | Stop Next.js; leave Docker services running |
 | `pnpm db:stop` | Stop project containers without deleting their volumes |
 | `pnpm db:up` | Start project containers and wait for readiness |
-| `docker compose ps` | Inspect container state |
+| `pnpm db:status` | Inspect container state |
+| `pnpm db:exec <args>` | Run a Compose exec command with URL-derived settings |
 | `pnpm cms:migrate` | Apply pending migrations to the database selected by APP_ENV |
 | `pnpm exec payload migrate:status` | Show migration status |
 
@@ -80,11 +84,11 @@ custom database triggers. See [developer workflow](payload-handbook.md#developer
 Start local services with `pnpm db:up`. Once, create a separate disposable database:
 
 ```sh
-docker compose exec -T postgres psql -U pazelgreen -d postgres -c "CREATE DATABASE pazelgreen_test;"
+pnpm db:exec -T postgres psql -U pazelgreen -d postgres -c "CREATE DATABASE pazelgreen_test;"
 ```
 
 This example assumes the default local Postgres user. If you changed
-`POSTGRES_USER`, use that value with `-U`. If the database already exists, reuse it
+the username in `DEV_DATABASE_URL`, use that value with `-U`. If the database already exists, reuse it
 only if it is genuinely disposable; do not delete another database to resolve the error.
 
 Set `TEST_DATABASE_URL` in `.env` using the local credentials and the
@@ -132,9 +136,10 @@ hosting needs an implemented storage adapter before deployment.
 For a reviewed release, install locked dependencies, run checks in the development/
 CI test environment, and build the release with its required configuration. Back
 up existing production data and apply `pnpm cms:migrate` once in a controlled
-release job before serving code that needs the new schema. Bootstrap a first admin
-only for an empty users collection, then serve the built app with `pnpm start`.
+release job before serving code that needs the new schema. Supply bootstrap credentials
+if no admin exists, then serve with `pnpm start`; its prestart check creates the admin.
 
+Use `pnpm start` as the deployment command so its admin check runs; invoking `next start` directly bypasses that check.
 `pnpm start` does not start Docker or apply migrations. Build success does not
 verify SMTP delivery or storage persistence. Verify the deployed HTTPS site,
 login/invitation delivery, approved content and denied private access, and rehearse

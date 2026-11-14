@@ -41,6 +41,34 @@ try {
   assert.equal((await api("/api/invitations/accept", undefined, {})).status, 400);
 
   const password = "integration-only-passphrase-123";
+  const initialLogin = await api("/api/users/login", undefined, { email: "initial-admin@pazelgreen.test", password });
+  assert.equal(initialLogin.status, 200);
+  const { token: initialToken, user: initialUser } = await initialLogin.json();
+  assert.equal(initialUser.mustChangePassword, true);
+  const initialHeaders = { Cookie: `payload-token=${initialToken}`, Origin: base, "Sec-Fetch-Site": "same-origin" };
+  const adminRedirect = await fetch(`${base}/admin`, { headers: initialHeaders, redirect: "manual" });
+  // Next can emit the redirect in streamed HTML once its layout has flushed.
+  if (adminRedirect.status === 307) {
+    assert.equal(adminRedirect.headers.get("location"), "/admin/change-initial-password");
+  } else {
+    assert.equal(adminRedirect.status, 200);
+    assert.ok((await adminRedirect.text()).includes("NEXT_REDIRECT;replace;/admin/change-initial-password;307;"), "Initial admin must be redirected to password setup");
+  }
+  const passwordPage = await fetch(`${base}/admin/change-initial-password`, { headers: initialHeaders });
+  assert.equal(passwordPage.status, 200);
+  assert.ok((await passwordPage.text()).includes("Choose your own password"));
+  assert.equal((await api("/api/private-files", initialToken)).status, 403);
+  assert.equal((await api("/api/invitations", initialToken, { email: "initial-blocked@pazelgreen.test", name: "Blocked", role: "staff" })).status, 403);
+  await patch(`/api/users/${initialUser.id}`, initialToken, { mustChangePassword: false });
+  assert.equal((await (await api(`/api/users/${initialUser.id}`, initialToken)).json()).mustChangePassword, true);
+  assert.equal((await patch(`/api/users/${initialUser.id}`, initialToken, { password })).status, 400);
+  assert.equal((await patch(`/api/users/${initialUser.id}`, initialToken, { email: "changed-admin@pazelgreen.test", password: `${password}-changed` })).status, 200);
+  assert.equal((await api("/api/private-files", initialToken)).status, 403, "Password change revokes the initial session");
+  const changedLogin = await api("/api/users/login", undefined, { email: "changed-admin@pazelgreen.test", password: `${password}-changed` });
+  assert.equal(changedLogin.status, 200);
+  const changed = await changedLogin.json();
+  assert.equal(changed.user.mustChangePassword, false);
+  assert.equal((await api("/api/private-files", changed.token)).status, 200);
   const adminLogin = await api("/api/users/login", undefined, { email: "admin@pazelgreen.test", password });
   assert.equal(adminLogin.status, 200);
   const adminToken = (await adminLogin.json()).token as string;

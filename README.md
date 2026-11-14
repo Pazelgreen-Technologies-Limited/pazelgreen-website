@@ -62,15 +62,16 @@ necessary values rather than overwriting working credentials.
 
 Set `APP_ENV=development`, choose a local PostgreSQL password, use that same
 URL-encoded password in `DEV_DATABASE_URL`, and set a random `PAYLOAD_SECRET` of
-at least 32 characters. The handbook explains [each value and how to generate
-secrets](docs/payload-handbook.md#first-local-setup). Actual `.env` files are ignored
+at least 32 characters. Before the first start, also set `BOOTSTRAP_ADMIN_EMAIL`
+and `BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters). The handbook explains
+[each value and how to generate secrets](docs/payload-handbook.md#first-local-setup). Actual `.env` files are ignored
 by Git; commit placeholders only in `.env.example`.
 
 ```sh
 pnpm dev
 ```
 
-This starts Docker services, waits for them, applies pending migrations, and then
+This starts Docker services, waits for them, applies pending migrations, ensures a first admin exists, and then
 starts Next.js/Payload. Keep that terminal open.
 
 | Local address | Purpose |
@@ -82,18 +83,15 @@ starts Next.js/Payload. Keep that terminal open.
 
 ### First administrator
 
-After startup/migrations finish, temporarily set `BOOTSTRAP_ADMIN_EMAIL` and
-`BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) in your untracked `.env`. In another
-terminal in this project:
-
-```sh
-pnpm cms:bootstrap
-```
-
-Remove those two bootstrap values after success, then sign in at `/admin`.
-This is needed once per empty database. For a shared environment with existing
-users, ask an admin for an invitation. The [handbook explains why public signup
-is blocked](docs/payload-handbook.md#first-local-setup).
+Before the first start, set `BOOTSTRAP_ADMIN_EMAIL` and
+`BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) in your untracked `.env`.
+`pnpm dev` and `pnpm start` automatically create an admin if none exists.
+Existing admins and their credentials are preserved, even when bootstrap values change.
+Sign in at `/admin`; newly bootstrapped admins must choose a password before using
+the CMS and can update their email at the same time. Remove bootstrap values afterward.
+An existing admin needs no bootstrap secrets on later starts. Shared environments
+use invitations for additional users. `pnpm cms:bootstrap` remains an optional
+manual check. See the [handbook](docs/payload-handbook.md#first-local-setup).
 
 ### Later starts and stopping
 
@@ -106,13 +104,13 @@ pushing Git commits does not share or back them up.
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm dev` | Start local services, migrate and run the development app |
+| `pnpm dev` | Start local services, migrate, ensure an admin and run the development app |
 | `pnpm db:up` / `pnpm db:stop` | Start/stop local services without deleting data |
 | `pnpm cms:migrate` | Apply committed migrations to the selected database |
 | `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated Payload types/admin imports |
 | `pnpm cms:migration:create <name>` | Generate a schema migration for review |
 | `pnpm lint` / `pnpm typecheck` | Check code style and TypeScript |
-| `pnpm test` | Run environment unit tests |
+| `pnpm test` | Run environment and local database configuration tests |
 | `pnpm test:integration` | Run PostgreSQL/Mailpit tests against a disposable test database |
 | `pnpm build` / `pnpm start` | Build and serve the optimized application |
 | `pnpm test:http` | Check real HTTP behavior using integration fixtures and a fresh build |

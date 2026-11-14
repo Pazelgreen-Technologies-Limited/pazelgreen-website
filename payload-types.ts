@@ -133,6 +133,7 @@ export interface User {
   role: 'admin' | 'staff';
   active?: boolean | null;
   password?: string | null;
+  mustChangePassword?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -330,6 +331,7 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   active?: T;
   password?: T;
+  mustChangePassword?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

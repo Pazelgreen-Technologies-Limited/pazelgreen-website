@@ -1,5 +1,6 @@
 import * as migration_20261107_102000_foundation from './20261107_102000_foundation';
 import * as migration_20261107_102100_last_admin_guard from './20261107_102100_last_admin_guard';
+import * as initialPassword from './20261114_120000_initial_password';
 
 export const migrations = [
   // Migration order is append-only.
@@ -13,4 +14,5 @@ export const migrations = [
     down: migration_20261107_102100_last_admin_guard.down,
     name: '20261107_102100_last_admin_guard'
   },
+  { up: initialPassword.up, down: initialPassword.down, name: '20261114_120000_initial_password' },
 ];

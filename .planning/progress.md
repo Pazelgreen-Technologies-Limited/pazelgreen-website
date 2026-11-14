@@ -1,6 +1,6 @@
 # CMS implementation progress
 
-Last updated: 2026-11-07.
+Last updated: 2026-11-14.
 Current phase: T01–T03 complete and verified; next planned implementation is T04.
 
 ## Start here
@@ -80,13 +80,13 @@ Current phase: T01–T03 complete and verified; next planned implementation is T
 - Approved privacy/terms/recruitment copy and applicant retention duration.
 - Production database, public/private storage, transactional email,
   private recruitment recipients, and deployment configuration.
-- Initial admin identity through secure setup; never commit credentials.
+- Production first-admin credentials through server secrets; local admin is configured. Never commit credentials.
 
 ## Next concrete action
 
 T04: implement company settings and existing-page SEO without redesigning pages.
-The owner can create the real first administrator with the documented CLI bootstrap
-after setting credentials in an untracked local/server environment. Use supported
+Startup now ensures a first administrator exists from server environment secrets;
+existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
 24.22.2 runtime in Temp was used for all final verification.
 
@@ -227,3 +227,63 @@ Operational handoff and remaining scope:
   remain historical evidence. No production actions or account setup performed.
 - No CMS scope/status change: T01–T03 remain complete, T04–T12 pending. Next
   implementation remains company settings and existing-page SEO (T04).
+
+### 2026-11-14 - Startup simplification decision (T02/T03 follow-up)
+
+User approved automatic first-admin creation on application startup using environment
+credentials, with mandatory initial password setup. Existing admins are preserved;
+there is no new super-admin role. Keep separate development/production/test URLs,
+and derive local Docker settings from DEV_DATABASE_URL instead of duplicate POSTGRES
+variables. Blog, careers and other CMS features remain subsequent work (T04–T12).
+
+### 2026-11-14 - T02/T03 startup follow-up completed and verified
+
+Implementation:
+
+- cms/bootstrap.ts and scripts/bootstrap-admin.ts implement an idempotent,
+  transaction-locked first-admin check. package.json runs it automatically in
+  predev after Docker/migrations and in prestart before serving production.
+  Existing admins (including inactive ones) are preserved without requiring
+  bootstrap secrets; existing staff are never promoted on an email collision.
+- cms/users.ts, cms/access.ts, cms/password.ts, the admin catch-all page and
+  admin/change-initial-password route enforce initial password setup before CMS
+  access. Reusing the initial password is rejected; the email can be changed too.
+  Password setup revokes every session within the update transaction. The HTTP
+  test caught Payload preserving the caller's session after beforeChange; the
+  final implementation clears it in afterChange and verifies revocation.
+- Added the append-only 20261114_120000_initial_password migration and matching
+  schema snapshot; regenerated payload-types.ts. Existing accounts default to
+  no forced password change. Applied migration to development and test DBs.
+- scripts/database-config.ts derives local Compose settings from DEV_DATABASE_URL;
+  scripts/database.ts passes them directly to Docker. Removed duplicate POSTGRES
+  entries from .env.example and the existing untracked local .env, preserving
+  connection URLs and all other secrets. Added db:status, db:exec and db:logs
+  helpers so operational commands receive those derived settings too.
+- Moved tsx into runtime dependencies for startup checks; refreshed pnpm-lock.yaml.
+  Updated README.md, docs/cms-setup.md, docs/payload-handbook.md and task.md.
+
+Actual validation (Node 24.22.2 portable runtime, pnpm 10.18.1):
+
+- pnpm test: 22 passed, covering environment selection and URL-to-Docker parsing.
+- pnpm test:integration: 20 passed with real PostgreSQL/Mailpit. Expanded checks
+  cover concurrent first-admin creation, missing/invalid bootstrap secrets, staff
+  email collision, preserved credentials on restart, mandatory password setup,
+  blocked content access, rejected flag bypass, password reuse and revoked sessions.
+- pnpm typecheck and pnpm lint passed with no errors or warnings.
+- Final pnpm build passed. Initial sandbox build could not fetch Google Fonts;
+  rebuilding with approved network access succeeded.
+- Final pnpm test:http passed against a temporary production server and the
+  disposable test database, including the initial-password route, cookie redirect,
+  password/email changes, denied private access and revoked initial JWT session.
+  The server stopped afterward. Test requests include browser-equivalent origin
+  headers as required by Payload cookie CSRF validation.
+- pnpm predev and pnpm prestart both passed against the local development DB and
+  reported that the existing administrator was preserved. Docker services healthy.
+- Offline lockfile refresh passed. Documentation links (36 local targets) and
+  fenced-code balance passed. Git whitespace check passed.
+
+No production actions, real account creation or CMS content features were added.
+Production migrations remain a controlled release step before pnpm start; direct
+next start bypasses the documented bootstrap lifecycle. No blockers remain for
+this follow-up. T04–T12 remain pending; next planned work is T04 company settings
+and existing-page SEO, followed by blog, careers and the other agreed CMS features.
