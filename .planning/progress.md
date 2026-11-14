@@ -102,6 +102,27 @@ Append dated entries with task ID, implementation summary, changed files,
 commands/results, unresolved blockers, and next action. Never log secrets or
 applicant personal data. A plan or partial implementation is not a completed task.
 
+### 2026-11-14 - Startup runtime follow-up after T06
+
+- Reproduced the user's predev exit 13 on system Node 22.13.0: Docker and
+  migrations succeeded, then bootstrap's dynamic Payload configuration import
+  reported an unsettled top-level await. Standalone bootstrap also sometimes
+  succeeded, so an isolated retry is not evidence of a reliable supported setup.
+- Node 22.13.0 is below the declared Payload/project engine minimum. Added
+  .npmrc engine-strict=true so pnpm refuses incompatible runtimes before startup
+  database actions. Documented runtime selection in README and cms-setup.md.
+- Verified pnpm dev under system Node 22.13.0 now fails immediately with
+  ERR_PNPM_UNSUPPORTED_ENGINE, before predev or database actions. With portable
+  Node 24.22.2 selected in PATH, pnpm predev passed (services healthy, migrations
+  complete, existing admin preserved), then Next dev reached Ready on temporary
+  port 3100. The temporary server was stopped; an attempted HTTP login request
+  was interrupted during first compilation and is not claimed as an HTTP pass.
+- Documented the exit-13 symptom in the handbook. No application/bootstrap logic
+  or credentials changed. The user's normal terminal still needs to select a
+  supported Node runtime; the Temp download is a session workaround, not a
+  permanent installation or a project dependency.
+- This is a T02/T03 startup follow-up. T01–T06 remain complete; T07 is next.
+
 ### 2026-11-14 - T06 implementation in progress
 
 - Added reviewed admin-managed dictionaries and jobs, immutable reference fields,

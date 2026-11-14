@@ -787,6 +787,7 @@ dataset between environments; use approved, appropriately sanitized data.
 | Symptom | What it usually means | First action |
 | --- | --- | --- |
 | Node version/engine error | The terminal is using a different Node installation | Run `node --version`; select `.node-version` and reopen the terminal |
+| Exit 13 / unsettled top-level await in bootstrap | Reproduced after migrations with unsupported Node 22.13.0 | Select supported Node 24.22.2 in the current terminal. pnpm now rejects unsupported engines before startup; `.node-version` does not switch runtimes by itself |
 | Docker daemon/pipe unavailable | Docker Desktop is stopped or this user cannot access it | Start Docker Desktop; verify `pnpm db:status` from the project |
 | Connection refused on 5433 | Database is not running or the configured port differs | Run `pnpm db:up`; check the port in `DEV_DATABASE_URL` |
 | PostgreSQL password authentication fails | URL credentials do not match the initialized role | Check the selected URL; changing `.env` does not rotate an existing database password |

@@ -8,6 +8,9 @@ this repository's scripts; stop and fix errors before continuing to the next ste
 ## Local setup
 
 Use Node **24.22.2**, pnpm **10.18.1**, and running Docker Desktop/Compose.
+The committed `.npmrc` enforces the package's Node engine requirement before
+scripts run. Verify `node --version` in the terminal you use for pnpm. The
+`.node-version` file pins a version but does not install or select it automatically.
 On a new checkout, install with `pnpm install --frozen-lockfile`, copy
 `.env.example` to `.env`, and configure:
 

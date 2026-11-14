@@ -56,6 +56,11 @@ Select/install the Node version before continuing; the version file does not
 install it for you. Check `node --version`, `pnpm --version` and
 `docker compose version` in your terminal.
 
+pnpm enforces the Node engine requirement before running scripts. Node 22.13.0
+is unsupported and can exit with an unsettled top-level await while loading
+Payload during startup. Select Node 24.22.2 in the same terminal before running
+`pnpm dev`; `.node-version` alone does not change your active runtime.
+
 ### First checkout
 
 ```sh
