@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-14.
-Current phase: T01–T04 complete and verified; next planned implementation is T05.
+Current phase: T01–T05 complete and verified; next planned implementation is T06.
 
 ## Start here
 
@@ -84,8 +84,9 @@ Current phase: T01–T04 complete and verified; next planned implementation is T
 
 ## Next concrete action
 
-T05: implement blog posts/categories and public listing/detail routes, preserving
-the review rules, public media boundaries and existing visual design.
+T06: implement admin-managed dictionaries, jobs, atomic annual advert references
+and public careers listing/detail routes, then connect Join Us openings. Preserve
+the approval workflow and immutable reference rules in task.md.
 Startup now ensures a first administrator exists from server environment secrets;
 existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
@@ -354,3 +355,85 @@ Actual validation (portable Node 24.22.2, pnpm 10.18.1):
   Normalized edited CRLF files before the final Git whitespace check.
 - No production deployment or real content publication performed. The next action
   is T05 blog implementation. Ready for the separate T04 commit.
+
+### 2026-11-14 - T05 blog implementation; final verification in progress
+
+- User continued to the next task after T04 commit 8caa57a. T05 only: posts,
+  categories, public media relationships, article/listing routes and previews.
+  Careers/applications and later tasks remain outside this implementation.
+- Added cms/blog.ts and cms/blog-content.ts with review-enabled posts/categories,
+  generated slugs, public author attribution, excerpts, publication display dates,
+  cover/inline media, a restricted Lexical editor and per-post SEO. Publication
+  requires nonempty safe content and previously published categories/images.
+  Referenced IDs are resolved through Payload rather than trusting node URLs.
+- Added lib/blog.ts and lib/blog-query.ts plus route-local components under
+  app/(frontend)/blog. Listing supports six posts/page, stable newest-first order,
+  approved-category filters, empty states and not-found behavior. Articles use
+  approved content and SEO at request time; editor cookies/preview query flags
+  cannot switch the normal public URL to a draft. Added a fixed Blog listing
+  group to Page SEO without competing with article-owned SEO.
+- Added session-protected /blog/preview/[id] and expanded authenticated JSON
+  previews to posts/categories. Visual previews send noindex, private/no-store and
+  no-referrer headers. Public uploads stay behind media access checks and bypass
+  the separate Next image optimizer cache. Navbar highlights Blog on nested URLs.
+- Design follows existing green/white palette and Nunito/Inter typography. New
+  listing uses image/text rows; articles use a narrow reading measure. Reviewed
+  desktop listing and mobile article screenshots from real Chrome test runs.
+- Generated 20261114_191532_blog_posts_and_categories migration/snapshot and types;
+  updated admin import map. Reviewed generated SQL and fixed type-only imports
+  and whitespace before applying the test migration. Existing data is preserved.
+- Added Playwright 1.65.1, browser config, desktop/mobile tests and a CI browser
+  step. Browser/HTTP suites use only the verified disposable local test database,
+  separate temporary servers and fixture content. No real posts were seeded.
+- Updated README, setup/handbook, blog editing guide and preview API enum. Guides
+  explain publication dates are display metadata rather than scheduling controls,
+  author privacy, media/category approval, preview authentication, URL changes and
+  sequential test execution. Production content/rights approval remains T12.
+
+Verification so far:
+
+- Unit tests: 46 passed; initial complete integration run: 34 passed. Initial
+  production build passed with approved network access for fonts. Ten desktop/
+  mobile Chrome checks passed, with screenshots captured under ignored test-results.
+- One integration invocation overlapped pnpm dependency relinking and could not
+  import a package; rerunning after installation succeeded. Draft fixtures were
+  corrected to satisfy Payload's generated strict draft types.
+- HTTP checks reached the protected-preview assertions; corrected a test that
+  followed an anonymous preview redirect then inspected the login page's headers.
+  The final rerun uses the original preview response.
+- Final verification is running sequentially after the last reference-query and
+  responsive wrapping refinements. Do not mark T05 complete until it finishes.
+- Next: finish checks, apply development migration, record final results and commit
+  T05 separately. T06 jobs/dictionaries/careers follows only after T05 completion.
+
+### 2026-11-14 - T05 final validation and handoff
+
+- Final pnpm lint and pnpm typecheck passed without errors/warnings.
+- pnpm test: 46 passed. pnpm test:integration: 34 passed against the verified
+  disposable PostgreSQL/Mailpit database, including publication, dependency
+  approval, slugs, live vs draft content/SEO, pagination/filtering and unpublishing.
+- Final pnpm build passed with font-download access. Blog routes are dynamic and
+  use request-time published reads. Final pnpm test:http passed, including article
+  HTML/metadata, category/page boundaries, unpublished not-found behavior, signed-in
+  public reads, preview authentication/noindex/no-store headers and JSON previews.
+- Final pnpm test:browser passed all 10 checks in installed headless Google Chrome
+  across desktop (1280x900) and mobile (390x844). Checked images load, no horizontal
+  overflow, keyboard activation, filtering/pagination, empty categories, public
+  article metadata and real-session draft previews. Screenshots reviewed locally.
+  Browser and HTTP temporary servers stopped; outputs remain ignored in test-results.
+- Reviewed migration rollback SQL and guarded generated foreign-key drops that
+  could follow CASCADE table removal. The applied UP SQL was unchanged. Added
+  tests/migrations/roundtrip.ts and pnpm test:migrations; its final fresh/up/down/up
+  check passed in a uniquely created scratch DB. The runner isolates Payload in a
+  child process because the adapter's destroy does not close its pool. Cleanup
+  finishes after worker exit; verified no scratch migration databases remain.
+- pnpm predev passed against local development: Docker services healthy, blog
+  migration applied, existing admin preserved. Generated types and import map are
+  included. Frozen-lockfile offline installation passed using the existing store.
+- Updated CI to install Chromium, run desktop/mobile flows and verify the latest
+  migration rollback/reapply. No remote Actions run, push or deployment was invoked.
+- Documentation file links (42 local targets) and fenced-code balance passed.
+  Updated the editor guide, setup/handbook, README, API preview enum and plan.
+- T05 is complete. No real post/category records or external resources were
+  created. Initial content and image rights/attribution remain T12 launch inputs.
+  Next task: T06 dictionaries, jobs, annual references and careers routes.

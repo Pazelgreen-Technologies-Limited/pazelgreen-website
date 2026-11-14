@@ -103,13 +103,18 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm test:integration
+pnpm test:migrations
 pnpm build
 pnpm test:http
+pnpm exec playwright install chromium
+pnpm test:browser
 ```
 
 Integration tests use real PostgreSQL and Mailpit. HTTP checks need their fixtures
 and a fresh production build; the script starts/stops its own test server on
-`127.0.0.1:3101`. CI provisions test services and runs these checks; it does not
+`127.0.0.1:3101`. Browser checks use a separate temporary server on port 3102 and
+need Chromium (or PLAYWRIGHT_CHANNEL=chrome for installed Google Chrome). Run suites
+sequentially because they share test fixtures. CI provisions test services and runs these checks; it does not
 provision production or deploy the website.
 
 ## Environment selection
@@ -155,10 +160,11 @@ The footer and Contact page read the same published values. Open days use HH:mm
 with closing after opening; mark closed days explicitly. Each weekday occurs once.
 Social links need an HTTP(S) URL; placeholder # links cannot be published.
 
-Page SEO contains fixed groups for Home, About, Solutions, Join Us and Contact.
+Page SEO contains fixed groups for Home, About, Solutions, Join Us, Contact and
+the Blog listing.
 It controls search titles/descriptions only. Empty fields use the existing site
-metadata defaults; homepage content remains outside the CMS scope. Future blog,
-job and legal metadata belong to their documents rather than these globals.
+metadata defaults; homepage content remains outside the CMS scope. Article SEO belongs to each post; future job/legal metadata will belong to their
+documents rather than these globals.
 
 Staff save drafts, set reviewState to in-review, then save again. An admin publishes
 the unchanged submitted draft. Editing a submitted draft invalidates its approval.
@@ -179,10 +185,16 @@ the request. Approved changes appear on the next request without a rebuild; draf
 are never used for rendering or metadata. The site now needs its database when
 serving marketing pages. Migrations remain required before running the updated app.
 
+## Blog (T05)
+
+Read the [blog editor guide](blog-editing.md) for posts/categories, media approval,
+visual draft previews, article SEO, public filtering/pagination and browser checks.
+No real articles are seeded automatically.
+
 ## Current limits and implementation status
 
-T01–T04 provide the CMS foundation, company settings and existing-page SEO.
-Visual blog/job previews, recruitment and other planned features remain pending. The current
+T01–T05 provide the CMS foundation, company settings, SEO and the blog.
+Job previews, recruitment and other planned features remain pending. The current
 media preview is authenticated JSON; private PDF/DOCX storage is not a complete
 application system. See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).

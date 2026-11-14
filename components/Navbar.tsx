@@ -41,7 +41,7 @@ export default function Navbar() {
           {/* Center nav links */}
           <ul className="hidden items-center gap-8 md:flex">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
 
               return (
                 <li key={link.label}>
@@ -77,7 +77,7 @@ export default function Navbar() {
             Top bar:
               - translate-y-[7px]  → moves it down to the center
               - rotate-45          → rotates it 45° clockwise
-            
+
             Bottom bar:
               - -translate-y-[7px] → moves it up to the center
               - -rotate-45         → rotates it 45° counter-clockwise
@@ -113,7 +113,7 @@ export default function Navbar() {
         >
           <ul className="flex flex-col px-6 py-4 gap-4">
             {navLinks.map((link, index) => {
-              const isActive = pathname === link.href;
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
               return (
                 <li
                   key={link.label}

@@ -17,6 +17,7 @@ and what changes between local development and production.
 | --- | --- |
 | [Payload handbook](docs/payload-handbook.md) | First-time learning, team workflows, production responsibilities, backups and troubleshooting |
 | [Setup command reference](docs/cms-setup.md) | Commands for local setup, first-admin creation, tests and releases |
+| [Blog editor guide](docs/blog-editing.md) | Writing, previewing, reviewing and publishing blog articles |
 | [Custom CMS API contract](docs/cms-api.yaml) | Invitation activation and authenticated draft-preview endpoints |
 | [Implementation plan](.planning/task.md) | Agreed CMS scope, task order and acceptance criteria |
 | [Progress record](.planning/progress.md) | Completed work, verification evidence and the next task |
@@ -30,11 +31,13 @@ version history, audit records, protected file storage and database migrations.
 
 Company settings and existing-page SEO (T04) are available under Website in the
 admin, with staff drafts and admin approval. Footer/Contact share published details.
-Blog, careers/applications, FAQs, announcements and legal pages remain planned.
+The Blog group (T05) now provides posts/categories, authenticated draft previews,
+public articles and a filtered/paginated blog listing. Careers/applications, FAQs,
+announcements and legal pages remain planned.
 Most other public marketing content is hardcoded.
 Contact-form delivery and newsletter integration are outside this CMS scope.
 See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T05: blog posts, categories and public blog pages**.
+The next planned task is **T06: dictionaries, jobs and public careers pages**.
 
 ## Run locally
 
@@ -112,13 +115,15 @@ pushing Git commits does not share or back them up.
 | `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated Payload types/admin imports |
 | `pnpm cms:migration:create <name>` | Generate a schema migration for review |
 | `pnpm lint` / `pnpm typecheck` | Check code style and TypeScript |
-| `pnpm test` | Run environment and local database configuration tests |
+| `pnpm test` | Run environment, local database configuration and blog unit tests |
 | `pnpm test:integration` | Run PostgreSQL/Mailpit tests against a disposable test database |
 | `pnpm build` / `pnpm start` | Build and serve the optimized application |
 | `pnpm test:http` | Check real HTTP behavior using integration fixtures and a fresh build |
+| `pnpm test:browser` | Check blog desktop/mobile flows using Playwright and the production build |
+| `pnpm test:migrations` | Check latest migration down/up in a new disposable local database |
 
 For a full verification run, use lint → typecheck → unit tests → integration tests
-→ build → HTTP checks, fixing failures before continuing. First configure the
+→ build → HTTP checks → browser checks, fixing failures before continuing. First configure the
 [separate test database](docs/cms-setup.md#test-database-and-checks); integration
 tests reset its CMS records. GitHub Actions is configured to run this sequence.
 

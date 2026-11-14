@@ -4,7 +4,7 @@ Start here if you have never used Payload. This guide explains what the parts do
 why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
-This describes the **T01–T04 implementation**, checked against this repository on
+This describes the **T01–T05 implementation**, checked against this repository on
 **14 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
@@ -42,7 +42,7 @@ See the official [configuration guide](https://payloadcms.com/docs/configuration
 
 For example, a developer can define a post with a title, body, cover image, and
 publication status. An editor can then write posts without changing React files.
-**Posts are an example of the model; our blog feature is still planned.**
+**Posts and categories now use this model in the implemented blog feature.**
 
 The public website remains a Next.js application. Its components decide where and
 how CMS data appears. Adding a field to Payload does not automatically put that
@@ -115,15 +115,15 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | Available in the committed foundation | Still planned |
 | --- | --- |
 | Public Home, About, Solutions, Join Us and Contact pages with shared company settings and SEO | Verified production contacts, hours and social URLs: T12 |
-| `/admin`, admin/staff users and invitations | Blog/categories and public blog pages: T05 |
+| `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
 | Image media library with review and version history | Jobs, code dictionaries and careers pages: T06 |
 | Restricted PDF/DOCX storage infrastructure | Candidate applications, full CV workflow and recruitment emails: T07 |
 | Audit events, protected media JSON preview and SQL migrations | Backend-only FAQs: T08; announcements: T09; legal pages: T10 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
 Most marketing content is still written directly in frontend components. Do not
-expect company settings, a blog editor, vacancies, or application records to appear
-in the current admin panel. Contact-message delivery and newsletter integration
+expect vacancies or application records yet. Company settings, page SEO and the
+blog editor are available now. Contact-message delivery and newsletter integration
 are outside this CMS scope. Homepage content editing is excluded from the plan.
 The [task plan](../.planning/task.md) and [progress record](../.planning/progress.md)
 track what has actually been delivered.
@@ -402,9 +402,11 @@ Direct version restoration is blocked here: copy the historical values into a
 draft and submit them for review. Review updates happen one document at a time;
 bulk updates are blocked by the current workflow.
 
-Current preview is authenticated JSON at `/api/preview/media/<id>`; it is not yet
-a visual blog/careers preview. A browser without a valid staff/admin session
-cannot use that endpoint. Future frontend preview routes belong to those features.
+Media has authenticated JSON previews at `/api/preview/media/<id>`; posts and
+categories also support that endpoint. The blog editor's Preview button opens a
+session-protected visual draft preview. See the [blog guide](blog-editing.md).
+A browser without a valid active staff/admin session cannot preview drafts.
+Visual careers previews follow T06.
 
 ### Public images and private files
 
@@ -598,14 +600,19 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm test:integration
+pnpm test:migrations
 pnpm build
 pnpm test:http
+pnpm exec playwright install chromium
+pnpm test:browser
 ```
 
 Run these in order and stop to fix failures. Integration tests apply migrations,
 reset CMS records in the disposable database, and send test email to Mailpit.
 HTTP tests require those fixtures and a fresh production build; they start a
-temporary server on `127.0.0.1:3101`, use test uploads, then stop it.
+temporary server on `127.0.0.1:3101`, use test uploads, then stop it. Browser
+checks use port 3102 and Chromium (or an installed Chrome selected with
+PLAYWRIGHT_CHANNEL=chrome). Run suites sequentially against their shared fixtures.
 See [test database setup](cms-setup.md#test-database-and-checks) before the first run.
 The test helpers refuse non-local database URLs or names without an `_test` suffix;
 you must still supply a genuinely disposable database.
@@ -838,7 +845,7 @@ Private storage exists, but public applications, candidate validation, notificat
 and retention handling are planned in T07.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T05: blog posts, categories and public blog pages. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T06: dictionaries, jobs and public careers pages. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
 
 ## Editing company settings and page SEO
@@ -849,3 +856,10 @@ for the supported fields, review process, public fallbacks and content verificat
 requirements. Both globals use the same staff-draft/admin-approval workflow as
 media; anonymous visitors cannot read drafts, history or editorial notes.
 Public pages and metadata read only the last approved publication.
+
+## Editing the blog
+
+Use the [blog editor guide](blog-editing.md) for article fields, published media,
+authenticated previews, editorial approval, SEO, filtering/pagination and browser
+verification. Normal public article URLs always use approved data, including when
+an editor is signed in. Job/application work remains a separate later task.

@@ -1,10 +1,11 @@
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import nextEnv from "@next/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLocalReq, getPayload, type Payload, type PayloadRequest } from "payload";
 import { sql } from "@payloadcms/db-postgres";
-import type { User } from "../../payload-types";
+import type { Category, Media, Post, User } from "../../payload-types";
 import { hashInvitation, Invitations } from "../../cms/invitations";
 import { previewEndpoint } from "../../cms/preview";
 import { ensureFirstAdmin } from "../../cms/bootstrap";
@@ -53,7 +54,7 @@ beforeAll(async () => {
   payload = await getPayload({ config });
   await payload.db.migrate();
   // Only this verified disposable local test database is reset; migrations remain.
-  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -371,5 +372,114 @@ describe("company settings and page SEO review", () => {
     await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
     await payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
     await payload.updateGlobal({ slug: "company-settings", data: { email: "private-draft@pazelgreen.test" }, overrideAccess: false, user: asUser(staff) });
+  });
+});
+
+
+const blogText = (text: string) => ({ type: "text", version: 1, text, format: 0, detail: 0, mode: "normal", style: "" });
+const blogBody = (text: string, mediaID?: number): Post["body"] => ({ root: {
+  type: "root", version: 1, format: "", indent: 0, direction: "ltr", children: [
+    { type: "paragraph", version: 1, format: "", indent: 0, direction: "ltr", children: [blogText(text)] },
+    ...(mediaID ? [{ type: "upload", version: 3, relationTo: "media", value: mediaID, format: "" }] : []),
+  ],
+} });
+
+describe("blog publication and public relationships", () => {
+  let category: Category;
+  let emptyCategory: Category;
+  let blogImage: Media;
+  let article: Post;
+  let draftArticle: Post;
+  const articleData = (slug: string) => ({ title: "Field notes: stronger food systems", slug, excerpt: "Test editorial updates from the Pazelgreen team.", authorName: "Pazelgreen editorial team", publicationDate: "2026-10-01T09:00:00.000Z", body: blogBody("Approved article body about connected agricultural systems."), categories: [category.id] });
+  async function publishCategory(id: number) {
+    await payload.update({ collection: "categories", id, data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    return payload.update({ collection: "categories", id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+  }
+  async function publishPost(id: number) {
+    await payload.update({ collection: "posts", id, data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    return payload.update({ collection: "posts", id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+  }
+  it("keeps categories private until reviewed and prevents staff publishing or deleting", async () => {
+    category = await payload.create({ collection: "categories", draft: true, data: { name: "Food systems", description: "Research and field updates on agricultural systems." }, overrideAccess: false, user: asUser(staff) });
+    expect(category.slug).toBe("food-systems");
+    expect((await payload.find({ collection: "categories", overrideAccess: false })).totalDocs).toBe(0);
+    await expect(payload.update({ collection: "categories", id: category.id, data: { _status: "published" }, overrideAccess: false, user: asUser(staff) })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.delete({ collection: "categories", id: category.id, overrideAccess: false, user: asUser(staff) })).rejects.toThrow();
+    category = await publishCategory(category.id);
+    emptyCategory = await payload.create({ collection: "categories", draft: true, data: { name: "Company updates" }, overrideAccess: false, user: asUser(staff) });
+    emptyCategory = await publishCategory(emptyCategory.id);
+    expect((await payload.find({ collection: "categories", overrideAccess: false })).totalDocs).toBe(2);
+  });
+  it("prevents publication with unapproved cover or inline images, then allows approved assets", async () => {
+    const bytes = await readFile(path.resolve("public/vision-bg.jpg"));
+    blogImage = await payload.create({ collection: "media", draft: true, data: { alt: "Agricultural field used in blog test fixtures", caption: "A view across the fields." }, file: { name: "blog-fields.jpg", mimetype: "image/jpeg", size: bytes.length, data: bytes }, overrideAccess: false, user: asUser(staff) });
+    article = await payload.create({ collection: "posts", draft: true, data: { ...articleData("field-notes"), coverImage: blogImage.id, body: blogBody("Approved article body about connected agricultural systems.", blogImage.id), seo: { title: "Approved field notes SEO", description: "Approved field notes description." } }, overrideAccess: false, user: asUser(staff) });
+    await payload.update({ collection: "posts", id: article.id, data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    await expect(payload.update({ collection: "posts", id: article.id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow("Publish every referenced");
+    await payload.update({ collection: "media", id: blogImage.id, data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    blogImage = await payload.update({ collection: "media", id: blogImage.id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    article = await payload.update({ collection: "posts", id: article.id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    const visible = await payload.findByID({ collection: "posts", id: article.id, overrideAccess: false, depth: 1 });
+    expect(visible.title).toBe(article.title);
+    expect(visible.authorName).toBe("Pazelgreen editorial team");
+    expect(visible.reviewState).toBeUndefined();
+    expect(visible.createdBy).toBeUndefined();
+    expect(typeof visible.coverImage).toBe("object");
+  });
+  it("keeps live text, URLs and SEO unchanged while replacements are edited", async () => {
+    await payload.update({ collection: "posts", id: article.id, data: { title: "Private revised field notes", body: blogBody("Private replacement article body."), seo: { title: "Private draft article SEO" } }, overrideAccess: false, user: asUser(staff) });
+    const live = await payload.findByID({ collection: "posts", id: article.id, overrideAccess: false });
+    expect(live.title).toBe("Field notes: stronger food systems");
+    expect(live.seo?.title).toBe("Approved field notes SEO");
+    const latest = await payload.findByID({ collection: "posts", id: article.id, draft: true, overrideAccess: false, user: asUser(staff) });
+    expect(latest.title).toBe("Private revised field notes");
+    expect(latest.reviewState).toBe("draft");
+    await expect(payload.update({ collection: "posts", id: article.id, data: { _status: "published" }, overrideAccess: false, user: asUser(staff) })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.delete({ collection: "posts", id: article.id, overrideAccess: false, user: asUser(staff) })).rejects.toThrow();
+  });
+  it("requires approved categories, safe body content and distinct public slugs", async () => {
+    const privateCategory = await payload.create({ collection: "categories", draft: true, data: { name: "Private category" }, overrideAccess: false, user: asUser(staff) });
+    const blocked = await payload.create({ collection: "posts", draft: true, data: { ...articleData("blocked-category"), categories: [privateCategory.id] }, overrideAccess: false, user: asUser(staff) });
+    await expect(publishPost(blocked.id)).rejects.toThrow("Publish every referenced");
+    const blank = await payload.create({ collection: "posts", draft: true, data: { ...articleData("empty-body"), body: blogBody("") }, overrideAccess: false, user: asUser(staff) });
+    await expect(publishPost(blank.id)).rejects.toThrow("Add article text");
+    await expect((async () => {
+      const duplicate = await payload.create({ collection: "posts", draft: true, data: articleData("field-notes"), overrideAccess: false, user: asUser(staff) });
+      await publishPost(duplicate.id);
+    })()).rejects.toThrow();
+    expect((await payload.find({ collection: "posts", where: { slug: { equals: "field-notes" } }, overrideAccess: false })).totalDocs).toBe(1);
+  });
+  it("denies anonymous draft/history reads and permits authenticated JSON previews", async () => {
+    draftArticle = await payload.create({ collection: "posts", draft: true, data: { ...articleData("draft-only-story"), title: "Private draft-only story" }, overrideAccess: false, user: asUser(staff) });
+    await expect(payload.findByID({ collection: "posts", id: draftArticle.id, draft: true, overrideAccess: false })).rejects.toThrow();
+    await expect(payload.findVersions({ collection: "posts", overrideAccess: false })).rejects.toThrow();
+    const editor = await request(staff); editor.routeParams = { collection: "posts", id: String(draftArticle.id) };
+    const response = await previewEndpoint.handler(editor);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect((await response.json()).title).toBe("Private draft-only story");
+    const anonymous = await request(); anonymous.routeParams = editor.routeParams;
+    expect((await previewEndpoint.handler(anonymous)).status).toBe(403);
+  });
+  it("supports deterministic pagination, category filters and an empty published category", async () => {
+    for (let index = 1; index <= 6; index++) {
+      const post = await payload.create({ collection: "posts", draft: true, data: { ...articleData("field-report-" + index), title: "Field report " + index, publicationDate: "2026-09-0" + index + "T09:00:00.000Z", coverImage: blogImage.id }, overrideAccess: false, user: asUser(staff) });
+      await publishPost(post.id);
+    }
+    const first = await payload.find({ collection: "posts", limit: 6, page: 1, sort: ["-publicationDate", "-id"], overrideAccess: false });
+    const second = await payload.find({ collection: "posts", limit: 6, page: 2, sort: ["-publicationDate", "-id"], overrideAccess: false });
+    expect(first.totalDocs).toBe(7);
+    expect(first.docs).toHaveLength(6);
+    expect(second.docs).toHaveLength(1);
+    expect(first.docs.some(post => post.id === second.docs[0].id)).toBe(false);
+    expect((await payload.find({ collection: "posts", where: { categories: { contains: emptyCategory.id } }, overrideAccess: false })).totalDocs).toBe(0);
+    expect((await payload.find({ collection: "posts", where: { categories: { contains: category.id } }, overrideAccess: false })).totalDocs).toBe(7);
+  });
+  it("unpublishes articles immediately without exposing the draft and preserves history", async () => {
+    const temporary = await payload.create({ collection: "posts", draft: true, data: articleData("withdrawn-story"), overrideAccess: false, user: asUser(staff) });
+    await publishPost(temporary.id);
+    await payload.update({ collection: "posts", id: temporary.id, data: { _status: "draft" }, overrideAccess: false, user: asUser(admin) });
+    expect((await payload.find({ collection: "posts", where: { slug: { equals: "withdrawn-story" } }, overrideAccess: false })).totalDocs).toBe(0);
+    expect((await payload.findVersions({ collection: "posts", where: { parent: { equals: temporary.id } }, overrideAccess: false, user: asUser(staff) })).totalDocs).toBeGreaterThan(0);
   });
 });

@@ -12,11 +12,11 @@ const getPublishedSEO = cache(async () => {
   return payload.findGlobal({ slug: "page-seo", draft: false, overrideAccess: false, depth: 0 });
 });
 
-export async function pageMetadata(page: StaticPage): Promise<Metadata> {
+export async function pageMetadata(page: StaticPage, defaults?: { title: string; description: string }): Promise<Metadata> {
   const seo = await getPublishedSEO();
   const fields = seo._status === "published" ? seo[page] : undefined;
   return {
-    title: fields?.title?.trim() || "Pazelgreen Technologies",
-    description: fields?.description?.trim() || "Innovating the future of sustainable agriculture",
+    title: fields?.title?.trim() || defaults?.title || "Pazelgreen Technologies",
+    description: fields?.description?.trim() || defaults?.description || "Innovating the future of sustainable agriculture",
   };
 }

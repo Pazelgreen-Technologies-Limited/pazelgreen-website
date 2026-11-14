@@ -72,6 +72,8 @@ export interface Config {
     'audit-events': AuditEvent;
     media: Media;
     'private-files': PrivateFile;
+    categories: Category;
+    posts: Post;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +86,8 @@ export interface Config {
     'audit-events': AuditEventsSelect<false> | AuditEventsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -244,6 +248,91 @@ export interface PrivateFile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  name: string;
+  /**
+   * URL address, for example reducing-food-waste. Changing a published slug changes its public address.
+   */
+  slug: string;
+  description?: string | null;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  /**
+   * URL address, for example reducing-food-waste. Changing a published slug changes its public address.
+   */
+  slug: string;
+  excerpt: string;
+  /**
+   * Public attribution, independent of private CMS user accounts.
+   */
+  authorName: string;
+  /**
+   * Date displayed on the article. This is not a scheduling control; approval publishes immediately.
+   */
+  publicationDate: string;
+  categories?: (number | Category)[] | null;
+  coverImage?: (number | null) | Media;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -285,6 +374,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'private-files';
         value: number | PrivateFile;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -432,6 +529,59 @@ export interface PrivateFilesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  authorName?: T;
+  publicationDate?: T;
+  categories?: T;
+  coverImage?: T;
+  body?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -554,6 +704,10 @@ export interface PageSeo {
     title?: string | null;
     description?: string | null;
   };
+  blog?: {
+    title?: string | null;
+    description?: string | null;
+  };
   reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
   /**
    * Required when returning a draft for changes.
@@ -648,6 +802,12 @@ export interface PageSeoSelect<T extends boolean = true> {
         description?: T;
       };
   contact?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  blog?:
     | T
     | {
         title?: T;

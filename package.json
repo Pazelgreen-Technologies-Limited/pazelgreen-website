@@ -27,7 +27,9 @@
     "cms:bootstrap": "tsx scripts/bootstrap-admin.ts",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "test:http": "tsx tests/http/cms-smoke.ts"
+    "test:http": "tsx tests/http/cms-smoke.ts",
+    "test:browser": "playwright test",
+    "test:migrations": "tsx tests/migrations/roundtrip.ts"
   },
   "dependencies": {
     "@next/env": "16.3.3",
@@ -49,6 +51,7 @@
     "tsx": "4.23.15"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.2",
     "@types/pg": "8.23.1",

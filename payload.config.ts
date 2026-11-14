@@ -14,6 +14,7 @@ import { createMedia, createPrivateFiles } from "./cms/media";
 import { previewEndpoint } from "./cms/preview";
 import { CompanySettings } from "./cms/company-settings";
 import { PageSEO } from "./cms/page-seo";
+import { Categories, Posts } from "./cms/blog";
 
 nextEnv.loadEnvConfig(process.cwd());
 const env = getServerEnvironment();
@@ -29,7 +30,7 @@ export default buildConfig({
   email: nodemailerAdapter({ defaultFromAddress: env.emailFrom, defaultFromName: "Pazelgreen", transportOptions: env.smtp, skipVerify: true }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Invitations, AuditEvents, createMedia(env.publicStorage), createPrivateFiles(env.privateStorage)],
+  collections: [Users, Invitations, AuditEvents, createMedia(env.publicStorage), createPrivateFiles(env.privateStorage), Categories, Posts],
   globals: [CompanySettings, PageSEO],
   endpoints: [previewEndpoint],
   typescript: { outputFile: path.resolve(root, "payload-types.ts") },
