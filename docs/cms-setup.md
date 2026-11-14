@@ -11,6 +11,9 @@ Use Node **24.22.2**, pnpm **10.18.1**, and running Docker Desktop/Compose.
 The committed `.npmrc` enforces the package's Node engine requirement before
 scripts run. Verify `node --version` in the terminal you use for pnpm. The
 `.node-version` file pins a version but does not install or select it automatically.
+After updating a Git Bash PATH entry in `.bashrc`, open a new terminal or run
+`source ~/.bashrc` followed by `hash -r`. Confirm `node --version` reports the
+supported version before retrying `pnpm dev`.
 On a new checkout, install with `pnpm install --frozen-lockfile`, copy
 `.env.example` to `.env`, and configure:
 

@@ -534,3 +534,24 @@ Verification so far:
   pages currently explain the forthcoming form; no submission endpoint exists.
   Full company codes, real vacancies, recruitment privacy/retention approval and
   production providers remain T12 launch dependencies.
+
+### 2026-11-14 - Persistent Git Bash runtime setup
+
+- User requested fixing the remaining unsupported-engine error. Installed the
+  already downloaded Node 24.22.2 under the user's LocalAppData Programs directory
+  (pazelgreen-node/node-v24.22.2-win-x64), outside Temp. No system Node installation
+  was removed or overwritten.
+- Added a managed PATH block to the user's .bashrc and .bash_profile, preserving
+  existing content and creating timestamped .pazelgreen-node-*.bak copies before
+  modification. These are local machine files, not repository dependencies.
+- A fresh Git Bash login selected the permanent user runtime, reported Node
+  v24.22.2 and pnpm 10.18.1. Ran actual pnpm dev through that shell on temporary
+  port 3100: Docker healthy, migrations complete, existing admin preserved, Next
+  reached Ready. Stopped the verification server with Ctrl+C. No HTTP response
+  test or application regression suite was needed/claimed for this setup change.
+- Existing open shells must reload .bashrc and clear Bash's command cache, or be
+  reopened. Added this instruction to docs/cms-setup.md. Other shell types still
+  need their own supported-runtime selection; the setup targets the user's Git
+  Bash workflow. Restored only Next's automatic AGENTS.md edits after verification.
+- No application code or credentials changed. T01–T06 remain complete; next CMS
+  task is T07 as described in Next concrete action above.
