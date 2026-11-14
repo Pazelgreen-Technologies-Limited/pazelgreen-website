@@ -74,6 +74,11 @@ export interface Config {
     'private-files': PrivateFile;
     categories: Category;
     posts: Post;
+    'employment-types': EmploymentType;
+    departments: Department;
+    'position-codes': PositionCode;
+    jobs: Job;
+    'annual-advert-counters': AnnualAdvertCounter;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +93,11 @@ export interface Config {
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'employment-types': EmploymentTypesSelect<false> | EmploymentTypesSelect<true>;
+    departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
+    'position-codes': PositionCodesSelect<false> | PositionCodesSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
+    'annual-advert-counters': AnnualAdvertCountersSelect<false> | AnnualAdvertCountersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -332,6 +342,165 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Administrators manage and approve codes. Retire entries instead of deleting them. Codes issued on adverts never change.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employment-types".
+ */
+export interface EmploymentType {
+  id: number;
+  name: string;
+  code: string;
+  active: boolean;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Administrators manage and approve codes. Retire entries instead of deleting them. Codes issued on adverts never change.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments".
+ */
+export interface Department {
+  id: number;
+  name: string;
+  code: string;
+  active: boolean;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Administrators manage and approve codes. Retire entries instead of deleting them. Codes issued on adverts never change.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "position-codes".
+ */
+export interface PositionCode {
+  id: number;
+  name: string;
+  code: string;
+  active: boolean;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Choose a published, active code. Locked permanently after first approval. Retired codes remain selectable for existing adverts only.
+   */
+  employmentType: number | EmploymentType;
+  /**
+   * Choose a published, active code. Locked permanently after first approval. Retired codes remain selectable for existing adverts only.
+   */
+  department: number | Department;
+  /**
+   * Choose a published, active code. Locked permanently after first approval. Retired codes remain selectable for existing adverts only.
+   */
+  positionCode: number | PositionCode;
+  location: string;
+  arrangement: 'remote' | 'hybrid' | 'on-site';
+  summary: string;
+  /**
+   * Plain text; put each responsibility on its own line.
+   */
+  responsibilities: string;
+  /**
+   * Plain text; put each requirement on its own line.
+   */
+  requirements: string;
+  compensation?: string | null;
+  /**
+   * Exact closing instant, stored in UTC. Enter an explicit offset when using the API. The timezone below controls public display. Empty means no deadline.
+   */
+  deadline?: string | null;
+  deadlineTimezone: string;
+  /**
+   * Closing or reopening requires admin approval. Deadlines apply automatically.
+   */
+  state: 'open' | 'closed';
+  reference?: string | null;
+  referenceYear?: number | null;
+  referenceSequence?: number | null;
+  employmentCode?: string | null;
+  departmentCode?: string | null;
+  positionCodeSnapshot?: string | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annual-advert-counters".
+ */
+export interface AnnualAdvertCounter {
+  id: number;
+  year: number;
+  value: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -382,6 +551,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'employment-types';
+        value: number | EmploymentType;
+      } | null)
+    | ({
+        relationTo: 'departments';
+        value: number | Department;
+      } | null)
+    | ({
+        relationTo: 'position-codes';
+        value: number | PositionCode;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'annual-advert-counters';
+        value: number | AnnualAdvertCounter;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -582,6 +771,123 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employment-types_select".
+ */
+export interface EmploymentTypesSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  active?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments_select".
+ */
+export interface DepartmentsSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  active?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "position-codes_select".
+ */
+export interface PositionCodesSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  active?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  employmentType?: T;
+  department?: T;
+  positionCode?: T;
+  location?: T;
+  arrangement?: T;
+  summary?: T;
+  responsibilities?: T;
+  requirements?: T;
+  compensation?: T;
+  deadline?: T;
+  deadlineTimezone?: T;
+  state?: T;
+  reference?: T;
+  referenceYear?: T;
+  referenceSequence?: T;
+  employmentCode?: T;
+  departmentCode?: T;
+  positionCodeSnapshot?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "annual-advert-counters_select".
+ */
+export interface AnnualAdvertCountersSelect<T extends boolean = true> {
+  year?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -708,6 +1014,10 @@ export interface PageSeo {
     title?: string | null;
     description?: string | null;
   };
+  careers?: {
+    title?: string | null;
+    description?: string | null;
+  };
   reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
   /**
    * Required when returning a draft for changes.
@@ -808,6 +1118,12 @@ export interface PageSeoSelect<T extends boolean = true> {
         description?: T;
       };
   blog?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  careers?:
     | T
     | {
         title?: T;

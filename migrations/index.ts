@@ -3,6 +3,7 @@ import * as migration_20261107_102100_last_admin_guard from './20261107_102100_l
 import * as migration_20261114_120000_initial_password from './20261114_120000_initial_password';
 import * as migration_20261114_174542_company_settings_and_page_seo from './20261114_174542_company_settings_and_page_seo';
 import * as migration_20261114_191532_blog_posts_and_categories from './20261114_191532_blog_posts_and_categories';
+import * as migration_20261114_201626_careers from './20261114_201626_careers';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261114_191532_blog_posts_and_categories.up,
     down: migration_20261114_191532_blog_posts_and_categories.down,
-    name: '20261114_191532_blog_posts_and_categories'
+    name: '20261114_191532_blog_posts_and_categories',
+  },
+  {
+    up: migration_20261114_201626_careers.up,
+    down: migration_20261114_201626_careers.down,
+    name: '20261114_201626_careers'
   },
 ];

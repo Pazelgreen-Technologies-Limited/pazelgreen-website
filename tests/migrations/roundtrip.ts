@@ -39,11 +39,13 @@ async function verifyScratchDatabase() {
   const payload = await getPayload({ config });
   try {
     await payload.db.migrate();
-    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.posts') AS relation")).rows[0].relation, "posts");
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
+    assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types WHERE _status = 'published'")).rows[0].count, 3);
     await runLatestMigration(payload, "down");
-    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.posts') AS relation")).rows[0].relation, null);
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, null);
     await runLatestMigration(payload, "up");
-    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.posts') AS relation")).rows[0].relation, "posts");
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
+    assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types")).rows[0].count, 3);
     console.info("Migration round trip passed: fresh schema, latest migration down, latest migration reapplied.");
   } finally { await payload.destroy(); }
 }

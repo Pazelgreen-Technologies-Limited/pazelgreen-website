@@ -75,6 +75,69 @@ try {
   const staffLogin = await api("/api/users/login", undefined, { email: "staff@pazelgreen.test", password });
   assert.equal(staffLogin.status, 200);
   const { token: staffToken, user: staff } = await staffLogin.json();
+  const careers = await (await api("/join-us/careers")).text();
+  assert.ok(careers.includes("Approved careers listing SEO"));
+  assert.ok(careers.includes("Field systems engineer"));
+  for (const privateTitle of ["Private revised engineering vacancy", "Closed field coordinator", "Expired field researcher", "Private draft vacancy"]) assert.ok(!careers.includes(privateTitle), privateTitle);
+  const joinUs = await (await api("/join-us")).text();
+  assert.ok(joinUs.includes("Field systems engineer"));
+  assert.ok(!joinUs.includes("Full Stack Engineers"));
+  assert.ok(!joinUs.includes("Closed field coordinator"));
+  const publicJob = (await (await api("/api/jobs?where[slug][equals]=field-systems-engineer")).json()).docs[0];
+  assert.ok(publicJob.reference.startsWith("D-TE | DH-"));
+  assert.equal(publicJob.reviewState, undefined);
+  const jobHTML = await (await api("/join-us/careers/field-systems-engineer?preview=true", staffToken)).text();
+  assert.ok(jobHTML.includes("Approved engineering opportunity"));
+  assert.ok(jobHTML.includes("Build agricultural systems at Pazelgreen."));
+  assert.ok(!jobHTML.includes("Private job SEO"));
+  assert.ok(jobHTML.includes("Interested in this role?"));
+  for (const slug of ["closed-vacancy", "expired-vacancy"]) {
+    const html = await (await api(`/join-us/careers/${slug}`)).text();
+    assert.ok(html.includes("Applications are closed"));
+    assert.ok(!html.includes("Interested in this role?"));
+  }
+  for (const route of ["/join-us/careers/private-vacancy", "/join-us/careers/withdrawn-vacancy", "/join-us/careers/not-a-job", "/join-us/careers?page=0", "/join-us/careers?page=99999"]) {
+    const response = await api(route);
+    const html = await response.text();
+    assert.ok([200, 404].includes(response.status));
+    assert.ok(html.includes("Position or page not found"), route);
+    assert.ok(html.includes("noindex"), route);
+    assert.ok(!html.includes("Private draft vacancy"));
+  }
+  assert.equal((await api("/api/jobs/versions")).status, 403);
+  assert.ok(!JSON.stringify(await (await api("/api/jobs?draft=true")).json()).includes("Private revised engineering vacancy"));
+  assert.equal((await api("/api/annual-advert-counters", adminToken)).status, 403);
+  assert.equal((await api("/api/departments", staffToken, { name: "Blocked", code: "NO" })).status, 403);
+  assert.equal((await patch(`/api/jobs/${publicJob.id}`, staffToken, { _status: "published" })).status, 403);
+  const anonJobPreview = await fetch(`${base}/join-us/careers/preview/${publicJob.id}`, { headers: { Origin: base }, redirect: "manual" });
+  assert.equal(anonJobPreview.headers.get("X-Robots-Tag"), "noindex, nofollow");
+  assert.ok(!(await anonJobPreview.text()).includes("Private revised engineering vacancy"));
+  const jobPreview = await api(`/join-us/careers/preview/${publicJob.id}`, staffToken);
+  assert.equal(jobPreview.headers.get("X-Robots-Tag"), "noindex, nofollow");
+  assert.ok(jobPreview.headers.get("Cache-Control")?.includes("no-store"));
+  assert.ok((await jobPreview.text()).includes("Private revised engineering vacancy"));
+  const jobJSON = await api(`/api/preview/jobs/${publicJob.id}`, staffToken);
+  assert.equal((await jobJSON.json()).title, "Private revised engineering vacancy");
+  // Warmed pages must reflect approval and time-based expiry without rebuilding.
+  async function publishJob(data: object) {
+    assert.equal((await patch(`/api/jobs/${publicJob.id}`, staffToken, data)).status, 200);
+    assert.equal((await patch(`/api/jobs/${publicJob.id}`, staffToken, { reviewState: "in-review" })).status, 200);
+    assert.equal((await patch(`/api/jobs/${publicJob.id}`, adminToken, { _status: "published" })).status, 200);
+    assert.equal((await (await api(`/api/jobs/${publicJob.id}`)).json()).reference, publicJob.reference);
+  }
+  await publishJob({ title: publicJob.title, seo: publicJob.seo, state: "closed" });
+  assert.ok((await (await api("/join-us/careers")).text()).includes("No open positions right now"));
+  assert.ok(!(await (await api("/join-us")).text()).includes("Field systems engineer"));
+  const deadline = new Date(Date.now() + 10000);
+  await publishJob({ state: "open", deadline: deadline.toISOString() });
+  assert.ok((await (await api("/join-us/careers")).text()).includes("Field systems engineer"));
+  await new Promise(resolve => setTimeout(resolve, Math.max(0, deadline.getTime() - Date.now() + 100)));
+  assert.ok((await (await api("/join-us/careers")).text()).includes("No open positions right now"));
+  assert.ok((await (await api("/join-us/careers/field-systems-engineer")).text()).includes("Applications are closed"));
+  assert.ok(!(await (await api("/join-us")).text()).includes("Field systems engineer"));
+  await publishJob({ state: "open", deadline: null });
+  assert.ok((await (await api("/join-us/careers")).text()).includes("Field systems engineer"));
+  await patch(`/api/jobs/${publicJob.id}`, staffToken, { title: "Private revised engineering vacancy", state: "closed", seo: { title: "Private job SEO" } });
   const blog = await (await api("/blog")).text();
   assert.ok(blog.includes("News &amp; insights"));
   assert.ok(blog.includes("Field notes: stronger food systems"));

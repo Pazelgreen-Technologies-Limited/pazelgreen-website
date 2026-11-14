@@ -1,6 +1,6 @@
 # Payload CMS implementation plan
 
-Status: T01–T05 implemented and verified. T06–T12 remain pending.
+Status: T01–T06 implemented and verified. T07–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
@@ -189,7 +189,7 @@ and sitemaps. Search engines may choose different displayed text.
   fields without redesigning the site. Seed only verified data when supplied;
   approved initial contacts/hours/social URLs remain the T12 launch dependency.
 - [x] T05: Implement blog/categories/public media and blog frontend routes.
-- [ ] T06: Implement dictionaries, jobs, annual references, careers routes,
+- [x] T06: Implement dictionaries, jobs, annual references, careers routes,
   open/closed/expiry behavior, and dynamic Join Us openings.
 - [ ] T07: Implement applications, per-advert IDs, private CVs, hiring workflow,
   acknowledgements, staff notifications, and retry-safe delivery.
@@ -251,3 +251,12 @@ approved media relationships, article/listing SEO and authenticated visual/JSON
 previews are implemented and verified. New posts still require admin approval.
 No real content was seeded; initial articles/image rights remain T12 inputs.
 T06 dictionaries, jobs and careers is the next implementation task.
+
+### 2026-11-14 - T06 completed
+
+Admin-managed reviewed dictionaries, jobs, atomic annual advert references,
+careers listing/detail routes, protected previews, automatic expiry and dynamic
+Join Us openings are implemented and verified. D/C/I employment types are seeded;
+no real vacancy or example department/position codes were seeded. Application
+forms/submission, per-advert applicant numbering and private CV workflow remain
+T07. Open role pages explicitly explain that online applications are forthcoming.

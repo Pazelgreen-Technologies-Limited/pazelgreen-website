@@ -4,7 +4,7 @@ Start here if you have never used Payload. This guide explains what the parts do
 why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
-This describes the **T01–T05 implementation**, checked against this repository on
+This describes the **T01–T06 implementation**, checked against this repository on
 **14 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
@@ -116,14 +116,14 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | --- | --- |
 | Public Home, About, Solutions, Join Us and Contact pages with shared company settings and SEO | Verified production contacts, hours and social URLs: T12 |
 | `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
-| Image media library with review and version history | Jobs, code dictionaries and careers pages: T06 |
+| Image media library; reviewed jobs, dictionaries, permanent advert references and careers pages | Approved real vacancies and full code list: T12 |
 | Restricted PDF/DOCX storage infrastructure | Candidate applications, full CV workflow and recruitment emails: T07 |
 | Audit events, protected media JSON preview and SQL migrations | Backend-only FAQs: T08; announcements: T09; legal pages: T10 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
 Most marketing content is still written directly in frontend components. Do not
-expect vacancies or application records yet. Company settings, page SEO and the
-blog editor are available now. Contact-message delivery and newsletter integration
+expect application records yet. Company settings, page SEO, blog and careers
+editors are available now. Contact-message delivery and newsletter integration
 are outside this CMS scope. Homepage content editing is excluded from the plan.
 The [task plan](../.planning/task.md) and [progress record](../.planning/progress.md)
 track what has actually been delivered.
@@ -402,11 +402,11 @@ Direct version restoration is blocked here: copy the historical values into a
 draft and submit them for review. Review updates happen one document at a time;
 bulk updates are blocked by the current workflow.
 
-Media has authenticated JSON previews at `/api/preview/media/<id>`; posts and
-categories also support that endpoint. The blog editor's Preview button opens a
+Media has authenticated JSON previews at `/api/preview/media/<id>`; posts,
+categories and jobs also support that endpoint. The blog editor's Preview button opens a
 session-protected visual draft preview. See the [blog guide](blog-editing.md).
 A browser without a valid active staff/admin session cannot preview drafts.
-Visual careers previews follow T06.
+The job editor also has protected visual previews. See the [careers guide](careers-editing.md).
 
 ### Public images and private files
 
@@ -845,7 +845,7 @@ Private storage exists, but public applications, candidate validation, notificat
 and retention handling are planned in T07.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T06: dictionaries, jobs and public careers pages. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T07: applications, private CVs and hiring workflow. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
 
 ## Editing company settings and page SEO

@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-14.
-Current phase: T01–T05 complete and verified; next planned implementation is T06.
+Current phase: T01–T06 complete and verified; next planned implementation is T07.
 
 ## Start here
 
@@ -84,9 +84,13 @@ Current phase: T01–T05 complete and verified; next planned implementation is T
 
 ## Next concrete action
 
-T06: implement admin-managed dictionaries, jobs, atomic annual advert references
-and public careers listing/detail routes, then connect Join Us openings. Preserve
-the approval workflow and immutable reference rules in task.md.
+T07: implement private applications/CVs, atomic per-advert applicant sequences,
+idempotent durable submission, public application forms and success references,
+private hiring statuses/notes/history, acknowledgements and retry-safe staff
+notifications. Recheck published/open/unexpired eligibility on the server at
+submission, preserve the permanent advert reference and snapshot rules, and keep
+candidate personal data out of logs. Recruitment recipients and approved
+privacy/retention copy remain launch inputs; do not invent company policy.
 Startup now ensures a first administrator exists from server environment secrets;
 existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
@@ -97,6 +101,25 @@ Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
 Append dated entries with task ID, implementation summary, changed files,
 commands/results, unresolved blockers, and next action. Never log secrets or
 applicant personal data. A plan or partial implementation is not a completed task.
+
+### 2026-11-14 - T06 implementation in progress
+
+- Added reviewed admin-managed dictionaries and jobs, immutable reference fields,
+  transactional annual counter allocation, careers routes/previews, listing SEO,
+  and dynamic Join Us openings. Migration includes agreed D/C/I employment types
+  only; department/position examples are not seeded as company data.
+- Added unit and integration checks for code validation, Lagos year boundaries,
+  concurrent numbering, retries, rollback, reference immutability and job states.
+- Unit checks passed (56); final integration, HTTP/browser, migration round trip,
+  lint, TypeScript and build validation remain pending. T06 is not complete yet.
+- Application collection/forms/submission and eligibility rechecks remain T07.
+- Production build and fresh migration/down/up checks passed. Integration caught
+  that private audit publication timestamps cannot be anonymous sort keys; public
+  careers ordering now uses immutable reference year/sequence and ID instead.
+- Expanded tests to cover actual Lagos year rollover and 12-item pagination.
+  Explicit draft-create flags are confined to creation; permission tests must
+  request actual publication rather than silently saving a draft. Final reruns
+  and HTTP/browser checks are in progress.
 
 ### 2026-11-07 - T01 baseline; T02/T03 implementation in progress
 
@@ -437,3 +460,56 @@ Verification so far:
 - T05 is complete. No real post/category records or external resources were
   created. Initial content and image rights/attribution remain T12 launch inputs.
   Next task: T06 dictionaries, jobs, annual references and careers routes.
+
+### 2026-11-14 - T06 final validation and handoff
+
+- Added cms/careers.ts and cms/career-rules.ts; registered employment types,
+  departments, position codes, reviewed jobs and a hidden counter collection.
+  Admins alone manage dictionaries. Codes are normalized, unique and delimiter
+  safe; retire entries instead of deleting them. Staff draft jobs, admins approve.
+- First approval allocates a company-wide sequence with a transactional UPSERT
+  and unique reference/year-sequence constraints. Africa/Lagos determines the
+  year. Snapshots and defining relationships are locked after issue; retries,
+  dictionary edits, closure/reopening and year rollover preserve references.
+  Issued adverts cannot be deleted; PostgreSQL guards reference changes/deletion.
+- Added lib/careers.ts, request-time paginated careers listing/detail pages and
+  authenticated noindex visual previews under app/(frontend)/join-us/careers/.
+  Join Us reads up to four real open roles. Public sort uses immutable year and
+  sequence, then ID. Draft closures preserve the live advert; expiry takes effect
+  at the exact deadline without another publish or rebuild. Closed detail URLs
+  remain informative; unpublished details are not found.
+- Added careers listing SEO to Page SEO and job-specific SEO on jobs. Extended
+  JSON previews and no-store/noindex/no-referrer headers to careers. Draft views
+  tolerate incomplete text and invalid deadline/timezone values.
+- Migration 20261114_201626_careers includes schema, snapshot and issued-reference
+  guard. Seeded only the explicitly agreed Direct=D, Contract=C, Internship=I
+  employment types with published versions; no real vacancies or department/
+  position examples. Generated Payload types are included; import map unchanged.
+- Final pnpm lint and pnpm typecheck passed with no lint errors/warnings.
+  pnpm test passed 56 unit tests. pnpm test:integration passed all 46 tests,
+  including concurrent cross-department publication, same-advert retries, failed
+  allocation rollback, actual Lagos year rollover, padding past 99, database-level
+  immutability, retirement/reopening, pagination and published vs draft states.
+- pnpm test:migrations passed fresh migrations/latest-down/latest-up in its own
+  scratch database, verifying D/C/I seeds and careers table removal/recreation.
+  Down SQL guards FK drops after CASCADE; scratch cleanup completed.
+- Final pnpm build passed. pnpm test:http passed production HTML/SEO/access,
+  previews, warmed-page closure/reopening, empty listings and real deadline
+  passage without republishing. It restores the approved job/private draft fixture.
+- pnpm test:browser passed all 16 checks in installed headless Google Chrome on
+  desktop 1280x900 and mobile 390x844. Reviewed careers detail screenshots; no
+  horizontal overflow. Verified Join Us links, approved metadata, closed/expired
+  details, private URLs and session-protected previews alongside blog regressions.
+  Next logged two stream-close messages during browser navigation; all assertions
+  passed. Temporary HTTP/browser servers stopped; screenshots are ignored.
+- pnpm predev passed locally: Docker healthy, careers migration applied, existing
+  admin preserved. Only D/C/I dictionary entries were initialized; no real job
+  content or external resources were created. No remote CI/push/deployment run.
+- Added docs/careers-editing.md and updated README, setup, handbook, API contract
+  and planning. Guide covers deadline entry/display, permanent IDs, retirement,
+  test safety and consistent counter/adverts backup requirements.
+- T06 is complete. T07 is next: applications, per-advert applicant references,
+  private CVs, recruitment operations and retry-safe email delivery. Open role
+  pages currently explain the forthcoming form; no submission endpoint exists.
+  Full company codes, real vacancies, recruitment privacy/retention approval and
+  production providers remain T12 launch dependencies.

@@ -2,14 +2,7 @@ import { Briefcase, Star } from "lucide-react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import MotionCard from "@/components/MotionCard";
-
-// Current open roles
-const openings = [
-  "Full Stack Engineers",
-  "Agricultural Scientists",
-  "Product Managers",
-  "Business Development",
-];
+import { getOpenJobs } from "@/lib/careers";
 
 // Reasons to join — placeholder, replace with real copy
 const whyJoinUs = [
@@ -19,7 +12,8 @@ const whyJoinUs = [
   "Competitive salary and equity options",
 ];
 
-export default function CareersSection() {
+export default async function CareersSection() {
+  const openings = await getOpenJobs(1, 4);
   return (
     <section className="bg-white px-6 py-16">
       <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
@@ -63,16 +57,17 @@ export default function CareersSection() {
             </div>
 
             <ul className="mt-2 space-y-2">
-              {openings.map((role) => (
+              {openings.docs.map((role) => (
                 <li
-                  key={role}
+                  key={role.id}
                   className="flex items-center gap-2 text-sm text-gray-600"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                  {role}
+                  <Link className="break-words hover:underline focus-visible:outline-2" href={`/join-us/careers/${role.slug}`}>{role.title}</Link>
                 </li>
               ))}
             </ul>
+            {!openings.docs.length && <p className="mt-3 text-sm text-gray-600">No open positions right now. Check back for new opportunities.</p>}
           </MotionCard>
 
           {/* Why Join Us card */}

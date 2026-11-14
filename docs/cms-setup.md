@@ -161,7 +161,7 @@ with closing after opening; mark closed days explicitly. Each weekday occurs onc
 Social links need an HTTP(S) URL; placeholder # links cannot be published.
 
 Page SEO contains fixed groups for Home, About, Solutions, Join Us, Contact and
-the Blog listing.
+the Blog and Careers listings.
 It controls search titles/descriptions only. Empty fields use the existing site
 metadata defaults; homepage content remains outside the CMS scope. Article SEO belongs to each post; future job/legal metadata will belong to their
 documents rather than these globals.
@@ -191,10 +191,17 @@ Read the [blog editor guide](blog-editing.md) for posts/categories, media approv
 visual draft previews, article SEO, public filtering/pagination and browser checks.
 No real articles are seeded automatically.
 
+## Careers (T06)
+
+Read the [careers editor guide](careers-editing.md) for admin-managed dictionaries,
+job drafts/approval, permanent annual advert IDs, preview, deadline semantics and
+public careers pages. The migration seeds only the agreed D/C/I employment types.
+No actual vacancies or example department/position codes are seeded.
+
 ## Current limits and implementation status
 
-T01–T05 provide the CMS foundation, company settings, SEO and the blog.
-Job previews, recruitment and other planned features remain pending. The current
+T01–T06 provide the CMS foundation, company settings, SEO, blog and careers.
+Applications/private CV workflow and recruitment emails are next in T07. The current
 media preview is authenticated JSON; private PDF/DOCX storage is not a complete
 application system. See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).

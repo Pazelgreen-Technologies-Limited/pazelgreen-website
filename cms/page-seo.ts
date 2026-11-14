@@ -8,6 +8,7 @@ export const staticPages = {
   joinUs: { path: "/join-us", label: "Join Us" },
   contact: { path: "/contact", label: "Contact" },
   blog: { path: "/blog", label: "Blog listing" },
+  careers: { path: "/join-us/careers", label: "Careers listing" },
 } as const;
 export type StaticPage = keyof typeof staticPages;
 

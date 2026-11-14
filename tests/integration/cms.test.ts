@@ -2,10 +2,11 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import nextEnv from "@next/env";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createLocalReq, getPayload, type Payload, type PayloadRequest } from "payload";
 import { sql } from "@payloadcms/db-postgres";
-import type { Category, Media, Post, User } from "../../payload-types";
+import type { Category, Department, EmploymentType, Job, Media, PositionCode, Post, User } from "../../payload-types";
+import { advertYear, openJobsWhere } from "../../cms/career-rules";
 import { hashInvitation, Invitations } from "../../cms/invitations";
 import { previewEndpoint } from "../../cms/preview";
 import { ensureFirstAdmin } from "../../cms/bootstrap";
@@ -54,7 +55,7 @@ beforeAll(async () => {
   payload = await getPayload({ config });
   await payload.db.migrate();
   // Only this verified disposable local test database is reset; migrations remain.
-  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v, employment_types, _employment_types_v, departments, _departments_v, position_codes, _position_codes_v, jobs, _jobs_v, annual_advert_counters RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -375,6 +376,185 @@ describe("company settings and page SEO review", () => {
   });
 });
 
+
+describe("careers dictionaries, publication and permanent references", () => {
+  let employment: EmploymentType;
+  let department: Department;
+  let otherDepartment: Department;
+  let position: PositionCode;
+  let mainJob: Job;
+  const editor = () => ({ overrideAccess: false, user: asUser(staff) });
+  const approver = () => ({ overrideAccess: false, user: asUser(admin) });
+  async function approveDictionary(collection: "employment-types" | "departments" | "position-codes", id: number) {
+    await payload.update({ collection, id, data: { reviewState: "in-review" }, ...approver() });
+    return payload.update({ collection, id, data: { _status: "published" }, ...approver() });
+  }
+  const jobData = (slug: string) => ({ title: "Field systems engineer", slug, employmentType: employment.id, department: department.id, positionCode: position.id,
+    location: "Lagos, Nigeria", arrangement: "hybrid" as const, summary: "Build dependable tools for agricultural teams.",
+    responsibilities: "Design field tools\nCollaborate with growers", requirements: "Experience delivering reliable software\nClear written communication", deadlineTimezone: "Africa/Lagos", state: "open" as const });
+  async function submit(id: number) { await payload.update({ collection: "jobs", id, data: { reviewState: "in-review" }, ...editor() }); }
+  async function approve(id: number) { return payload.update({ collection: "jobs", id, data: { _status: "published" }, ...approver() }); }
+  async function publish(id: number) { await submit(id); return approve(id); }
+
+  it("restricts dictionary management to admins and normalizes safe unique codes", async () => {
+    await expect(payload.create({ collection: "departments", draft: true, data: { name: "Blocked", code: "NO" }, ...editor() })).rejects.toThrow();
+    employment = await payload.create({ collection: "employment-types", draft: true, data: { name: "Direct", code: " d " }, ...approver() });
+    department = await payload.create({ collection: "departments", draft: true, data: { name: "Technology & Engineering", code: "te" }, ...approver() });
+    otherDepartment = await payload.create({ collection: "departments", draft: true, data: { name: "Agriculture", code: "AG" }, ...approver() });
+    position = await payload.create({ collection: "position-codes", draft: true, data: { name: "Department Head", code: "DH" }, ...approver() });
+    expect(department.code).toBe("TE");
+    expect((await payload.find({ collection: "departments", overrideAccess: false })).docs).toHaveLength(0);
+    for (const [collection, id] of [["employment-types", employment.id], ["departments", department.id], ["departments", otherDepartment.id], ["position-codes", position.id]] as const) await approveDictionary(collection, id);
+    await expect((async () => {
+      const duplicate = await payload.create({ collection: "departments", draft: true, data: { name: "Duplicate", code: "TE" }, ...approver() });
+      await approveDictionary("departments", duplicate.id);
+    })()).rejects.toThrow();
+    await expect(payload.delete({ collection: "departments", id: department.id, ...approver() })).rejects.toThrow();
+    await expect(payload.find({ collection: "annual-advert-counters", ...approver() })).rejects.toMatchObject({ status: 403 });
+  });
+  it("gives drafts no reference, hides them and refuses staff publication", async () => {
+    mainJob = await payload.create({ draft: true, collection: "jobs", data: { ...jobData("field-systems-engineer"), seo: { title: "Approved engineering opportunity", description: "Build agricultural systems at Pazelgreen." }, reference: "FORGED", referenceSequence: 999 }, ...editor() });
+    expect(mainJob.reference).toBeFalsy();
+    expect((await payload.find({ collection: "jobs", overrideAccess: false })).totalDocs).toBe(0);
+    expect((await payload.find({ collection: "jobs", draft: true, overrideAccess: false })).totalDocs).toBe(0);
+    await expect(payload.findVersions({ collection: "jobs", overrideAccess: false })).rejects.toThrow();
+    await expect(payload.update({ collection: "jobs", id: mainJob.id, data: { _status: "published" }, ...editor() })).rejects.toMatchObject({ status: 403 });
+    mainJob = await publish(mainJob.id);
+    expect(mainJob.reference).toBe(`D-TE | DH-${advertYear()}-01`);
+    expect(mainJob.referenceSequence).toBe(1);
+    await expect(approve(mainJob.id)).rejects.toMatchObject({ status: 409 });
+    expect((await payload.findByID({ collection: "jobs", id: mainJob.id, overrideAccess: false })).reference).toBe(mainJob.reference);
+  });
+  it("allocates one company-wide annual sequence across concurrent departments", async () => {
+    const jobs = await Promise.all(Array.from({ length: 6 }, (_, index) => payload.create({ draft: true, collection: "jobs", data: { ...jobData(`concurrent-vacancy-${index}`), department: index % 2 ? department.id : otherDepartment.id }, ...editor() })));
+    await Promise.all(jobs.map(job => submit(job.id)));
+    const published = await Promise.all(jobs.map(job => approve(job.id)));
+    expect(published.map(job => job.referenceSequence).sort((a, b) => a! - b!)).toEqual([2, 3, 4, 5, 6, 7]);
+    expect(new Set(published.map(job => job.reference)).size).toBe(6);
+    expect(published.every(job => job.referenceYear === advertYear())).toBe(true);
+    // Remove these from public listings while preserving their issued IDs.
+    for (const job of published) await payload.update({ collection: "jobs", id: job.id, data: { _status: "draft" }, ...approver() });
+  });
+  it("serializes two first-publication requests for the same advert without double allocation", async () => {
+    const job = await payload.create({ draft: true, collection: "jobs", data: jobData("publication-retry"), ...editor() });
+    await submit(job.id);
+    const result = await Promise.allSettled([approve(job.id), approve(job.id)]);
+    expect(result.filter(item => item.status === "fulfilled")).toHaveLength(1);
+    const live = await payload.findByID({ collection: "jobs", id: job.id, overrideAccess: false });
+    expect(live.referenceSequence).toBe(8);
+    await payload.update({ collection: "jobs", id: job.id, data: { _status: "draft" }, ...approver() });
+  });
+  it("locks defining relationships and reference snapshots in drafts and database writes", async () => {
+    await expect(payload.update({ collection: "jobs", id: mainJob.id, data: { department: otherDepartment.id }, ...editor() })).rejects.toMatchObject({ status: 409 });
+    const changed = await payload.update({ collection: "jobs", id: mainJob.id, data: { reference: "FORGED", referenceSequence: 900 }, ...approver() });
+    expect(changed.reference).toBe(mainJob.reference);
+    expect(changed.referenceSequence).toBe(1);
+    await expect(payload.db.pool.query("UPDATE jobs SET reference_sequence = 900 WHERE id = $1", [mainJob.id])).rejects.toThrow("immutable");
+    await expect(payload.delete({ collection: "jobs", id: mainJob.id, ...approver() })).rejects.toThrow("cannot be deleted");
+    await expect(payload.db.pool.query("DELETE FROM jobs WHERE id = $1", [mainJob.id])).rejects.toThrow("cannot be deleted");
+  });
+  it("keeps published adverts open during draft closure, then approves closure and reopening with the same ID", async () => {
+    await payload.update({ collection: "jobs", id: mainJob.id, data: { state: "closed" }, ...editor() });
+    expect((await payload.find({ collection: "jobs", where: openJobsWhere(), overrideAccess: false })).docs.some(job => job.id === mainJob.id)).toBe(true);
+    const closed = await publish(mainJob.id);
+    expect(closed.reference).toBe(mainJob.reference);
+    expect((await payload.find({ collection: "jobs", where: openJobsWhere(), overrideAccess: false })).totalDocs).toBe(0);
+    expect((await payload.findByID({ collection: "jobs", id: mainJob.id, overrideAccess: false })).state).toBe("closed");
+    await payload.update({ collection: "jobs", id: mainJob.id, data: { state: "open" }, ...editor() });
+    expect((await publish(mainJob.id)).reference).toBe(mainJob.reference);
+  });
+  it("preserves snapshots after dictionary changes and permits reopening with retired entries", async () => {
+    await payload.update({ collection: "departments", id: department.id, data: { code: "TECH", active: false }, ...approver() });
+    await approveDictionary("departments", department.id);
+    await payload.update({ collection: "jobs", id: mainJob.id, data: { state: "closed" }, ...editor() });
+    await publish(mainJob.id);
+    await payload.update({ collection: "jobs", id: mainJob.id, data: { state: "open" }, ...editor() });
+    expect((await publish(mainJob.id)).reference).toBe(mainJob.reference);
+    const retired = await payload.create({ draft: true, collection: "jobs", data: jobData("retired-code-job"), ...editor() });
+    await expect(publish(retired.id)).rejects.toThrow("activate");
+    await payload.update({ collection: "departments", id: department.id, data: { active: true }, ...approver() });
+    await approveDictionary("departments", department.id);
+  });
+  it("rolls back the counter when publication fails after allocation", async () => {
+    const before = Number((await payload.db.pool.query("SELECT value FROM annual_advert_counters WHERE year = $1", [advertYear()])).rows[0].value);
+    const duplicate = await payload.create({ draft: true, collection: "jobs", data: jobData("rollback-allocation"), ...editor() });
+    await payload.update({ collection: "jobs", id: duplicate.id, data: { slug: "field-systems-engineer" }, ...editor() });
+    await expect(publish(duplicate.id)).rejects.toThrow();
+    expect(Number((await payload.db.pool.query("SELECT value FROM annual_advert_counters WHERE year = $1", [advertYear()])).rows[0].value)).toBe(before);
+    expect((await payload.findByID({ collection: "jobs", id: duplicate.id, draft: true, ...editor() })).reference).toBeFalsy();
+  });
+  it("continues an annual counter above 99 and keeps other years independent", async () => {
+    await payload.db.pool.query("UPDATE annual_advert_counters SET value = 99 WHERE year = $1", [advertYear()]);
+    await payload.db.pool.query("INSERT INTO annual_advert_counters (year, value) VALUES ($1, 44)", [advertYear() - 1]);
+    const overflow = await payload.create({ draft: true, collection: "jobs", data: jobData("sequence-overflow"), ...editor() });
+    const issued = await publish(overflow.id);
+    expect(issued.reference).toBe(`D-TECH | DH-${advertYear()}-100`);
+    expect(Number((await payload.db.pool.query("SELECT value FROM annual_advert_counters WHERE year = $1", [advertYear() - 1])).rows[0].value)).toBe(44);
+    await payload.update({ collection: "jobs", id: issued.id, data: { _status: "draft" }, ...approver() });
+  });
+  it("allocates a fresh counter at Lagos year rollover without renumbering existing adverts", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      async function publishAt(id: number, instant: string) {
+        vi.setSystemTime(new Date(instant));
+        await submit(id);
+        vi.setSystemTime(new Date(Date.now() + 1000));
+        return approve(id);
+      }
+      vi.setSystemTime(new Date("2034-12-31T22:59:55Z"));
+      const prior = await payload.create({ draft: true, collection: "jobs", data: jobData("rollover-prior-year"), ...editor() });
+      const first = await publishAt(prior.id, "2034-12-31T22:59:56Z");
+      expect(first.referenceYear).toBe(2034);
+      expect(first.referenceSequence).toBe(1);
+      vi.setSystemTime(new Date("2034-12-31T23:00:00Z"));
+      const next = await payload.create({ draft: true, collection: "jobs", data: jobData("rollover-next-year"), ...editor() });
+      const second = await publishAt(next.id, "2034-12-31T23:00:01Z");
+      expect(second.referenceYear).toBe(2035);
+      expect(second.referenceSequence).toBe(1);
+      vi.setSystemTime(new Date("2034-12-31T23:00:03Z"));
+      await payload.update({ collection: "jobs", id: prior.id, data: { state: "closed" }, ...editor() });
+      expect((await publishAt(prior.id, "2034-12-31T23:00:04Z")).reference).toBe(first.reference);
+      for (const job of [first, second]) {
+        vi.setSystemTime(new Date(Date.now() + 1000));
+        await payload.update({ collection: "jobs", id: job.id, data: { _status: "draft" }, ...approver() });
+      }
+    } finally { vi.useRealTimers(); }
+  });
+  it("paginates open vacancies deterministically without including draft or withdrawn adverts", async () => {
+    const jobs = await Promise.all(Array.from({ length: 13 }, (_, index) => payload.create({ draft: true, collection: "jobs", data: jobData(`pagination-vacancy-${index}`), ...editor() })));
+    await Promise.all(jobs.map(job => submit(job.id)));
+    await Promise.all(jobs.map(job => approve(job.id)));
+    const query = { collection: "jobs" as const, where: openJobsWhere(), limit: 12, sort: ["-referenceYear", "-referenceSequence", "-id"], overrideAccess: false };
+    const first = await payload.find({ ...query, page: 1 });
+    const second = await payload.find({ ...query, page: 2 });
+    expect(first.totalDocs).toBe(14);
+    expect(first.docs).toHaveLength(12);
+    expect(second.docs).toHaveLength(2);
+    expect(first.docs.some(job => second.docs.some(other => other.id === job.id))).toBe(false);
+    for (const job of jobs) await payload.update({ collection: "jobs", id: job.id, data: { _status: "draft" }, ...approver() });
+  });
+  it("excludes closed/expired/unpublished jobs while retaining public closed details", async () => {
+    for (const [slug, state, deadline] of [["closed-vacancy", "closed", undefined], ["expired-vacancy", "open", "2020-01-01T00:00:00.000Z"]] as const) {
+      const job = await payload.create({ draft: true, collection: "jobs", data: { ...jobData(slug), state, deadline, title: slug === "closed-vacancy" ? "Closed field coordinator" : "Expired field researcher" }, ...editor() });
+      await publish(job.id);
+    }
+    await payload.create({ draft: true, collection: "jobs", data: { ...jobData("private-vacancy"), title: "Private draft vacancy" }, ...editor() });
+    const withdrawn = await payload.create({ draft: true, collection: "jobs", data: jobData("withdrawn-vacancy"), ...editor() });
+    await publish(withdrawn.id);
+    await payload.update({ collection: "jobs", id: withdrawn.id, data: { _status: "draft" }, ...approver() });
+    const open = await payload.find({ collection: "jobs", where: openJobsWhere(), overrideAccess: false });
+    expect(open.docs.map(job => job.slug)).toEqual(["field-systems-engineer"]);
+    expect((await payload.find({ collection: "jobs", overrideAccess: false })).docs.map(job => job.slug).sort()).toEqual(["closed-vacancy", "expired-vacancy", "field-systems-engineer"]);
+    await payload.update({ collection: "jobs", id: mainJob.id, data: { title: "Private revised engineering vacancy", state: "closed", seo: { title: "Private job SEO" } }, ...editor() });
+    const req = await request(staff); req.routeParams = { collection: "jobs", id: String(mainJob.id) };
+    expect((await (await previewEndpoint.handler(req)).json()).title).toBe("Private revised engineering vacancy");
+    await payload.updateGlobal({ slug: "page-seo", data: { careers: { title: "Approved careers listing SEO", description: "Approved careers listing description." }, home: { title: "Approved homepage title", description: "Approved homepage description" } }, ...editor() });
+    await payload.updateGlobal({ slug: "page-seo", data: { reviewState: "in-review" }, ...editor() });
+    await payload.updateGlobal({ slug: "page-seo", data: { _status: "published" }, ...approver() });
+    // Preserve the pre-existing HTTP fixture's private homepage replacement.
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Private draft homepage title" } }, ...editor() });
+  });
+});
 
 const blogText = (text: string) => ({ type: "text", version: 1, text, format: 0, detail: 0, mode: "normal", style: "" });
 const blogBody = (text: string, mediaID?: number): Post["body"] => ({ root: {
