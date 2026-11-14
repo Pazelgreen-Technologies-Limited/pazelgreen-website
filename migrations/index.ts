@@ -1,18 +1,27 @@
 import * as migration_20261107_102000_foundation from './20261107_102000_foundation';
 import * as migration_20261107_102100_last_admin_guard from './20261107_102100_last_admin_guard';
-import * as initialPassword from './20261114_120000_initial_password';
+import * as migration_20261114_120000_initial_password from './20261114_120000_initial_password';
+import * as migration_20261114_174542_company_settings_and_page_seo from './20261114_174542_company_settings_and_page_seo';
 
 export const migrations = [
-  // Migration order is append-only.
   {
     up: migration_20261107_102000_foundation.up,
     down: migration_20261107_102000_foundation.down,
-    name: '20261107_102000_foundation'
+    name: '20261107_102000_foundation',
   },
   {
     up: migration_20261107_102100_last_admin_guard.up,
     down: migration_20261107_102100_last_admin_guard.down,
-    name: '20261107_102100_last_admin_guard'
+    name: '20261107_102100_last_admin_guard',
   },
-  { up: initialPassword.up, down: initialPassword.down, name: '20261114_120000_initial_password' },
+  {
+    up: migration_20261114_120000_initial_password.up,
+    down: migration_20261114_120000_initial_password.down,
+    name: '20261114_120000_initial_password',
+  },
+  {
+    up: migration_20261114_174542_company_settings_and_page_seo.up,
+    down: migration_20261114_174542_company_settings_and_page_seo.down,
+    name: '20261114_174542_company_settings_and_page_seo'
+  },
 ];

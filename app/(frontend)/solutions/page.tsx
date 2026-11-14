@@ -1,3 +1,7 @@
+import { pageMetadata } from "@/lib/page-seo";
+
+export const generateMetadata = () => pageMetadata("solutions");
+
 import SolutionHero from "./_components/SolutionHero";
 import EcosystemSection from "./_components/EcosystemSection";
 import PagexFeature from "./_components/PagexFeature";

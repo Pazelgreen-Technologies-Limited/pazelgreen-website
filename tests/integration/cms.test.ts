@@ -53,7 +53,7 @@ beforeAll(async () => {
   payload = await getPayload({ config });
   await payload.db.migrate();
   // Only this verified disposable local test database is reset; migrations remain.
-  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -282,5 +282,94 @@ describe("review, publication and private files", () => {
     expect(audit.totalDocs).toBeGreaterThanOrEqual(2);
     expect(audit.docs.every((entry) => typeof entry.actor === "string")).toBe(true);
     await expect(payload.find({ collection: "audit-events", user: asUser(staff), overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+  });
+});
+
+
+describe("company settings and page SEO review", () => {
+  it("keeps first drafts private and rejects anonymous edits and staff publication", async () => {
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { email: "blocked@pazelgreen.test" }, overrideAccess: false })).rejects.toThrow();
+    await payload.updateGlobal({ slug: "company-settings", data: { email: "public-company@pazelgreen.test", phone: "+234 800 000 0000", address: "Test office", departmentContacts: [{ label: "Partnerships", email: "partners@pazelgreen.test" }], workingHours: [{ day: "monday", opens: "09:00", closes: "17:00" }, { day: "sunday", closed: true }], socialLinks: [{ platform: "linkedin", label: "LinkedIn", url: "https://example.com/company" }] }, overrideAccess: false, user: asUser(staff) });
+    const publicDraft = await payload.findGlobal({ slug: "company-settings", overrideAccess: false });
+    expect(publicDraft.email).toBeUndefined();
+    await expect(payload.findGlobal({ slug: "company-settings", draft: true, overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(staff) })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toMatchObject({ status: 409 });
+  });
+  it("publishes unchanged reviewed settings and preserves live values during edits", async () => {
+    await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    const published = await payload.findGlobal({ slug: "company-settings", overrideAccess: false });
+    expect(published.email).toBe("public-company@pazelgreen.test");
+    expect(published.reviewState).toBeUndefined();
+    expect(published.modifiedBy).toBeUndefined();
+    await payload.updateGlobal({ slug: "company-settings", data: { email: "private-draft@pazelgreen.test" }, overrideAccess: false, user: asUser(staff) });
+    expect((await payload.findGlobal({ slug: "company-settings", overrideAccess: false })).email).toBe(published.email);
+    expect((await payload.findGlobal({ slug: "company-settings", draft: true, overrideAccess: false, user: asUser(staff) })).email).toBe("private-draft@pazelgreen.test");
+  });
+  it("invalidates approval on edits and requires an admin note when returning changes", async () => {
+    await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    const changed = await payload.updateGlobal({ slug: "company-settings", data: { phone: "+234 800 000 0001" }, overrideAccess: false, user: asUser(staff) });
+    expect(changed.reviewState).toBe("draft");
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toMatchObject({ status: 409 });
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { reviewState: "changes-requested" }, overrideAccess: false, user: asUser(staff) })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { reviewState: "changes-requested" }, overrideAccess: false, user: asUser(admin) })).rejects.toMatchObject({ status: 400 });
+    const returned = await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "changes-requested", reviewNote: "Verify the public contact details." }, overrideAccess: false, user: asUser(admin) });
+    expect(returned.reviewState).toBe("changes-requested");
+    expect((await payload.findGlobal({ slug: "company-settings", overrideAccess: false })).reviewNote).toBeUndefined();
+    const corrected = await payload.updateGlobal({ slug: "company-settings", data: { address: "Corrected test office" }, draft: true, overrideAccess: false, user: asUser(staff) });
+    expect(corrected.reviewState).toBe("draft");
+    await expect(payload.findGlobalVersions({ slug: "company-settings", overrideAccess: false })).rejects.toThrow();
+  });
+  it("reviews page metadata independently while keeping replacement SEO private", async () => {
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Approved homepage title", description: "Approved homepage description" }, contact: { title: "Approved contact title", description: "Approved contact description" } }, overrideAccess: false, user: asUser(staff) });
+    await expect(payload.updateGlobal({ slug: "page-seo", data: { _status: "published" }, overrideAccess: false, user: asUser(staff) })).rejects.toMatchObject({ status: 403 });
+    expect((await payload.findGlobal({ slug: "page-seo", overrideAccess: false })).home?.title).toBeFalsy();
+    await payload.updateGlobal({ slug: "page-seo", data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "page-seo", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Private draft homepage title" } }, overrideAccess: false, user: asUser(staff) });
+    expect((await payload.findGlobal({ slug: "page-seo", overrideAccess: false })).home?.title).toBe("Approved homepage title");
+    await expect(payload.findGlobal({ slug: "page-seo", draft: true, overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+  });
+  it("rejects unsafe social URLs and invalid business hours at publication", async () => {
+    for (const invalid of [
+      { socialLinks: [{ platform: "other" as const, label: "Unsafe", url: "javascript:alert(1)" }] },
+      { workingHours: [{ day: "monday" as const, opens: "18:00", closes: "09:00" }] },
+      { workingHours: [{ day: "sunday" as const, closed: true }, { day: "sunday" as const, closed: true }] },
+      { timezone: "Invalid/Timezone" },
+    ]) {
+      await payload.updateGlobal({ slug: "company-settings", data: invalid, draft: true, overrideAccess: false, user: asUser(staff) });
+      await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "in-review" }, draft: true, overrideAccess: false, user: asUser(staff) });
+      await expect(payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow();
+      await payload.updateGlobal({ slug: "company-settings", data: { timezone: "Africa/Lagos", socialLinks: [{ platform: "linkedin", label: "LinkedIn", url: "https://example.com/company" }], workingHours: [{ day: "monday", opens: "09:00", closes: "17:00" }, { day: "sunday", closed: true }] }, draft: true, overrideAccess: false, user: asUser(staff) });
+    }
+  });
+  it("serializes publication against concurrent edits without exposing unreviewed SEO", async () => {
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Concurrent reviewed title" } }, draft: true, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "page-seo", data: { reviewState: "in-review" }, draft: true, overrideAccess: false, user: asUser(staff) });
+    const results = await Promise.allSettled([
+      payload.updateGlobal({ slug: "page-seo", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) }),
+      payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Concurrent unreviewed title" } }, draft: true, overrideAccess: false, user: asUser(staff) }),
+    ]);
+    expect(results[1].status).toBe("fulfilled");
+    expect((await payload.findGlobal({ slug: "page-seo", overrideAccess: false })).home?.title).not.toBe("Concurrent unreviewed title");
+    const latest = await payload.findGlobal({ slug: "page-seo", draft: true, overrideAccess: false, user: asUser(staff) });
+    expect(latest.reviewState).toBe("draft");
+    // Restore the public/draft fixture used by the production HTTP suite.
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Approved homepage title", description: "Approved homepage description" } }, draft: true, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "page-seo", data: { reviewState: "in-review" }, draft: true, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "page-seo", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    await payload.updateGlobal({ slug: "page-seo", data: { home: { title: "Private draft homepage title" } }, draft: true, overrideAccess: false, user: asUser(staff) });
+  });
+  it("prevents version restoration from bypassing approval and supports admin unpublishing", async () => {
+    const versions = await payload.findGlobalVersions({ slug: "company-settings", overrideAccess: false, user: asUser(admin) });
+    await expect(payload.restoreGlobalVersion({ slug: "company-settings", id: versions.docs[0].id, overrideAccess: false, user: asUser(admin) })).rejects.toMatchObject({ status: 403 });
+    await payload.updateGlobal({ slug: "company-settings", data: { _status: "draft" }, overrideAccess: false, user: asUser(admin) });
+    expect((await payload.findGlobal({ slug: "company-settings", overrideAccess: false })).email).toBeUndefined();
+    // Leave approved settings plus a private replacement for the real HTTP checks.
+    await payload.updateGlobal({ slug: "company-settings", data: { email: "public-company@pazelgreen.test", phone: "+234 800 000 0000", reviewState: "draft" }, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "company-settings", data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    await payload.updateGlobal({ slug: "company-settings", data: { _status: "published" }, overrideAccess: false, user: asUser(admin) });
+    await payload.updateGlobal({ slug: "company-settings", data: { email: "private-draft@pazelgreen.test" }, overrideAccess: false, user: asUser(staff) });
   });
 });

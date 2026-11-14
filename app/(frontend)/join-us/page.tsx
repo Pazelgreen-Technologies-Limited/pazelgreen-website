@@ -1,3 +1,7 @@
+import { pageMetadata } from "@/lib/page-seo";
+
+export const generateMetadata = () => pageMetadata("joinUs");
+
 import JoinHero from "./_components/JoinHero";
 import RolesSection from "./_components/RolesSection";
 import ImpactBanner from "./_components/ImpactBanner";

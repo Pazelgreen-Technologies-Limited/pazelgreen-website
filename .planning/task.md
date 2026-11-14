@@ -1,6 +1,6 @@
 # Payload CMS implementation plan
 
-Status: T01–T03 implemented and verified. T04–T12 remain pending.
+Status: T01–T04 implemented and verified. T05–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
@@ -185,8 +185,9 @@ and sitemaps. Search engines may choose different displayed text.
   Do not expose secrets.
 - [x] T03: Implement users/invitations, access rules, last-admin protection,
   draft/review/publish behavior, authenticated previews, history, and audit fields.
-- [ ] T04: Implement company settings and existing-page SEO; seed verified data
-  and connect footer/contact fields without redesigning the site.
+- [x] T04: Implement company settings and existing-page SEO; connect footer/contact
+  fields without redesigning the site. Seed only verified data when supplied;
+  approved initial contacts/hours/social URLs remain the T12 launch dependency.
 - [ ] T05: Implement blog/categories/public media and blog frontend routes.
 - [ ] T06: Implement dictionaries, jobs, annual references, careers routes,
   open/closed/expiry behavior, and dynamic Join Us openings.
@@ -233,3 +234,12 @@ credentials, with mandatory initial password setup. Existing admins are preserve
 there is no new super-admin role. Keep separate development/production/test URLs,
 and derive local Docker settings from DEV_DATABASE_URL instead of duplicate POSTGRES
 variables. Blog, careers and other CMS features remain subsequent work (T04–T12).
+
+### 2026-11-14 - T04 completion and remaining work
+
+Completed the next pending implementation task, T04, after the startup follow-up
+commit. Company settings and fixed-route SEO are review-enabled globals. No
+verified contact dataset was supplied: existing display fallbacks are retained,
+and no company records were automatically seeded or published. T12 still requires
+owner verification and initial approved content. T05 blog implementation is next;
+T05–T12 have not been claimed complete.

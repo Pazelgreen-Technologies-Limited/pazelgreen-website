@@ -1,30 +1,8 @@
 import { Mail, Building2, Handshake, Sprout, User } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { socialLinks } from "@/lib/social-links";
+import { companySocialLinks } from "@/lib/social-links";
+import { formatWorkingHours, getCompanySettings } from "@/lib/company-settings";
 import Link from "next/link";
-
-// Direct contact cards shown on the right column
-const contactCards = [
-  {
-    icon: Mail,
-    title: "General Inquiries",
-    email: "hello@pazelgreen.com",
-    description: "For any general questions or information.",
-  },
-  {
-    icon: Handshake,
-    title: "Partnerships",
-    email: "partners@pazelgreen.com",
-    description: "Explore partnership and collaboration opportunities.",
-  },
-  {
-    icon: Sprout,
-    title: "PAGEX Inquiry",
-    email: "pagex@pazelgreen.com",
-    description:
-      "Want to learn more about Pazelgreen's flagship platform? Request a product conversation.",
-  },
-];
 
 // Dropdown options for the Inquiry Type field
 const inquiryOptions = [
@@ -33,7 +11,13 @@ const inquiryOptions = [
   "PAGEX Product Demo",
 ];
 
-export default function ContactForm() {
+export default async function ContactForm() {
+  const company = await getCompanySettings();
+  const socialLinks = companySocialLinks(company.socialLinks);
+  const contactCards = [
+    ...(company.email ? [{ icon: Mail, title: "General Inquiries", email: company.email, description: "For any general questions or information." }] : []),
+    ...(company.departmentContacts ?? []).map(contact => ({ icon: contact.label.toLowerCase().includes("pagex") ? Sprout : Handshake, title: contact.label, email: contact.email, description: contact.description })),
+  ];
   return (
     <section id="contact-form" className="bg-gray-50 px-6 py-16">
       <div className="mx-auto max-w-5xl">
@@ -181,6 +165,11 @@ export default function ContactForm() {
             ))}
 
             {/* Connect with Pazelgreen dark card */}
+            {(company.phone || company.address || !!company.workingHours?.length) && <div className="rounded-xl bg-green-50 p-4 text-sm text-gray-700">
+              {company.phone && <p><a href={`tel:${company.phone.replace(/[^+\d]/g, "")}`}>{company.phone}</a></p>}
+              {company.address && <p className="whitespace-pre-line">{company.address}</p>}
+              {!!company.workingHours?.length && <div className="mt-3"><p className="font-semibold">Working hours ({company.timezone})</p>{formatWorkingHours(company.workingHours).map(row => <p key={row}>{row}</p>)}</div>}
+            </div>}
             <div className="rounded-xl bg-green-900 p-6 text-white">
               <p className="mb-1 flex items-center gap-2 text-xs font-semibold text-green-300">
                 <span className="h-px w-6 bg-green-400" /> FOLLOW US

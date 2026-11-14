@@ -93,8 +93,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'company-settings': CompanySetting;
+    'page-seo': PageSeo;
+  };
+  globalsSelect: {
+    'company-settings': CompanySettingsSelect<false> | CompanySettingsSelect<true>;
+    'page-seo': PageSeoSelect<false> | PageSeoSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -463,6 +469,203 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Public contact information. Save a draft, submit for review, then publish as an administrator. Never add private notification recipients here.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-settings".
+ */
+export interface CompanySetting {
+  id: number;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  departmentContacts?:
+    | {
+        label: string;
+        email: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  timezone: string;
+  workingHours?:
+    | {
+        day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+        closed?: boolean | null;
+        /**
+         * 24-hour HH:mm in the configured timezone.
+         */
+        opens?: string | null;
+        closes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  socialLinks?:
+    | {
+        platform: 'facebook' | 'x' | 'linkedin' | 'instagram' | 'youtube' | 'other';
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Search titles and descriptions for existing public pages. Homepage content is not editable here.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-seo".
+ */
+export interface PageSeo {
+  id: number;
+  home?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  about?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  solutions?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  joinUs?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  contact?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-settings_select".
+ */
+export interface CompanySettingsSelect<T extends boolean = true> {
+  email?: T;
+  phone?: T;
+  address?: T;
+  departmentContacts?:
+    | T
+    | {
+        label?: T;
+        email?: T;
+        description?: T;
+        id?: T;
+      };
+  timezone?: T;
+  workingHours?:
+    | T
+    | {
+        day?: T;
+        closed?: T;
+        opens?: T;
+        closes?: T;
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-seo_select".
+ */
+export interface PageSeoSelect<T extends boolean = true> {
+  home?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  about?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  solutions?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  joinUs?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  contact?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

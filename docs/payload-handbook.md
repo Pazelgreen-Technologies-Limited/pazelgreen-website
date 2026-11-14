@@ -4,8 +4,8 @@ Start here if you have never used Payload. This guide explains what the parts do
 why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
-This describes the **T01–T03 foundation**, checked against this repository on
-**7 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
+This describes the **T01–T04 implementation**, checked against this repository on
+**14 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
 
@@ -67,7 +67,7 @@ See [deployment options](https://payloadcms.com/docs/production/deployment).
 | Collection | A set of records with the same fields, such as users or images. [Payload collections](https://payloadcms.com/docs/configuration/collections) |
 | Document | One record in a collection, such as one image with its alt text |
 | Field / schema | A piece of data / the definition of the fields and their rules |
-| Global | One shared document, useful for company settings rather than many independent records. Globals are planned here. [Payload globals](https://payloadcms.com/docs/configuration/globals) |
+| Global | One shared document, useful for company settings rather than many independent records. Company settings and page SEO use globals here. [Payload globals](https://payloadcms.com/docs/configuration/globals) |
 | Slug | A stable identifier used in code or URLs, such as the collection slug `media` |
 | Relationship | A link from one record to another, such as a future post referring to an image |
 | Hook | Server code that runs around an operation; we use hooks to enforce review and record audit events |
@@ -114,7 +114,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 
 | Available in the committed foundation | Still planned |
 | --- | --- |
-| Public Home, About, Solutions, Join Us and Contact pages | CMS-backed company details and page SEO: T04 |
+| Public Home, About, Solutions, Join Us and Contact pages with shared company settings and SEO | Verified production contacts, hours and social URLs: T12 |
 | `/admin`, admin/staff users and invitations | Blog/categories and public blog pages: T05 |
 | Image media library with review and version history | Jobs, code dictionaries and careers pages: T06 |
 | Restricted PDF/DOCX storage infrastructure | Candidate applications, full CV workflow and recruitment emails: T07 |
@@ -819,8 +819,8 @@ environment's existing admin for an invitation.
 storage are independent. Production editors work in the production CMS.
 
 **Can I use the admin without a database?** The full CMS needs its database.
-Some current public marketing pages can build/render independently because their
-content is hardcoded; that does not make an operational CMS database optional.
+The public page build avoids database reads through request-time rendering, but
+serving those pages needs the database for published company settings and SEO.
 
 **Do all editors need Docker and Node?** No. Editors using a hosted CMS need its
 URL and their account. People running the whole project locally need those tools.
@@ -838,6 +838,14 @@ Private storage exists, but public applications, candidate validation, notificat
 and retention handling are planned in T07.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T04: shared company settings and SEO for existing
-public pages. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T05: blog posts, categories and public blog pages. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
+
+## Editing company settings and page SEO
+
+The Website group contains Company settings and Page SEO. Read the
+[editing and publication reference](cms-setup.md#company-settings-and-page-seo-t04)
+for the supported fields, review process, public fallbacks and content verification
+requirements. Both globals use the same staff-draft/admin-approval workflow as
+media; anonymous visitors cannot read drafts, history or editorial notes.
+Public pages and metadata read only the last approved publication.

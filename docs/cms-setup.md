@@ -146,10 +146,43 @@ login/invitation delivery, approved content and denied private access, and rehea
 [backup recovery](payload-handbook.md#backups-and-recovery). Coordinate breaking
 schema changes with the running app; code rollback alone does not restore a database.
 
+## Company settings and page SEO (T04)
+
+The Website group in Payload contains **Company settings** and **Page SEO**.
+Company settings control the primary email, phone, address, department contacts,
+ordered social links and working hours in an IANA timezone (Africa/Lagos initially).
+The footer and Contact page read the same published values. Open days use HH:mm
+with closing after opening; mark closed days explicitly. Each weekday occurs once.
+Social links need an HTTP(S) URL; placeholder # links cannot be published.
+
+Page SEO contains fixed groups for Home, About, Solutions, Join Us and Contact.
+It controls search titles/descriptions only. Empty fields use the existing site
+metadata defaults; homepage content remains outside the CMS scope. Future blog,
+job and legal metadata belong to their documents rather than these globals.
+
+Staff save drafts, set reviewState to in-review, then save again. An admin publishes
+the unchanged submitted draft. Editing a submitted draft invalidates its approval.
+To return a draft, admins choose changes-requested and provide a review note.
+Previously published values remain public during draft edits. Version restoration
+cannot bypass review. An admin may unpublish a global to restore the site fallbacks.
+
+No contact data was seeded or published automatically: current email addresses
+conflict and social links are placeholders. Before launch, verify real contacts,
+hours and social URLs, enter them in Company settings and complete approval.
+Until first publication, the old footer contacts and social placeholders remain
+frontend fallbacks; Contact uses that same primary email. Once published, blank
+optional fields and empty lists are omitted rather than replaced with old values.
+No private SMTP/recruitment recipients belong in this public global.
+
+These public pages read published globals at request time, memoized only within
+the request. Approved changes appear on the next request without a rebuild; drafts
+are never used for rendering or metadata. The site now needs its database when
+serving marketing pages. Migrations remain required before running the updated app.
+
 ## Current limits and implementation status
 
-T01–T03 provide the CMS foundation. Visual blog/job previews, company settings,
-SEO, recruitment and other planned features are not all present yet. The current
+T01–T04 provide the CMS foundation, company settings and existing-page SEO.
+Visual blog/job previews, recruitment and other planned features remain pending. The current
 media preview is authenticated JSON; private PDF/DOCX storage is not a complete
 application system. See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).

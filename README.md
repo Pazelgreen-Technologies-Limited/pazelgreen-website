@@ -28,11 +28,13 @@ The public Home, About, Solutions, Join Us and Contact pages exist. The CMS
 foundation (T01–T03) includes admin/staff accounts, invitations, media review,
 version history, audit records, protected file storage and database migrations.
 
-Company settings/SEO, blog, careers/applications, FAQs, announcements and legal
-pages are still planned. Most public marketing content is currently hardcoded.
+Company settings and existing-page SEO (T04) are available under Website in the
+admin, with staff drafts and admin approval. Footer/Contact share published details.
+Blog, careers/applications, FAQs, announcements and legal pages remain planned.
+Most other public marketing content is hardcoded.
 Contact-form delivery and newsletter integration are outside this CMS scope.
 See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T04: company settings and existing-page SEO**.
+The next planned task is **T05: blog posts, categories and public blog pages**.
 
 ## Run locally
 

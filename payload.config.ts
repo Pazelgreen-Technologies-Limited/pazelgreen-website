@@ -12,6 +12,8 @@ import { Invitations } from "./cms/invitations";
 import { AuditEvents } from "./cms/audit";
 import { createMedia, createPrivateFiles } from "./cms/media";
 import { previewEndpoint } from "./cms/preview";
+import { CompanySettings } from "./cms/company-settings";
+import { PageSEO } from "./cms/page-seo";
 
 nextEnv.loadEnvConfig(process.cwd());
 const env = getServerEnvironment();
@@ -28,6 +30,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   sharp,
   collections: [Users, Invitations, AuditEvents, createMedia(env.publicStorage), createPrivateFiles(env.privateStorage)],
+  globals: [CompanySettings, PageSEO],
   endpoints: [previewEndpoint],
   typescript: { outputFile: path.resolve(root, "payload-types.ts") },
   csrf: [env.serverURL],

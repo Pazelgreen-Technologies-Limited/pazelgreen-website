@@ -1,3 +1,7 @@
+import { pageMetadata } from "@/lib/page-seo";
+
+export const generateMetadata = () => pageMetadata("about");
+
 import AboutHero from "./_components/AboutHero";
 import WhoWeAreSection from "./_components/WhoWeAreSection";
 import OurStorySection from "./_components/OurStorySection";

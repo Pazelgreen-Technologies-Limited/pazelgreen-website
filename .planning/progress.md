@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-14.
-Current phase: T01–T03 complete and verified; next planned implementation is T04.
+Current phase: T01–T04 complete and verified; next planned implementation is T05.
 
 ## Start here
 
@@ -84,7 +84,8 @@ Current phase: T01–T03 complete and verified; next planned implementation is T
 
 ## Next concrete action
 
-T04: implement company settings and existing-page SEO without redesigning pages.
+T05: implement blog posts/categories and public listing/detail routes, preserving
+the review rules, public media boundaries and existing visual design.
 Startup now ensures a first administrator exists from server environment secrets;
 existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
@@ -287,3 +288,69 @@ Production migrations remain a controlled release step before pnpm start; direct
 next start bypasses the documented bootstrap lifecycle. No blockers remain for
 this follow-up. T04–T12 remain pending; next planned work is T04 company settings
 and existing-page SEO, followed by blog, careers and the other agreed CMS features.
+
+### 2026-11-14 - T04 company settings and existing-page SEO completed
+
+Scope and implementation:
+
+- Committed the preceding startup follow-up separately as f573e32 (feat: automate
+  first admin setup and simplify database configuration). Interpreted the user's
+  next pending task as T04, the next unchecked plan item; broader CMS tasks remain
+  in their agreed sequence. No launch data or unrelated feature scope was invented.
+- Added cms/company-settings.ts and cms/page-seo.ts globals, registered in
+  payload.config.ts. Company fields cover primary and department contacts, ordered
+  social URLs, weekday opening/closing/closed entries and an IANA timezone. SEO is
+  constrained to Home/About/Solutions/Join Us/Contact; homepage content is excluded.
+- cms/global-review.ts shares review transitions and audit fields with collections
+  via cms/workflow.ts. Updates serialize on a global-specific transaction lock.
+  Staff draft/submit; admins publish unchanged submitted drafts, return with notes
+  or unpublish. Anonymous draft/history access and version restoration are denied.
+  Last approved values stay public while replacements are edited. Tests found and
+  fixed the shared workflow's inability to edit returned drafts: editing now resets
+  changes-requested to draft without allowing staff to issue reviewer decisions.
+- lib/company-settings.ts and lib/page-seo.ts read only approved data with explicit
+  access control, at request time and memoized only per request. Footer and Contact
+  share contacts/socials/hours. Every existing page emits approved title/description
+  through generateMetadata, with existing defaults for empty/unpublished SEO.
+  No persistent page/data cache can retain old settings after approval.
+- Updated components/Footer.tsx, the route-local ContactForm, lib/social-links.ts
+  and five existing route pages without changing their overall design. Blank
+  optional published values are omitted. No contact delivery/newsletter work added.
+- Generated migration 20261114_174542_company_settings_and_page_seo with schema
+  snapshot/index and regenerated payload-types.ts. Corrected generated type imports
+  for Node 24 runtime compatibility before applying/testing the migration.
+- Updated README, setup reference and team handbook with editorial usage, field
+  validation, review, fallback behavior and the live database requirement.
+
+Content and remaining work:
+
+- No verified company dataset was supplied. The old footer primary contact is the
+  shared initial display fallback (the prior Contact general email differed).
+  Existing social placeholders are retained only as legacy display fallbacks;
+  CMS publication rejects placeholder/non-HTTP(S) social URLs. No real company
+  global was seeded/published. Owner-approved contact details, hours, URLs and
+  initial publication remain explicitly in T12. Missing values were not invented.
+- T05 blog is next. T06 careers, T07 applications and T08–T12 remain pending.
+
+Actual validation (portable Node 24.22.2, pnpm 10.18.1):
+
+- pnpm test: 22 passed.
+- pnpm test:integration: 27 passed against disposable local PostgreSQL/Mailpit.
+  Added global privacy/permission checks, first draft vs publication, preserved live
+  data, returned-draft edits, approval invalidation, reviewer notes, version denial,
+  invalid URL/timezone/hours publication, concurrent edit/publication and unpublish.
+- pnpm typecheck and pnpm lint passed with zero errors/warnings.
+- pnpm build passed with approved font-download access; public marketing routes
+  correctly render at request time, so builds do not publish draft data.
+- pnpm test:http passed against the production build and disposable test database.
+  Verified real rendered Footer/Contact details, hours, socials, approved titles/
+  descriptions, absence of private drafts, anonymous global history/draft denial,
+  staff publish denial and approved updates on warmed pages without a rebuild.
+  Existing auth/invitations/media/private-download/session checks also passed.
+  The temporary test server stopped afterward.
+- pnpm predev passed locally: Docker healthy, globals migration applied and the
+  existing administrator preserved. pnpm cms:importmap reported no new imports.
+- Documentation file links (37 local targets) and code-fence balance passed.
+  Normalized edited CRLF files before the final Git whitespace check.
+- No production deployment or real content publication performed. The next action
+  is T05 blog implementation. Ready for the separate T04 commit.
