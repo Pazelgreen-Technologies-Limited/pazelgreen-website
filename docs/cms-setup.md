@@ -169,7 +169,7 @@ Social links need an HTTP(S) URL; placeholder # links cannot be published.
 Page SEO contains fixed groups for Home, About, Solutions, Join Us, Contact and
 the Blog and Careers listings.
 It controls search titles/descriptions only. Empty fields use the existing site
-metadata defaults; homepage content remains outside the CMS scope. Article SEO belongs to each post; future job/legal metadata will belong to their
+metadata defaults; homepage content remains outside the CMS scope. Article SEO belongs to each post; job/legal metadata belongs to their
 documents rather than these globals.
 
 Staff save drafts, set reviewState to in-review, then save again. An admin publishes
@@ -206,9 +206,10 @@ No actual vacancies or example department/position codes are seeded.
 
 ## Current limits and implementation status
 
-T01–T09 provide the CMS foundation, company settings, SEO, blog, careers,
+T01–T10 provide the CMS foundation, company settings, SEO, blog, careers,
 private recruitment, [backend-only FAQs](faqs-editing.md) and
-[scheduled announcements](announcements-editing.md). Read [recruitment operations](recruitment.md) before enabling
+[scheduled announcements](announcements-editing.md) and
+[reviewed legal pages](legal-editing.md). Read [recruitment operations](recruitment.md) before enabling
 applications: approve notice/retention settings, configure private recipients and
 schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setup.
 See [current functionality](payload-handbook.md#what-is-available-today),

@@ -75,5 +75,5 @@ jobs:
       - name: Install browser test dependencies
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Check blog desktop and mobile flows
+      - name: Check public CMS desktop and mobile flows
         run: pnpm test:browser

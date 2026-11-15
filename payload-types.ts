@@ -83,6 +83,7 @@ export interface Config {
     'hiring-history': HiringHistory;
     faqs: Faq;
     announcements: Announcement;
+    'legal-pages': LegalPage;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -106,6 +107,7 @@ export interface Config {
     'hiring-history': HiringHistorySelect<false> | HiringHistorySelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    'legal-pages': LegalPagesSelect<false> | LegalPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -633,6 +635,58 @@ export interface Announcement {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Fixed privacy policy and terms documents. Company-approved copy is required before launch; no policy is seeded. Effective date is displayed metadata, not scheduling.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages".
+ */
+export interface LegalPage {
+  id: number;
+  /**
+   * Permanent page identity. Create each page once, then edit its existing document.
+   */
+  identity: 'privacy-policy' | 'terms-of-service';
+  title: string;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Calendar date YYYY-MM-DD; no timezone or automatic activation.
+   */
+  effectiveDate: string;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -719,6 +773,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'announcements';
         value: number | Announcement;
+      } | null)
+    | ({
+        relationTo: 'legal-pages';
+        value: number | LegalPage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1113,6 +1171,34 @@ export interface AnnouncementsSelect<T extends boolean = true> {
   startsAt?: T;
   endsAt?: T;
   priority?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages_select".
+ */
+export interface LegalPagesSelect<T extends boolean = true> {
+  identity?: T;
+  title?: T;
+  body?: T;
+  effectiveDate?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   reviewState?: T;
   reviewNote?: T;
   createdBy?: T;

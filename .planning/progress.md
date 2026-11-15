@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-15.
-Current phase: T01–T09 complete; T10 authorized next with a separate commit and documentation.
+Current phase: T01–T10 complete and verified. T11 is next; T11–T12 remain pending.
 
 ## Start here
 
@@ -84,10 +84,14 @@ Current phase: T01–T09 complete; T10 authorized next with a separate commit an
 
 ## Next concrete action
 
-T10 legal pages and route SEO is next.
-The user authorized T07–T10 with commits/docs as work progresses. Recruitment
-recipients, scheduler deployment and approved privacy/retention copy remain launch
-inputs; do not invent company policy. T11/T12 remain later work.
+T11 is next: audit public cache behavior, add/verify sitemap and indexing rules,
+complete broader integration/E2E acceptance, backup/migration recovery guidance,
+editor onboarding and operations. Exclude FAQs, private applications/CVs,
+unapproved content and authenticated previews from public indexing. T07–T10 are
+finished in separate commits; the user has not requested implementation of T11 yet.
+T12 still needs real codes/content/contacts, company-approved legal/retention copy,
+production providers/persistent storage, delivery scheduler and recipient setup.
+No company policy or launch approval should be invented.
 Startup now ensures a first administrator exists from server environment secrets;
 existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
@@ -646,3 +650,64 @@ Verification so far:
   assertions initially used an ambiguous navigation selector; corrected by naming
   the main navigation landmark. No production deployment or real notices created.
 - T09 complete. T10 model/guide are prepared separately but unregistered.
+
+### 2026-11-15 - T10 implementation and verification underway
+
+- Registered reviewed Legal Pages with fixed privacy-policy/terms-of-service
+  identities, serialized creation even for drafts, permanent identity guards,
+  restricted rich text, calendar-only effective dates and document-owned SEO.
+  Legal deletion is denied; history remains available to active CMS staff.
+- Added public /privacy-policy and /terms-of-service, unavailable/noindex states,
+  authenticated /legal/preview/[id] and JSON previews. Footer destinations already
+  existed and now resolve when a document is approved. No legal copy was seeded.
+- Moved the blog's rich-text renderer to shared components/RichTextBody.tsx for
+  use by distinct blog/legal pages; retained safe links and approved-image behavior.
+  Added shared LegalDocument/LegalUnavailable views and request-time metadata.
+- Generated migration 20261115_094339_legal_pages, snapshot and types. Added
+  concurrent identity/review/date/body/SEO tests and legal HTTP/browser coverage.
+  Additional T07 regression checks cover real DOCX, omission of optional fields,
+  durable failure rollback/file cleanup and actual acknowledgement/staff delivery
+  to local Mailpit. Test setup now rejects external SMTP explicitly.
+- Added legal editor guide and synchronized README/setup/handbook/API docs.
+  T10 verification is in progress; do not mark complete yet. After final checks,
+  apply development migrations, record results/remaining T11–T12 work and commit.
+
+### 2026-11-15 - T10 final verification and batch handoff
+
+- Final lint and pnpm typecheck passed; unit tests: 63 passed; integration: 61
+  passed. Included concurrent legal identity creation, staff publication denial,
+  private drafts/history, preserved live body/date/SEO, immutable identities,
+  invalid effective dates, restricted content and protected JSON previews.
+- Recruitment regressions also passed: valid DOCX, ZIP traversal/macro/expansion
+  rejection, missing optional API fields, actual durable failure rollback with
+  private-byte cleanup, and successful candidate/staff sends through local Mailpit.
+  The assignment picker follows existing directory privacy: staff can select
+  themselves; admins can select active colleagues. No user read access was expanded.
+- Latest migration fresh/down/up passed in a newly created scratch database;
+  cleanup completed. The fresh migration chain includes all T07–T10 schemas and
+  preserves the agreed D/C/I seeds. Reviewed generated SQL/type imports/whitespace.
+- Production build passed. Final HTTP suite passed legal publication/unpublish,
+  server-rendered SEO/fallbacks, draft privacy, preview headers/session protection,
+  FAQ denial, active announcements, and actual PDF/DOCX download access/headers.
+  An initial download check selected the newest file and assumed PDF; corrected it
+  to select by MIME and added explicit DOCX download assertions. Reset fixtures
+  before the final sequential integration/HTTP/browser run, which all passed.
+- All 28 installed-Chrome browser checks passed at desktop 1280x900 and mobile
+  390x844: legal footer links/content/metadata/canonical, private previews and
+  unpublished terms, plus blog/careers/application/scheduled-notice regressions.
+  Reviewed mobile policy screenshot: readable text, effective date and notice/nav
+  spacing, no horizontal overflow. Next logged one stream-close event during
+  navigation; no assertion failed. Temporary HTTP/browser servers stopped.
+- Documentation verification passed 58 local targets and balanced Markdown fences;
+  PyYAML parsed the custom API contract with four paths. Updated README, setup,
+  handbook, careers/recruitment guides, legal guide, API contract and CI step label.
+- pnpm predev passed against development: PostgreSQL/Mailpit healthy, all four
+  new migrations applied, existing admin credentials unchanged. No synthetic
+  content/policies or applicant records were inserted into development. No secrets
+  were printed or changed. AGENTS.md is unchanged.
+- T07 commit: 06c237e; T08: e7f9601; T09: e2c1cb1. This final T10 change is ready
+  for its own commit. No push, remote CI run or production deployment performed.
+- T01–T10 complete; next is T11 as described above. Launch remains gated on T12
+  inputs. Applications are intentionally disabled until approved recruitment
+  notice/version/retention settings are published. Configure private recipients
+  and schedule pnpm cms:deliver every minute to operate recruitment delivery.

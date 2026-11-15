@@ -1,7 +1,9 @@
 # Recruitment operations
 
 Applications are private and have no applicant login. Staff and admins can filter
-Applications by job/status, assign an active colleague, and update status or notes.
+Applications by job/status and update status or notes. Staff can select themselves
+in the assignment picker; admins can select any active colleague. The existing
+user directory remains private to administrators.
 Hiring History retains the actor ID and each operational change immediately;
 these private actions do not require editorial approval. No status-change emails
 are sent. Deactivating staff retains historical attribution.

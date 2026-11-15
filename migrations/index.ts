@@ -7,6 +7,7 @@ import * as migration_20261114_201626_careers from './20261114_201626_careers';
 import * as migration_20261115_085557 from './20261115_085557';
 import * as migration_20261115_092113_faqs from './20261115_092113_faqs';
 import * as migration_20261115_092830_announcements from './20261115_092830_announcements';
+import * as migration_20261115_094339_legal_pages from './20261115_094339_legal_pages';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261115_092830_announcements.up,
     down: migration_20261115_092830_announcements.down,
-    name: '20261115_092830_announcements'
+    name: '20261115_092830_announcements',
+  },
+  {
+    up: migration_20261115_094339_legal_pages.up,
+    down: migration_20261115_094339_legal_pages.down,
+    name: '20261115_094339_legal_pages'
   },
 ];

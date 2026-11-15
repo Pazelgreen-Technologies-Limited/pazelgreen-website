@@ -3,7 +3,7 @@ import { RichText, type JSXConvertersFunction } from "@payloadcms/richtext-lexic
 import type { Media, Post } from "@/payload-types";
 import { inspectArticleBody, relationID, safeArticleURL } from "@/cms/blog-content";
 
-export function ArticleBody({ body, media, preview = false }: { body: Post["body"]; media: Media[]; preview?: boolean }) {
+export function RichTextBody({ body, media = [], preview = false }: { body: Post["body"]; media?: Media[]; preview?: boolean }) {
   const validation = inspectArticleBody(body);
   if (validation.error) return preview ? <p className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-950">{validation.error} Save corrected content to preview the article body.</p> : null;
   const converters: JSXConvertersFunction = ({ defaultConverters }) => ({

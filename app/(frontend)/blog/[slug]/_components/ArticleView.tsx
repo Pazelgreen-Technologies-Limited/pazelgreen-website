@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Media, Post } from "@/payload-types";
 import { relationID } from "@/cms/blog-content";
 import { blogListingURL } from "@/lib/blog-query";
-import { ArticleBody } from "./ArticleBody";
+import { RichTextBody } from "@/components/RichTextBody";
 
 export function ArticleView({ post, media, preview = false }: { post: Post; media: Media[]; preview?: boolean }) {
   const cover = media.find(image => image.id === relationID(post.coverImage));
@@ -26,7 +26,7 @@ export function ArticleView({ post, media, preview = false }: { post: Post; medi
         <Image src={cover.url} alt={cover.alt} width={cover.width || 1400} height={cover.height || 900} sizes="(min-width: 1024px) 1024px, 100vw" className="max-h-[36rem] w-full rounded-2xl object-cover" priority unoptimized />
         {(cover.caption || cover.attribution) && <figcaption className="mt-3 text-sm text-gray-500">{[cover.caption, cover.attribution].filter(Boolean).join(" — ")}</figcaption>}
       </figure>}
-      <div className="mx-auto max-w-3xl"><ArticleBody body={post.body} media={media} preview={preview} /></div>
+      <div className="mx-auto max-w-3xl"><RichTextBody body={post.body} media={media} preview={preview} /></div>
     </article>
   </main>;
 }

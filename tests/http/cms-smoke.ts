@@ -84,6 +84,36 @@ try {
   const staffLogin = await api("/api/users/login", undefined, { email: "staff@pazelgreen.test", password });
   assert.equal(staffLogin.status, 200);
   const { token: staffToken, user: staff } = await staffLogin.json();
+  const legal = (await (await api("/api/legal-pages?where[identity][equals]=privacy-policy")).json()).docs[0];
+  const privacyHTML = await (await api("/privacy-policy?preview=true", staffToken)).text();
+  for (const approved of ["Approved privacy policy", "Approved privacy SEO", "Approved privacy description", "Approved privacy fixture", "2027-02-01"]) assert.ok(privacyHTML.includes(approved), approved);
+  for (const draft of ["Private privacy replacement", "Private privacy SEO", "Private replacement policy text"]) assert.ok(!privacyHTML.includes(draft), draft);
+  assert.equal((await api("/api/legal-pages/versions")).status, 403);
+  assert.equal((await patch(`/api/legal-pages/${legal.id}`, staffToken, { _status: "published" })).status, 403);
+  const legalPreview = await api(`/legal/preview/${legal.id}`, staffToken);
+  assert.equal(legalPreview.headers.get("x-robots-tag"), "noindex, nofollow");
+  assert.ok(legalPreview.headers.get("cache-control")?.includes("no-store"));
+  assert.equal(legalPreview.headers.get("referrer-policy"), "no-referrer");
+  assert.ok((await legalPreview.text()).includes("Private privacy replacement"));
+  assert.equal((await api(`/api/preview/legal-pages/${legal.id}`)).status, 403);
+  assert.ok((await (await api(`/api/preview/legal-pages/${legal.id}`, staffToken)).text()).includes("Private privacy replacement"));
+  const anonymousLegalPreview = await fetch(`${base}/legal/preview/${legal.id}`, { redirect: "manual" });
+  assert.equal(anonymousLegalPreview.headers.get("x-robots-tag"), "noindex, nofollow");
+  assert.ok(!(await anonymousLegalPreview.text()).includes("Private privacy replacement"));
+  const unavailableTerms = await (await api("/terms-of-service")).text();
+  assert.ok(unavailableTerms.includes("This document is not available"));
+  assert.ok(unavailableTerms.includes("noindex"));
+  const terms = (await (await api("/api/legal-pages?draft=true&where[identity][equals]=terms-of-service", adminToken)).json()).docs[0];
+  assert.equal((await patch(`/api/legal-pages/${terms.id}?draft=true`, staffToken, { title: "Approved terms of service" })).status, 200);
+  assert.equal((await patch(`/api/legal-pages/${terms.id}?draft=true`, staffToken, { reviewState: "in-review" })).status, 200);
+  assert.equal((await patch(`/api/legal-pages/${terms.id}`, adminToken, { _status: "published" })).status, 200);
+  const termsHTML = await (await api("/terms-of-service")).text();
+  assert.ok(termsHTML.includes("Approved terms of service | Pazelgreen"));
+  assert.ok(termsHTML.includes("Unapproved terms fixture")); // Deliberately approved test-only fixture.
+  assert.equal((await patch(`/api/legal-pages/${terms.id}`, adminToken, { _status: "draft" })).status, 200);
+  const withdrawnTerms = await (await api("/terms-of-service")).text();
+  assert.ok(withdrawnTerms.includes("This document is not available"));
+  assert.ok(!withdrawnTerms.includes("Unapproved terms fixture"));
   const careers = await (await api("/join-us/careers")).text();
   assert.ok(careers.includes("Approved careers listing SEO"));
   assert.ok(careers.includes("Field systems engineer"));
@@ -238,14 +268,26 @@ try {
   assert.equal(preview.headers.get("cache-control"), "private, no-store");
   assert.equal((await preview.json()).alt, "HTTP unapproved replacement");
 
-  const file = (await (await api("/api/private-files?limit=1", staffToken)).json()).docs[0];
+  const file = (await (await api("/api/private-files?limit=1&where[mimeType][equals]=application%2Fpdf", staffToken)).json()).docs[0];
   assert.ok(file, "Integration private-file fixture is required.");
   const downloadPath = `/api/private-files/file/${encodeURIComponent(file.filename)}`;
   assert.equal((await api(downloadPath)).status, 403);
   const download = await api(downloadPath, staffToken);
   assert.equal(download.status, 200);
   assert.equal(download.headers.get("cache-control"), "private, no-store");
+  assert.equal(download.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(download.headers.get("content-disposition"), "attachment");
   assert.ok((await download.text()).startsWith("%PDF-"));
+
+  const docx = (await (await api("/api/private-files?limit=1&where[mimeType][equals]=application%2Fvnd.openxmlformats-officedocument.wordprocessingml.document", staffToken)).json()).docs[0];
+  assert.ok(docx, "Integration DOCX fixture is required.");
+  const docxPath = `/api/private-files/file/${encodeURIComponent(docx.filename)}`;
+  assert.equal((await api(docxPath)).status, 403);
+  const docxDownload = await api(docxPath, staffToken);
+  assert.equal(docxDownload.status, 200);
+  assert.equal(docxDownload.headers.get("cache-control"), "private, no-store");
+  assert.equal(docxDownload.headers.get("content-disposition"), "attachment");
+  assert.ok(Buffer.from(await docxDownload.arrayBuffer()).subarray(0, 2).equals(Buffer.from("PK")));
 
   assert.equal((await patch(`/api/users/${staff.id}`, adminToken, { active: false })).status, 200);
   assert.equal((await api(downloadPath, staffToken)).status, 403, "Deactivation must invalidate an existing session.");

@@ -1,6 +1,6 @@
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import nextEnv from "@next/env";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createLocalReq, getPayload, type Payload, type PayloadRequest } from "payload";
@@ -14,7 +14,7 @@ import { isAdmin } from "../../cms/access";
 import { submitApplication } from "../../cms/submit-application";
 import { deliverApplications } from "../../cms/deliver-applications";
 import { randomUUID } from "node:crypto";
-import { cvPDF } from "../fixtures/cv";
+import { cvDOCX, cvPDF } from "../fixtures/cv";
 import { announcementSnapshot } from "../../cms/announcement-rules";
 
 let payload: Payload;
@@ -49,6 +49,7 @@ function bootstrap() {
 
 beforeAll(async () => {
   nextEnv.loadEnvConfig(process.cwd());
+  if (process.env.SMTP_HOST && !["127.0.0.1", "localhost"].includes(process.env.SMTP_HOST)) throw new Error("Integration email tests require local Mailpit, never external SMTP.");
   const testURL = process.env.TEST_DATABASE_URL;
   if (!testURL || !new URL(testURL).pathname.endsWith("_test") || !["127.0.0.1", "localhost"].includes(new URL(testURL).hostname)) {
     throw new Error("Integration tests require a local TEST_DATABASE_URL whose database name ends in _test.");
@@ -64,6 +65,7 @@ beforeAll(async () => {
   await payload.db.drizzle.execute(sql`TRUNCATE applications, hiring_history, applicant_counters, recruitment_rate_limits, recruitment_settings, _recruitment_settings_v, recruitment_delivery, recruitment_delivery_recipients RESTART IDENTITY CASCADE`);
   await payload.db.drizzle.execute(sql`TRUNCATE faqs, _faqs_v RESTART IDENTITY CASCADE`);
   await payload.db.drizzle.execute(sql`TRUNCATE announcements, _announcements_v RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE legal_pages, _legal_pages_v RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -672,6 +674,49 @@ describe("blog publication and public relationships", () => {
   });
 });
 
+describe("fixed legal documents and SEO", () => {
+  const editor = () => ({ overrideAccess: false, user: asUser(staff) });
+  const approver = () => ({ overrideAccess: false, user: asUser(admin) });
+  it("reserves fixed identities once, including concurrent draft creation", async () => {
+    const attempts = await Promise.allSettled([0, 1].map(() => payload.create({ collection: "legal-pages", draft: true, data: { identity: "privacy-policy", title: "Approved privacy policy", body: blogBody("Approved privacy fixture. Not company policy."), effectiveDate: "2027-02-01", seo: { title: "Approved privacy SEO", description: "Approved privacy description" } }, ...editor() })));
+    expect(attempts.filter(item => item.status === "fulfilled")).toHaveLength(1);
+    expect(attempts.filter(item => item.status === "rejected")).toHaveLength(1);
+    await payload.create({ collection: "legal-pages", draft: true, data: { identity: "terms-of-service", title: "Private terms draft", body: blogBody("Unapproved terms fixture"), effectiveDate: "2027-02-01" }, ...editor() });
+    expect((await payload.find({ collection: "legal-pages", overrideAccess: false })).totalDocs).toBe(0);
+  });
+  it("publishes only reviewed content and preserves approved body/date/SEO during replacement drafts", async () => {
+    const policy = (await payload.find({ collection: "legal-pages", draft: true, where: { identity: { equals: "privacy-policy" } }, ...editor() })).docs[0];
+    await payload.update({ collection: "legal-pages", id: policy.id, data: { reviewState: "in-review" }, ...editor() });
+    await expect(payload.update({ collection: "legal-pages", id: policy.id, data: { _status: "published" }, ...editor() })).rejects.toThrow("administrators");
+    await payload.update({ collection: "legal-pages", id: policy.id, data: { _status: "published" }, ...approver() });
+    await payload.update({ collection: "legal-pages", id: policy.id, data: { title: "Private privacy replacement", body: blogBody("Private replacement policy text"), effectiveDate: "2028-03-01", seo: { title: "Private privacy SEO" } }, ...editor() });
+    const approved = await payload.findByID({ collection: "legal-pages", id: policy.id, overrideAccess: false });
+    expect(approved.title).toBe("Approved privacy policy");
+    expect(approved.effectiveDate).toBe("2027-02-01");
+    expect(approved.seo?.title).toBe("Approved privacy SEO");
+    expect(JSON.stringify(approved.body)).toContain("Approved privacy fixture");
+    expect(approved.reviewNote).toBeUndefined();
+    await expect(payload.findVersions({ collection: "legal-pages", overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.delete({ collection: "legal-pages", id: policy.id, ...approver() })).rejects.toThrow();
+    const unchanged = await payload.update({ collection: "legal-pages", id: policy.id, data: { identity: "terms-of-service" }, ...editor() });
+    expect(unchanged.identity).toBe("privacy-policy");
+    await expect(payload.update({ collection: "legal-pages", id: policy.id, data: { identity: "terms-of-service" }, overrideAccess: true, user: asUser(admin) })).rejects.toThrow("permanent");
+    const req = await request(staff); req.routeParams = { collection: "legal-pages", id: String(policy.id) };
+    expect((await (await previewEndpoint.handler(req)).json()).title).toBe("Private privacy replacement");
+  });
+  it("rejects unapproved embeds and invalid effective dates, and invalidates edited submissions", async () => {
+    const terms = (await payload.find({ collection: "legal-pages", draft: true, where: { identity: { equals: "terms-of-service" } }, ...editor() })).docs[0];
+    await payload.update({ collection: "legal-pages", id: terms.id, data: { body: blogBody("No uploads allowed", 1), effectiveDate: "2027-02-01" }, ...editor() });
+    await payload.update({ collection: "legal-pages", id: terms.id, data: { reviewState: "in-review" }, ...editor() });
+    await expect(payload.update({ collection: "legal-pages", id: terms.id, data: { _status: "published" }, ...approver() })).rejects.toThrow("cannot contain uploads");
+    const changed = await payload.update({ collection: "legal-pages", id: terms.id, data: { body: blogBody("Unapproved terms fixture"), effectiveDate: "2027-02-30" }, ...editor() });
+    expect(changed.reviewState).toBe("draft");
+    await payload.update({ collection: "legal-pages", id: terms.id, data: { reviewState: "in-review" }, ...editor() });
+    await expect(payload.update({ collection: "legal-pages", id: terms.id, data: { _status: "published" }, ...approver() })).rejects.toThrow();
+    await payload.update({ collection: "legal-pages", id: terms.id, data: { effectiveDate: "2027-02-01" }, ...editor() });
+  });
+});
+
 describe("reviewed announcements", () => {
   it("selects only eligible published notices and preserves live content during edits", async () => {
     const editor = { overrideAccess: false, user: asUser(staff) };
@@ -814,5 +859,26 @@ describe("private recruitment submissions and durable email", () => {
     await submitApplication(payload, form());
     await expect(submitApplication(payload, form())).rejects.toMatchObject({ status: 429 });
     expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(1001);
+  });
+  it("rolls back a durable-write failure and removes its private file bytes", async () => {
+    const files = (await readdir(path.resolve("storage/test-private"))).sort();
+    const count = (await payload.count({ collection: "applications", overrideAccess: true })).totalDocs;
+    const hooks = payload.collections.applications.config.hooks!.beforeChange!;
+    hooks.push(() => { throw new Error("Simulated durable write failure"); });
+    try { await expect(submitApplication(payload, form(randomUUID(), "rollback@pazelgreen.test"))).rejects.toThrow("Simulated durable write failure"); }
+    finally { hooks.pop(); }
+    expect((await payload.count({ collection: "applications", overrideAccess: true })).totalDocs).toBe(count);
+    expect((await readdir(path.resolve("storage/test-private"))).sort()).toEqual(files);
+    expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(1001);
+  });
+  it("accepts DOCX and omitted optional fields, then delivers queued mail through local Mailpit", async () => {
+    const application = form(randomUUID(), "docx@pazelgreen.test");
+    for (const optional of ["phone", "portfolio", "message"]) application.delete(optional);
+    application.set("cv", new File([new Uint8Array(cvDOCX())], "cv.docx"));
+    expect((await submitApplication(payload, application)).reference).toBe(`${job.reference}-1002`);
+    await payload.db.pool.query("UPDATE applications SET next_delivery_at=NOW() - INTERVAL '1 minute'");
+    expect(await deliverApplications(payload)).toBe(3);
+    const saved = await payload.find({ collection: "applications", overrideAccess: true });
+    expect(saved.docs.every(item => item.candidateDelivery === "sent" && item.staffDelivery === "sent")).toBe(true);
   });
 });

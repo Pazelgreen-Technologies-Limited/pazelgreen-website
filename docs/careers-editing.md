@@ -122,7 +122,8 @@ rollover, sequence overflow, immutable codes, retirement, pagination, closed sta
 request-time expiry, protected previews, metadata and desktop/mobile navigation.
 
 The migration round trip creates and removes its own local scratch database and
-requires a database role with `CREATEDB`. Rollback removes all careers tables and
-their data; it is a disposable-database check, not a production recovery strategy.
+requires a database role with `CREATEDB`. It rolls back/reapplies the latest schema
+migration; that can remove its tables/data. This is a disposable-database check,
+not a production recovery strategy.
 Production recovery must preserve counters alongside adverts and application data
 in consistent database backups. Never reset counters to fill a sequence gap.

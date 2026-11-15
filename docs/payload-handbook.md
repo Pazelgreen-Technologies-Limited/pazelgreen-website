@@ -118,7 +118,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
 | Image media library; reviewed jobs, dictionaries, permanent advert references and careers pages | Approved real vacancies and full code list: T12 |
 | Private applications/CVs, permanent applicant IDs, hiring history and queued recruitment emails | Approved recruitment notice/retention, recipients and production scheduler: T12 |
-| Audit events, protected previews, SQL migrations, private FAQs and scheduled announcements | Legal pages: T10 |
+| Audit events, protected previews, SQL migrations, private FAQs, scheduled announcements and reviewed legal pages | Approved company legal copy: T12 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
 Most marketing content is still written directly in frontend components. Do not
@@ -847,7 +847,7 @@ are implemented in T07. Read [recruitment operations](recruitment.md) before ena
 the form and scheduling delivery. Company-approved policy remains a launch input.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T10: legal pages and route SEO. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T11: cache/sitemap verification and operational handoff. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
 
 ## Editing company settings and page SEO
@@ -865,3 +865,11 @@ Use the [blog editor guide](blog-editing.md) for article fields, published media
 authenticated previews, editorial approval, SEO, filtering/pagination and browser
 verification. Normal public article URLs always use approved data, including when
 an editor is signed in. See the careers and recruitment guides for job applications.
+
+## FAQs, announcements and legal pages
+
+Use the [FAQ guide](faqs-editing.md) for internal-only answers; approval never grants
+anonymous access. Use the [announcement guide](announcements-editing.md) for one
+scheduled notice above navigation. The [legal guide](legal-editing.md) explains
+fixed privacy/terms identities, effective dates, approved versions, previews and
+document-owned SEO. No company policy or notice is seeded automatically.

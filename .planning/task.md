@@ -1,6 +1,6 @@
 # Payload CMS implementation plan
 
-Status: T01–T09 implemented and verified. T10–T12 remain pending.
+Status: T01–T10 implemented and verified. T11–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
@@ -195,7 +195,7 @@ and sitemaps. Search engines may choose different displayed text.
   acknowledgements, staff notifications, and retry-safe delivery.
 - [x] T08: Implement backend-only FAQs and test denied anonymous reads.
 - [x] T09: Implement announcements, scheduling, selection, and responsive navbar.
-- [ ] T10: Implement legal pages and SEO for newly built routes.
+- [x] T10: Implement legal pages and SEO for newly built routes.
 - [ ] T11: Complete cache invalidation, sitemap behavior, integration/E2E tests,
   migrations/backup instructions, editor onboarding, and operational documentation.
 - [ ] T12: Validate launch dependencies: actual codes, verified content, approved
@@ -260,3 +260,26 @@ Join Us openings are implemented and verified. D/C/I employment types are seeded
 no real vacancy or example department/position codes were seeded. Application
 forms/submission, per-advert applicant numbering and private CV workflow remain
 T07. Open role pages explicitly explain that online applications are forthcoming.
+
+### 2026-11-15 - T07–T10 completed
+
+The user authorized T07–T10 with incremental commits and documentation. Private
+applications/CVs, per-advert applicant IDs, hiring operations and durable email
+delivery are implemented. Recruitment forms require an approved notice/version
+and retention duration; private recipients and a delivery scheduler need setup.
+SMTP delivery is at least once across crashes and never creates another applicant
+record/reference. Existing user-directory privacy is preserved: staff can select
+themselves in the assignment picker; admins can select active colleagues.
+
+FAQs remain backend-only after approval. Reviewed announcements display one
+eligible notice above responsive navigation, with request-time selection and
+open-page schedule refreshes. Fixed privacy/terms documents have approved public
+routes, private previews, version history and document-owned SEO. Effective legal
+dates are calendar dates, not activation schedules. No real content/policies,
+candidates or recipients were seeded. Company approvals remain launch inputs.
+
+Final checks passed: lint, TypeScript, 63 unit tests, 61 integration tests,
+production build, HTTP suite, 28 desktop/mobile browser checks and scratch
+migration fresh/down/up. All four development migrations were applied through
+predev; the existing admin was preserved. T11 is the next task; no T11/T12
+completion, production deployment or remote CI result is implied.

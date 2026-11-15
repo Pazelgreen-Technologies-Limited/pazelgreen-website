@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Pazelgreen custom CMS endpoints
   version: 0.2.0
-  description: Custom endpoints through T09. Payload collection REST APIs enforce server access rules. Applications, hiring history, FAQs and CVs require active CMS access.
+  description: Custom endpoints through T10. Payload collection REST APIs enforce server access rules. Applications, hiring history, FAQs and CVs require active CMS access.
 servers:
   - url: http://localhost:3000/api
 paths:
@@ -36,7 +36,7 @@ paths:
       summary: Read latest draft JSON as authenticated active staff/admin
       security: [{ payloadCookie: [] }]
       parameters:
-        - { name: collection, in: path, required: true, schema: { type: string, enum: [media, posts, categories, jobs] } }
+        - { name: collection, in: path, required: true, schema: { type: string, enum: [media, posts, categories, jobs, legal-pages] } }
         - { name: id, in: path, required: true, schema: { type: string, pattern: '^[1-9][0-9]*$' } }
       responses:
         '200': { description: Draft JSON with private no-store caching and noindex }
