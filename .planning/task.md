@@ -3,6 +3,11 @@
 Status: T01–T10 implemented and verified. T11–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
+The delivery checklist below is authoritative for completion. Read
+[the current handoff](progress.md) for verified commits, results and concrete
+T11 next steps. Superseded dated milestones are in [history.md](history.md).
+The latest user request is documentation maintenance, not implementation of T11.
+
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
 Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
 separate TEST_DATABASE_URL. Production must never fall back to Docker. Local
@@ -65,6 +70,9 @@ working hours by day/range with closed state and timezone (Africa/Lagos initiall
 and ordered social links with platform/label/URL. Feed footer and Contact details
 from one source. Private notification recipients must be stored separately.
 Verify real contact details and social URLs before seeding production.
+Implemented public reads use the last approved database global. Before first
+publication or after unpublishing, legacy contacts/social placeholders are shown;
+published optional blanks are omitted. The fallback is not approved launch data.
 
 ## Blog and media
 
@@ -133,6 +141,10 @@ Allow intentional later submissions; flag matching email/job for staff review.
 Show the ID on the success screen and email an acknowledgement.
 Notify staff through private configured recruitment recipients. Email failure
 must not lose a saved application: retry delivery and show failures to staff.
+Delivery is operated by scheduling `pnpm cms:deliver` every minute; startup does
+not run the worker. SMTP is at least once across crashes, while application/ID
+creation remains idempotent. The existing private user directory limits staff's
+assignment picker to themselves; admins can select active colleagues.
 Statuses: New, In Review, Shortlisted, Interview, Offer, Hired, Rejected, Withdrawn.
 Support filters by job/status, optional staff assignment, and private notes/history.
 Do not automatically send rejection/offer/status emails in this phase.
@@ -167,6 +179,9 @@ boundaries and the existing fixed navbar.
 Legal collection: fixed privacy-policy/terms identities, title, rich-text content,
 effective date, version history, and workflow. Build /privacy-policy and
 /terms-of-service and connect the footer. Require approved legal copy before launch.
+Effective dates are calendar values in YYYY-MM-DD, not activation schedules.
+The fixed page identities cannot change; edit the existing records rather than
+creating competing copies. Unpublished legal documents have no public copy.
 
 SEO: title/description with defaults and draft/admin approval.
 Use a constrained global keyed to existing static public routes. Store blog/job/
@@ -227,59 +242,14 @@ Mark tasks complete only after implementation and verification. Keep decisions,
 changed files, test evidence, blockers, and the next action in progress.md.
 Record scope changes before expanding implementation.
 
-### 2026-11-14 - Startup simplification decision (T02/T03 follow-up)
+## Confirmed startup and infrastructure decisions
 
-User approved automatic first-admin creation on application startup using environment
-credentials, with mandatory initial password setup. Existing admins are preserved;
-there is no new super-admin role. Keep separate development/production/test URLs,
-and derive local Docker settings from DEV_DATABASE_URL instead of duplicate POSTGRES
-variables. Blog, careers and other CMS features remain subsequent work (T04–T12).
-
-### 2026-11-14 - T04 completion and remaining work
-
-Completed the next pending implementation task, T04, after the startup follow-up
-commit. Company settings and fixed-route SEO are review-enabled globals. No
-verified contact dataset was supplied: existing display fallbacks are retained,
-and no company records were automatically seeded or published. T12 still requires
-owner verification and initial approved content. T05 blog implementation is next;
-T05–T12 have not been claimed complete.
-
-### 2026-11-14 - T05 completed
-
-Blog posts/categories, public listing/detail routes, pagination/category filters,
-approved media relationships, article/listing SEO and authenticated visual/JSON
-previews are implemented and verified. New posts still require admin approval.
-No real content was seeded; initial articles/image rights remain T12 inputs.
-T06 dictionaries, jobs and careers is the next implementation task.
-
-### 2026-11-14 - T06 completed
-
-Admin-managed reviewed dictionaries, jobs, atomic annual advert references,
-careers listing/detail routes, protected previews, automatic expiry and dynamic
-Join Us openings are implemented and verified. D/C/I employment types are seeded;
-no real vacancy or example department/position codes were seeded. Application
-forms/submission, per-advert applicant numbering and private CV workflow remain
-T07. Open role pages explicitly explain that online applications are forthcoming.
-
-### 2026-11-15 - T07–T10 completed
-
-The user authorized T07–T10 with incremental commits and documentation. Private
-applications/CVs, per-advert applicant IDs, hiring operations and durable email
-delivery are implemented. Recruitment forms require an approved notice/version
-and retention duration; private recipients and a delivery scheduler need setup.
-SMTP delivery is at least once across crashes and never creates another applicant
-record/reference. Existing user-directory privacy is preserved: staff can select
-themselves in the assignment picker; admins can select active colleagues.
-
-FAQs remain backend-only after approval. Reviewed announcements display one
-eligible notice above responsive navigation, with request-time selection and
-open-page schedule refreshes. Fixed privacy/terms documents have approved public
-routes, private previews, version history and document-owned SEO. Effective legal
-dates are calendar dates, not activation schedules. No real content/policies,
-candidates or recipients were seeded. Company approvals remain launch inputs.
-
-Final checks passed: lint, TypeScript, 63 unit tests, 61 integration tests,
-production build, HTTP suite, 28 desktop/mobile browser checks and scratch
-migration fresh/down/up. All four development migrations were applied through
-predev; the existing admin was preserved. T11 is the next task; no T11/T12
-completion, production deployment or remote CI result is implied.
+- Startup creates the first admin only when none exists, using server-side
+  bootstrap email/password variables. First login requires changing the initial
+  password; existing credentials are preserved. There is no super-admin role.
+- Local Docker settings are derived from DEV_DATABASE_URL. No duplicate
+  POSTGRES_* values are required in .env. Development, production and test URLs
+  remain separate, selected by APP_ENV.
+- T01–T10 have been verified; code baseline and detailed evidence are in progress.md.
+  T11 covers remaining cache/indexing/navigation/operations work. T12 needs actual
+  company content, policies and deployed providers; local tests do not approve launch.

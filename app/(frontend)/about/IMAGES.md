@@ -1,8 +1,11 @@
-# About Page — Image Asset Checklist
+# About page image assets
 
-This page references the following image filenames. Export them from Figma, rename to match the filenames below, and drop them into `public/`.
+These static assets are referenced by the About page. They are controlled in code,
+not by the CMS media library. When replacing them with approved assets, keep the
+filenames below in `public/` or update the corresponding component references.
+Export from the team's design source when available and confirm image rights.
 
-| Placeholder file            | Used in section               | Suggested Figma export                                     |
+| Asset path                  | Used in section               | Suggested replacement                                      |
 | --------------------------- | ----------------------------- | ---------------------------------------------------------- |
 | `/about-hero-bg.jpg`        | `AboutHero` (background)      | Aerial/top-down agriculture scene, dark green tones        |
 | `/about-founder.png`        | `FounderPerspective` (right)  | Founder portrait photo                                      |
@@ -13,7 +16,7 @@ This page references the following image filenames. Export them from Figma, rena
 ## Tips
 
 - The hero image is rendered with `object-cover` so any aspect ratio works — Next.js auto-generates responsive `srcset` for `1920w`, `1080w`, `828w`, etc.
-- The founder image is rendered in a `3/4` (mobile) to `4/5` (desktop) aspect-ratio frame.
+- The founder image is rendered in a `4/5` (mobile) to `3/4` (desktop) aspect-ratio frame.
 - The fragmentation image is rendered in `3/4` (mobile) to `4/5` (desktop) with three floating "System Insight" cards layered on top.
 - The PAGEX network image is rendered in a square (`aspect-square`) frame — export as a square PNG with a transparent background.
-- The commitment CTA background is rendered in a `h-[500px]` banner — use a wide landscape image (~1920x800 or similar).
+- The commitment CTA background is rendered in a 420px mobile / 500px desktop banner — use a wide landscape image (~1920x800 or similar).

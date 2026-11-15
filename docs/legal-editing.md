@@ -13,7 +13,8 @@ an admin publishes the unchanged submission only after company/legal approval.
 There is no default or automatically generated policy copy. Until publication,
 the public page returns not found with noindex; a draft is never a public fallback.
 
-Effective Date is displayed information, not an activation schedule. Publication
+Enter Effective Date as a valid calendar date in `YYYY-MM-DD`; it has no timezone.
+It is displayed information, not an activation schedule. Publication
 makes the approved version available immediately. Change the date only as approved
 by the policy owner. Version history retains prior revisions and reviewer details.
 Editing approved content preserves the previous public body, date and SEO until

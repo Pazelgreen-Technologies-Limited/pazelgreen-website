@@ -1,184 +1,174 @@
 # Pazelgreen website
 
-Pazelgreen's public website and content management application. Built with Next.js,
-Payload CMS, PostgreSQL, TypeScript, and Tailwind CSS.
+Pazelgreen's public website and team content management system. Built with
+Next.js, Payload CMS, PostgreSQL, TypeScript and Tailwind CSS.
 
-The public site introduces Pazelgreen's work on sustainable technology and reducing
-food and agricultural waste across Africa. Payload provides the team's admin
-interface and the backend for CMS features as they are added.
+**The CMS features through T10 are implemented and verified.** The next work is
+T11: cache/indexing checks, sitemap behavior and operational handoff. Production
+launch approval and company content are still pending in T12.
 
-## New to the project?
+## Where to start
 
-Start with the [Payload team handbook](docs/payload-handbook.md). It explains how
-the system fits together, why each setup step exists, how editors use the admin,
-and what changes between local development and production.
-
-| Document | Use it for |
+| What you want to do | Start here |
 | --- | --- |
-| [Payload handbook](docs/payload-handbook.md) | First-time learning, team workflows, production responsibilities, backups and troubleshooting |
-| [Setup command reference](docs/cms-setup.md) | Commands for local setup, first-admin creation, tests and releases |
-| [Blog editor guide](docs/blog-editing.md) | Writing, previewing, reviewing and publishing blog articles |
-| [Careers editor guide](docs/careers-editing.md) | Code dictionaries, job approval, permanent advert references and public states |
-| [Recruitment operations](docs/recruitment.md) | Private applications/CVs, hiring history, privacy settings and email retries |
-| [FAQ editor guide](docs/faqs-editing.md) | Internal questions/answers and private editorial approval |
-| [Announcement guide](docs/announcements-editing.md) | Reviewed notices, scheduling, priority and navigation behavior |
-| [Legal editor guide](docs/legal-editing.md) | Fixed policy documents, approved legal copy, previews and route SEO |
-| [Custom CMS API contract](docs/cms-api.yaml) | Invitation activation and authenticated draft-preview endpoints |
-| [Implementation plan](.planning/task.md) | Agreed CMS scope, task order and acceptance criteria |
-| [Progress record](.planning/progress.md) | Completed work, verification evidence and the next task |
-| [Repository instructions](AGENTS.md) | Architecture and coding conventions |
+| Edit content on an already hosted site | Open that site's `/admin` with your invited account; no Node or Docker needed |
+| Run the website on your computer | Follow [Run locally](#run-locally) below |
+| Understand how the CMS works | Read the [team handbook](docs/payload-handbook.md) |
+| Continue development or hand work to another agent | Read [AGENTS.md](AGENTS.md), the [task plan](.planning/task.md) and the [current handoff](.planning/progress.md) |
 
-## Current status
+## What you can edit
 
-The public Home, About, Solutions, Join Us and Contact pages exist. The CMS
-foundation (T01–T03) includes admin/staff accounts, invitations, media review,
-version history, audit records, protected file storage and database migrations.
+| Content | Where to edit it | Where it appears |
+| --- | --- | --- |
+| Company email, phone, address, hours, department contacts and socials | Website → Company Settings | Footer and Contact page |
+| Search titles/descriptions for static pages and listings | Website → Page SEO | Public page metadata |
+| Blog posts, categories and images | Blog and Content/Media | `/blog` and article pages |
+| Jobs, employment types, departments and position codes | Careers | `/join-us/careers`, role pages and Join Us openings |
+| Applications, private CVs, hiring statuses, assignments and notes | Careers | Private CMS screens; candidates use the public job form |
+| Recruitment notice/retention settings and private recipients | Careers → Recruitment Settings / Recruitment Delivery | Application form and queued email delivery |
+| FAQs | Content → FAQs | Internal CMS only, including after approval |
+| Scheduled announcements | Website → Announcements | One notice above public navigation |
+| Privacy policy and terms | Website → Legal Pages | `/privacy-policy` and `/terms-of-service` |
 
-Company settings and existing-page SEO (T04) are available under Website in the
-admin, with staff drafts and admin approval. Footer/Contact share published details.
-The Blog group (T05) now provides posts/categories, authenticated draft previews,
-public articles and a filtered/paginated blog listing. Careers (T06) provides code
-dictionaries, reviewed jobs, permanent annual advert references, public careers
-pages and dynamic Join Us openings. Recruitment (T07) adds private applications,
-CVs, applicant references, hiring workflow and queued emails. FAQs (T08) provide
-private reviewed questions/answers. Announcements (T09) provide reviewed, scheduled
-notices above navigation. Legal pages (T10) provide reviewed privacy/terms documents,
-protected previews and document-owned SEO. Unpublished policies have no public copy.
-Most other public marketing content is hardcoded.
-Contact-form delivery and newsletter integration are outside this CMS scope.
-See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T11: cache/sitemap checks, broader acceptance and operational documentation**.
+Public content comes from approved database records. Staff save drafts and submit
+them for review; admins publish. Editing a published record keeps the previous
+approved version live until its replacement is approved.
+
+Homepage/other marketing copy and navigation remain in code. Contact-form delivery
+and newsletter integration are outside the agreed CMS scope.
+
+### Why the admin or website may look empty
+
+The CMS provides editing screens; it does not invent company articles, jobs or
+policies. Only the agreed Direct/Contract/Internship employment types are seeded.
+
+- Company Settings uses the original hardcoded contact/social values until first
+  publication, and again if unpublished. These are legacy fallbacks, not verified
+  launch content. Once published, database values feed both Footer and Contact;
+  blank optional fields are omitted.
+- Blogs and careers show empty states until approved records exist. Legal pages
+  are unavailable until approved policy documents are published.
+- Application forms stay disabled until approved recruitment notice/version and
+  retention settings are published. Configure recipients and the delivery
+  scheduler separately; see [recruitment operations](docs/recruitment.md).
 
 ## Run locally
 
-### Requirements
+### 1. Prepare your tools
 
-| Tool | Project version / role |
-| --- | --- |
-| Node.js | **24.22.2**, pinned in [`.node-version`](.node-version) |
-| pnpm | **10.18.1**, pinned in [package.json](package.json) |
-| Docker Desktop / Compose | Runs local PostgreSQL and Mailpit; Docker must be running |
+Use **Node 24.22.2**, **pnpm 10.18.1** and running **Docker Desktop with Compose**.
+Select Node in the terminal you will use; [`.node-version`](.node-version) records
+the version but does not install or activate it.
 
-Select/install the Node version before continuing; the version file does not
-install it for you. Check `node --version`, `pnpm --version` and
-`docker compose version` in your terminal.
-
-pnpm enforces the Node engine requirement before running scripts. Node 22.13.0
-is unsupported and can exit with an unsettled top-level await while loading
-Payload during startup. Select Node 24.22.2 in the same terminal before running
-`pnpm dev`; `.node-version` alone does not change your active runtime.
-
-### First checkout
+In your checkout:
 
 ```sh
-git clone git@github.com:Pazelgreen-Technologies-Limited/pazelgreen-website.git
-cd pazelgreen-website
+node --version
+pnpm --version
+docker compose version
 pnpm install --frozen-lockfile
 ```
 
-For a new checkout, copy `.env.example` to `.env` (PowerShell:
-`Copy-Item .env.example .env`). If `.env` already exists, keep it and edit the
-necessary values rather than overwriting working credentials.
+Node 22.13.0 is unsupported. If pnpm reports an engine error, fix the active Node
+version first. Git Bash users who changed `.bashrc` can reload it with
+`source ~/.bashrc` and clear remembered command paths with `hash -r`.
 
-Set `APP_ENV=development`, choose a local PostgreSQL password, use that same
-URL-encoded password in `DEV_DATABASE_URL`, and set a random `PAYLOAD_SECRET` of
-at least 32 characters. Before the first start, also set `BOOTSTRAP_ADMIN_EMAIL`
-and `BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters). The handbook explains
-[each value and how to generate secrets](docs/payload-handbook.md#first-local-setup). Actual `.env` files are ignored
-by Git; commit placeholders only in `.env.example`.
+### 2. Configure your local environment
+
+If `.env` does not exist, copy [`.env.example`](.env.example) to `.env`. **Keep an
+existing `.env`; do not overwrite working settings.** Set these values:
+
+| Setting | What to enter |
+| --- | --- |
+| `APP_ENV` | `development` |
+| `DEV_DATABASE_URL` | Your local PostgreSQL URL, normally using port 5433 and database `pazelgreen`; URL-encode special password characters |
+| `PAYLOAD_SECRET` | A random secret of at least 32 characters; keep it stable |
+| `SERVER_URL` | `http://localhost:3000` for the default local address |
+| `BOOTSTRAP_ADMIN_EMAIL` | Your first admin email; needed only if no admin exists |
+| `BOOTSTRAP_ADMIN_PASSWORD` | A unique initial password of 12–256 characters |
+
+Docker database settings are derived from `DEV_DATABASE_URL`; you do not need
+duplicate `POSTGRES_*` variables. Local email defaults to Mailpit. The handbook
+explains [secret generation and each setting](docs/payload-handbook.md#first-local-setup).
+Real `.env` files, uploads and database contents are kept out of Git.
+
+### 3. Start and sign in
 
 ```sh
 pnpm dev
 ```
 
-This starts Docker services, waits for them, applies pending migrations, ensures a first admin exists, and then
-starts Next.js/Payload. Keep that terminal open.
+This starts PostgreSQL/Mailpit, waits for them, applies migrations, ensures the
+first admin exists and starts Next.js. Keep the terminal open.
 
-| Local address | Purpose |
+| Address | Purpose |
 | --- | --- |
 | [localhost:3000](http://localhost:3000) | Public website |
-| [localhost:3000/admin](http://localhost:3000/admin) | Payload admin |
-| [localhost:8025](http://localhost:8025) | Mailpit inbox for development emails |
-| `127.0.0.1:5433` | PostgreSQL connection from your computer |
+| [localhost:3000/admin](http://localhost:3000/admin) | CMS admin |
+| [localhost:8025](http://localhost:8025) | Captured local emails; these are not sent to real inboxes |
 
-### First administrator
+Sign in with the bootstrap credentials. A newly created admin must choose a new
+password before editing content and can update their email at the same time.
+Sign in again afterward and remove bootstrap values from `.env`. Existing admins
+and their credentials are preserved on later starts. Invite teammates through
+the CMS rather than sharing passwords.
 
-Before the first start, set `BOOTSTRAP_ADMIN_EMAIL` and
-`BOOTSTRAP_ADMIN_PASSWORD` (12–256 characters) in your untracked `.env`.
-`pnpm dev` and `pnpm start` automatically create an admin if none exists.
-Existing admins and their credentials are preserved, even when bootstrap values change.
-Sign in at `/admin`; newly bootstrapped admins must choose a password before using
-the CMS and can update their email at the same time. Remove bootstrap values afterward.
-An existing admin needs no bootstrap secrets on later starts. Shared environments
-use invitations for additional users. `pnpm cms:bootstrap` remains an optional
-manual check. See the [handbook](docs/payload-handbook.md#first-local-setup).
+Use the same browser origin as `SERVER_URL`. If you change the hostname or port,
+update that setting and restart; application submissions check the public origin.
 
-### Later starts and stopping
+### 4. Make your first company-details edit
 
-Run `pnpm dev` for normal local work. Press Ctrl+C to stop Next.js; Docker services
-keep running. `pnpm db:stop` stops those services while preserving their volumes.
-`pnpm db:up` starts them again. Database records and uploaded files are local data;
-pushing Git commits does not share or back them up.
+1. Open Website → Company Settings and enter verified company details.
+2. Save the draft, then set Review State to **in-review** and save again.
+3. As an admin, publish that unchanged submitted draft.
+4. Refresh the public Footer/Contact page to see the approved database values.
+   No rebuild is needed. Further content edits need another review cycle.
 
-## Common commands
+On later days, run `pnpm dev`. Ctrl+C stops Next.js; `pnpm db:stop` stops the
+Docker services while preserving their data. `pnpm db:up` starts them again.
+
+## Everyday commands and checks
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm dev` | Start local services, migrate, ensure an admin and run the development app |
-| `pnpm db:up` / `pnpm db:stop` | Start/stop local services without deleting data |
-| `pnpm cms:migrate` | Apply committed migrations to the selected database |
-| `pnpm cms:deliver` | Deliver due recruitment acknowledgements/notifications; schedule every minute |
-| `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated Payload types/admin imports |
-| `pnpm cms:migration:create <name>` | Generate a schema migration for review |
+| `pnpm dev` | Start local services, migrate, ensure an admin and run the app |
+| `pnpm db:up` / `pnpm db:stop` / `pnpm db:status` | Start, stop or inspect local services |
+| `pnpm cms:deliver` | Deliver due recruitment emails; run manually locally, schedule every minute when deployed |
+| `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated CMS types/admin imports |
+| `pnpm cms:migration:create <name>` / `pnpm cms:migrate` | Generate a migration for review / apply committed migrations |
 | `pnpm lint` / `pnpm typecheck` | Check code style and TypeScript |
-| `pnpm test` | Run environment, database configuration, blog, careers, recruitment and announcement unit tests |
-| `pnpm test:integration` | Run PostgreSQL/Mailpit tests against a disposable test database |
-| `pnpm build` / `pnpm start` | Build and serve the optimized application |
-| `pnpm test:http` | Check real HTTP behavior using integration fixtures and a fresh build |
-| `pnpm test:browser` | Check public CMS desktop/mobile flows using Playwright and the production build |
-| `pnpm test:migrations` | Check latest migration down/up in a new disposable local database |
+| `pnpm build` / `pnpm start` | Build / serve the optimized app; start does not start Docker or apply migrations |
 
-For a full verification run, use lint → typecheck → unit tests → integration tests
-→ build → HTTP checks → browser checks, fixing failures before continuing. First configure the
-[separate test database](docs/cms-setup.md#test-database-and-checks); integration
-tests reset its CMS records. GitHub Actions is configured to run this sequence.
+For verification, first configure the [separate disposable test database and local
+Mailpit](docs/cms-setup.md#test-database-and-checks). Run lint → typecheck →
+`pnpm test` → `pnpm test:integration` → `pnpm test:migrations` → build →
+`pnpm test:http` → `pnpm test:browser`, fixing failures before continuing.
+Browser tests need Chromium or installed Chrome; the setup guide explains both.
+Tests reset test records. Run suites sequentially and let test servers stop
+before rebuilding. After a failed HTTP sequence, rerun integration to reset its
+fixtures before retrying. GitHub Actions is configured for these checks; local
+passing results do not mean a remote CI run or deployment happened.
 
-## How the repository is organized
+## Guides and project handoff
 
-```text
-app/
-  (frontend)/       Public pages, public layout/styles and route-specific _components/
-  (payload)/        Admin, REST routes and isolated CMS layout/styles
-components/        UI shared across distinct public pages
-cms/               Collections, permissions, review hooks and custom endpoints
-migrations/        Database migrations and schema snapshots
-scripts/           Local service, first-admin and recruitment delivery commands
-tests/             Unit, integration and production HTTP checks
-docs/              Team handbook, command reference and API contract
-.planning/         Implementation scope and progress
-payload.config.ts  Payload's main configuration
-payload-types.ts   Generated CMS record types
-compose.yaml       Local PostgreSQL and Mailpit services
-.env.example       Documented configuration placeholders
-```
+| Guide | Use it for |
+| --- | --- |
+| [Team handbook](docs/payload-handbook.md) | Concepts, accounts, environments, deployment and backups |
+| [Setup reference](docs/cms-setup.md) | Exact local, test, migration and release commands |
+| [Blog](docs/blog-editing.md) / [Careers](docs/careers-editing.md) | Creating and publishing articles and jobs |
+| [Recruitment](docs/recruitment.md) | Private CVs, applicant IDs, hiring operations, email retries and retention |
+| [FAQs](docs/faqs-editing.md) / [Announcements](docs/announcements-editing.md) / [Legal pages](docs/legal-editing.md) | Feature-specific editing rules |
+| [Custom API contract](docs/cms-api.yaml) | Invitations, draft previews, application submission and active announcements |
+| [Task plan](.planning/task.md) / [Current handoff](.planning/progress.md) | Agreed scope, completion evidence, remaining inputs and T11 next steps |
+| [Archived history](.planning/history.md) | Earlier implementation notes; superseded next actions are historical only |
 
-Route groups in parentheses preserve the public URLs. Page-specific UI belongs in
-that route's `_components/` folder; `components/` is for UI shared across distinct
-pages. Use strict TypeScript and Tailwind utilities. Prefer Server Components and
-add client components where interaction requires them. Follow [AGENTS.md](AGENTS.md)
-and read relevant installed Next.js guides before changing application code.
+Code lives in `app/` (public/admin routes), `cms/` (schemas and server rules),
+`lib/` (public reads), `components/` (shared UI), `migrations/`, `scripts/` and
+`tests/`. Follow [AGENTS.md](AGENTS.md) for component placement and coding rules.
 
-## Production and contributing
-
-`APP_ENV=development` selects `DEV_DATABASE_URL`; `APP_ENV=production` requires
-`PRODUCTION_DATABASE_URL` with no local fallback. Production also needs HTTPS,
-SMTP, persistent public/private storage, migrations and backups. Our Compose file
-is for local services. Read [the production guide](docs/payload-handbook.md#running-in-production)
-before selecting hosting or deploying; `pnpm start` does not provision services.
-
-For a PR, include relevant tests, generated files and reviewed migrations; describe
-what changed and which checks ran. Use commit subjects like `feat: add company
-settings`, `fix: preserve published content` or `docs: clarify CMS onboarding`.
-Update the handbook/runbook when behavior changes and `.planning/progress.md`
-after meaningful CMS work. Keep credentials, real uploads and private records out
-of source control.
+Production needs independently configured PostgreSQL, SMTP, HTTPS, persistent
+public/private storage, release migrations, recruitment scheduling and verified
+backups. Git does not share or back up content/uploads. Read the
+[production procedure](docs/payload-handbook.md#running-in-production) before
+deploying. T11/T12 still include indexing/navigation checks, recovery work,
+company-approved content/policies and launch acceptance.

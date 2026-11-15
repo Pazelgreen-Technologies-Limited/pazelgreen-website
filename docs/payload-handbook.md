@@ -4,10 +4,12 @@ Start here if you have never used Payload. This guide explains what the parts do
 why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
-This describes the **T01–T06 implementation**, checked against this repository on
-**14 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
+This describes the **T01–T10 implementation**, checked against this repository on
+**15 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
+For current implementation status and the next task, read
+[the handoff](../.planning/progress.md). T11/T12 and launch approval are incomplete.
 
 If you are learning the system, read the concepts and local setup first. Editors
 of a hosted site can go to [Using the admin panel](#using-the-admin-panel).
@@ -31,6 +33,9 @@ deploying the site needs [Running in production](#running-in-production) and
 - [Working as a team](#working-as-a-team)
 - [Troubleshooting](#troubleshooting)
 - [Common questions](#common-questions)
+- [Editing company settings and page SEO](#editing-company-settings-and-page-seo)
+- [Editing the blog](#editing-the-blog)
+- [FAQs, announcements and legal pages](#faqs-announcements-and-legal-pages)
 
 ## What Payload is
 
@@ -69,7 +74,7 @@ See [deployment options](https://payloadcms.com/docs/production/deployment).
 | Field / schema | A piece of data / the definition of the fields and their rules |
 | Global | One shared document, useful for company settings rather than many independent records. Company settings and page SEO use globals here. [Payload globals](https://payloadcms.com/docs/configuration/globals) |
 | Slug | A stable identifier used in code or URLs, such as the collection slug `media` |
-| Relationship | A link from one record to another, such as a future post referring to an image |
+| Relationship | A link from one record to another, such as a post referring to an image |
 | Hook | Server code that runs around an operation; we use hooks to enforce review and record audit events |
 | Access control | Server rules deciding who may read, create, update, or delete data |
 | Draft / published version | Work in progress / the approved content available to public readers |
@@ -83,7 +88,7 @@ flowchart LR
   Visitor[Website visitor] --> Frontend[Next.js public pages]
   Editor[Staff or admin] --> Admin[Payload admin panel]
   Admin --> Backend[Payload APIs and server rules]
-  Frontend -. CMS integration as features are added .-> Backend
+  Frontend -->|Approved content reads| Backend
   Backend --> DB[(PostgreSQL)]
   Backend --> Files[Public and private upload storage]
   Backend --> Mail[Mailpit locally / SMTP in production]
@@ -95,7 +100,7 @@ flowchart LR
 | PostgreSQL | Users, passwords in hashed form, sessions, invitations, content records, file metadata, versions and audit events | Docker container; host port 5433 |
 | Public upload storage | Image files intended for public use after approval | `storage/public/` |
 | Private upload storage | Restricted PDF/DOCX files | `storage/private/` |
-| Mailpit | Captures development emails so you can inspect invitation/reset links | Docker container; inbox on port 8025, SMTP on 1025 |
+| Mailpit | Captures invitations, password resets and recruitment emails sent by the delivery worker | Docker container; inbox on port 8025, SMTP on 1025 |
 | Git repository | Application code, schema definitions, migrations, tests and documentation | This checkout |
 
 An upload has **two parts**: a database record describing it and the actual file
@@ -112,7 +117,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 
 ## What is available today
 
-| Available in the committed foundation | Still planned |
+| Available now | Remaining launch inputs or work |
 | --- | --- |
 | Public Home, About, Solutions, Join Us and Contact pages with shared company settings and SEO | Verified production contacts, hours and social URLs: T12 |
 | `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
@@ -121,9 +126,10 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | Audit events, protected previews, SQL migrations, private FAQs, scheduled announcements and reviewed legal pages | Approved company legal copy: T12 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
-Most marketing content is still written directly in frontend components. Do not
-expect application records yet. Company settings, page SEO, blog and careers
-editors are available now. Contact-message delivery and newsletter integration
+Most marketing content is still written directly in frontend components. Applications
+appear only after candidates submit to an eligible role with recruitment enabled;
+the app does not seed candidate records. All editors listed above are implemented.
+Contact-message delivery and newsletter integration
 are outside this CMS scope. Homepage content editing is excluded from the plan.
 The [task plan](../.planning/task.md) and [progress record](../.planning/progress.md)
 track what has actually been delivered.
@@ -362,6 +368,21 @@ account. Failed logins can temporarily lock an account (five attempts, ten-minut
 lock time). If access still fails, contact an admin/operator rather than deleting
 users or clearing the database to repeat setup.
 
+### Find the right editing screen
+
+Company Settings and Page SEO are under Website. Blog contains Posts/Categories;
+Content contains Media and internal FAQs. Careers contains jobs, code dictionaries,
+applications, hiring history and recruitment settings. Website also contains
+Announcements and Legal Pages. A new database provides screens, not company copy.
+Only the agreed D/C/I employment types are initialized automatically.
+
+For job/application workflows, use the [careers guide](careers-editing.md) and
+[recruitment runbook](recruitment.md). Application forms require published enabled
+recruitment settings with approved notice/version/retention values. An admin sets
+private recipients in Recruitment Delivery, and an operator schedules
+`pnpm cms:deliver` every minute. Locally, run that command manually and inspect
+Mailpit. Saving an application queues email; starting the app does not deliver it.
+
 ### Save, submit, review, publish
 
 Payload supports drafts and versions. Our additional review rules live in
@@ -377,7 +398,7 @@ flowchart LR
   Published -->|Edit a replacement| Draft
 ```
 
-For a current media record:
+The same draft/review steps apply to public content. For example, for a media record:
 
 1. Upload a JPEG, PNG or WebP image and write useful alt text. Add a caption or
    attribution if needed. Save the draft.
@@ -397,16 +418,20 @@ The server enforces these rules even when a caller uses the API instead of the U
 Editing a published document creates a replacement draft while the approved
 version remains available publicly. An admin can **Unpublish** it to withdraw
 public access while keeping the record and version history. **Delete** can remove
-the record and associated files/history; use Unpublish when you need to retain it.
+the record and associated files/history where deletion is permitted; use Unpublish
+when you need to retain it. Issued jobs, legal pages and applications have stricter
+deletion restrictions described in their feature guides.
 Direct version restoration is blocked here: copy the historical values into a
 draft and submit them for review. Review updates happen one document at a time;
 bulk updates are blocked by the current workflow.
 
 Media has authenticated JSON previews at `/api/preview/media/<id>`; posts,
-categories and jobs also support that endpoint. The blog editor's Preview button opens a
+categories, jobs and legal pages also support that endpoint. The blog editor's Preview button opens a
 session-protected visual draft preview. See the [blog guide](blog-editing.md).
 A browser without a valid active staff/admin session cannot preview drafts.
 The job editor also has protected visual previews. See the [careers guide](careers-editing.md).
+Legal previews follow the same session/privacy rules; see the [legal guide](legal-editing.md).
+FAQs remain internal even when approved and have no public preview/page.
 
 ### Public images and private files
 
@@ -416,10 +441,14 @@ media record so an already approved file URL cannot silently change its contents
 An approved media record being available through the API does not mean a public
 page already references it.
 
-The `private-files` collection accepts PDF/DOCX as storage infrastructure. Only
-admins currently create, update or delete these files; active staff/admins can
-read/download them. It is not yet a candidate application system. Keep private
-documents out of `media`, Next's `public/` folder, and public links.
+The application form accepts byte-validated PDF/DOCX CVs and stores them in
+`private-files` with random filenames. Candidates submit through the protected
+application endpoint; they cannot browse records or download files. Active
+staff/admins can read/download CVs. Direct upload/metadata management is admin-only;
+CV bytes cannot be replaced and files attached to an application cannot be deleted
+through the normal file API. Keep private documents out of `media`, Next's
+`public/` folder, and public links. See [recruitment operations](recruitment.md)
+for idempotent submissions, hiring history, email retries and retention review.
 
 Both upload directories are outside Next's static `public/` directory and files
 are served through Payload access checks. Current file responses use
@@ -545,8 +574,9 @@ schema difference instead of inventing an empty migration for every edit.
 `pnpm exec payload migrate:status` shows applied/pending migrations. Already applied
 migrations are recorded in the database, so `pnpm dev` normally skips them. Keep
 existing migrations append-only; add a new one rather than editing a migration
-that teammates or production have already applied. Preserve the custom last-admin
-trigger migration. Editing content in the admin does not require a schema migration.
+that teammates or production have already applied. Preserve custom guards for the
+last admin, issued advert references, applicant identity and legal page identity,
+plus the atomic counters. Editing content in the admin needs no schema migration.
 The official [migration reference](https://payloadcms.com/docs/database/migrations)
 explains the CLI; use our scripts and disabled-push policy when following it.
 
@@ -590,6 +620,10 @@ PAYLOAD_SECRET to a browser to "authenticate" it.
 Bypassing access in a controlled bootstrap/migration is different from bypassing
 access in a public page. Direct database writes also bypass Payload hooks; do not
 use them as the normal way to publish content or manage accounts.
+The announcement selector is a deliberate narrow exception: trusted server code
+reads private publication timestamps to rank explicitly published/enabled records,
+then returns only sanitized display fields. See [lib/announcements.ts](../lib/announcements.ts).
+Do not copy that access bypass to general public reads or return full records.
 
 ### Checks before a PR
 
@@ -613,6 +647,9 @@ HTTP tests require those fixtures and a fresh production build; they start a
 temporary server on `127.0.0.1:3101`, use test uploads, then stop it. Browser
 checks use port 3102 and Chromium (or an installed Chrome selected with
 PLAYWRIGHT_CHANNEL=chrome). Run suites sequentially against their shared fixtures.
+Do not rebuild while either test server is running: builds replace `.next` files
+the servers need. HTTP checks mutate accounts/content; after a failed HTTP run,
+rerun integration to reset fixtures before retrying the HTTP sequence.
 See [test database setup](cms-setup.md#test-database-and-checks) before the first run.
 The test helpers refuse non-local database URLs or names without an `_test` suffix;
 you must still supply a genuinely disposable database.
@@ -633,6 +670,7 @@ Before the first release, the team must name an operator and configure:
 | PostgreSQL | An independently provisioned production database, credentials, network access, TLS configuration, backups and recovery |
 | Public/private storage | Two persistent mounted paths with app read/write permissions, or a deliberately implemented storage adapter |
 | Email | Production SMTP service, verified sender/domain, credentials and tested delivery |
+| Recruitment delivery | Private recipients, approved notice/retention values, a scheduler running `pnpm cms:deliver` every minute and queue monitoring |
 | Release process | A job/process capable of applying migrations using the correct deployment environment |
 | Operations | Owners for logs, uptime, storage capacity, backups, recovery and access removal |
 
@@ -644,7 +682,7 @@ replicas need access to the same uploaded files and the same environment secret.
 The general [Payload deployment guide](https://payloadcms.com/docs/production/deployment)
 describes the hosting pieces; our storage configuration is more specific.
 
-No production provider has been chosen or provisioned by the CMS foundation.
+The repository does not provision production providers or a delivery scheduler.
 Keep those decisions and the remaining launch work visible in the task plan.
 The database account used for migrations needs permission to change its schema;
 the runtime account needs the application's required data permissions. Have the
@@ -703,7 +741,10 @@ review the configured CORS/CSRF origins instead of opening them to every website
    supervision, then verify public pages and `/admin` through the HTTPS hostname.
 6. Test an invitation/reset email, an approved image, and a private file download;
    verify anonymous/private/draft access is denied. Remove temporary acceptance data.
-7. Confirm backups and an isolated restore test, and complete the launch checks.
+7. If enabling recruitment, approve/publish the notice/version/retention settings,
+   configure private recipients, schedule `pnpm cms:deliver` every minute and test
+   durable submission/delivery recovery without real candidate records.
+8. Confirm backups and an isolated restore test, and complete T11/T12 launch checks.
 
 `pnpm start` runs the idempotent admin check before Next.js. Use it as the deployment
 command: calling `next start` directly skips the check. It does not install
@@ -713,9 +754,9 @@ Follow the host's process management rather than leaving an interactive shell op
 
 The current marketing-page build can succeed without proving database/email/file
 service health. SMTP startup verification is skipped in our adapter, so a successful
-boot is not proof that email works. Later CMS-backed pages may fetch data during
-builds; revisit database availability and build/migration ordering as those routes
-are implemented.
+boot is not proof that email works. Current public CMS reads run at request time;
+serving those pages requires the migrated database. Recheck build/migration
+ordering if a later change introduces build-time reads.
 
 ### Subsequent releases
 
@@ -730,9 +771,10 @@ old code is compatible with the new schema before switching back. Prefer a revie
 forward fix when reversing a migration would lose data. Do not run reset/fresh/down
 commands against production as a routine recovery action.
 
-Editors can continue maintaining existing content without a schema deployment.
-Whether a page immediately shows an approved change depends on its CMS integration
-and cache invalidation. Those remaining frontend/cache tasks are tracked in the plan.
+Editors can maintain existing content without a schema deployment. Current public
+reads use approved data on the next request; drafts stay private. Already open
+pages may need a refresh, while announcements also poll at schedule boundaries
+and at least once per minute. T11 still audits browser cache and indexing behavior.
 
 ## Backups and recovery
 
@@ -740,6 +782,10 @@ Back up the **database and both upload stores**. PostgreSQL includes account,
 content, version, audit and file-metadata records; its backup alone does not contain
 the file bytes in our filesystem setup. Back up required configuration/secrets
 through the approved secret manager, and retain the matching release/migration code.
+Preserve annual/per-advert counters and issued references with their jobs and
+applications so restored systems cannot reuse IDs. Saved applications also hold
+queued delivery state and the acknowledged notice snapshot. Coordinate retention,
+legal holds, email-worker restart and backup expiry; see [recruitment operations](recruitment.md).
 
 Use your database provider's backup/point-in-time recovery or an operator-managed
 Postgres backup process. Protect copies of private files and database dumps as
@@ -804,7 +850,11 @@ dataset between environments; use approved, appropriately sanitized data.
 | Public record returns 404 | No matching publicly readable record exists | Check ID, publication state and environment; private/draft content may deliberately be unavailable |
 | Upload rejected | File exceeds 5 MB or fails allowed type/content checks | Use the allowed format; image replacement needs a new record |
 | File missing after redeploy | Filesystem was ephemeral, a mount is wrong, or only the DB was restored | Check persistent mount paths and matching file backups |
-| Saved content does not change a public page | It is a draft, the page is still hardcoded, or cache integration is pending | Check publication, the page's actual data source and current task status |
+| Saved content does not change a public page | A draft was saved, an open page needs refresh, or that text is outside CMS scope | Publish an unchanged submitted draft, refresh, and check the field-to-page map in README |
+| Company details still show the original values | Company Settings has no approved publication or was unpublished | Publish verified settings; drafts do not replace the legacy fallback |
+| Application form is missing | Role is closed/expired or recruitment settings are disabled/unpublished | Check current role eligibility and approved notice/version/retention settings |
+| Application was saved but email has not arrived | Delivery worker has not run, recipients are missing, or SMTP failed | Inspect delivery states; configure recipients and run/schedule `pnpm cms:deliver` |
+| Application POST returns an origin error | Browser address and SERVER_URL differ | Match hostname/port/HTTPS to the configured public origin and restart |
 | Test DB guard rejects the URL | Test helpers refuse the requested database | Create a separate local `_test` database; never point tests at meaningful data |
 | HTTP tests cannot sign in/find fixtures | Integration fixtures are absent or the build is stale | Run integration tests successfully, then build, then HTTP checks |
 | Build cannot fetch Google fonts | This site's font downloads cannot reach Google | Restore build-time network access; this is separate from Payload's database setup |
@@ -834,21 +884,23 @@ serving those pages needs the database for published company settings and SEO.
 URL and their account. People running the whole project locally need those tools.
 
 **Can I publish only static HTML files to run the CMS?** No. The admin, API,
-authentication and database operations need a running server. A successful build
-of static marketing pages does not replace the Next.js/Payload server.
+authentication and database operations need a running server. Public CMS reads
+also need the server and migrated database; the build is not a static-only site.
 
 **Does Payload automatically provide our approval process?** It provides building
 blocks such as access rules, hooks and versions. Our specific roles, invitations,
 last-admin protection and approval requirements are implemented in this repository.
 
-**Can the public submit CVs now?** Not through a completed application feature.
-Private applications, candidate validation, notifications and retention review dates
-are implemented in T07. Read [recruitment operations](recruitment.md) before enabling
-the form and scheduling delivery. Company-approved policy remains a launch input.
+**Can the public submit CVs now?** The application feature is implemented. It accepts
+submissions only for approved open/unexpired roles when recruitment settings are
+enabled and published with approved notice/version/retention values. Read
+[recruitment operations](recruitment.md) before enabling it and scheduling delivery.
+Company-approved policy remains a launch input.
 
-**What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T11: cache/sitemap verification and operational handoff. Production hosting, real content, approved policies and the remaining
-feature/launch tasks must be completed before treating this foundation as launch-ready.
+**What should we do next?** T11 is the next implementation task: cache/indexing,
+sitemap/navigation checks and operational handoff. Read [the current handoff](../.planning/progress.md)
+for its concrete starting point. T12 still requires production providers, verified
+company content, approved policies and launch acceptance.
 
 ## Editing company settings and page SEO
 

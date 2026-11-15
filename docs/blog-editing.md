@@ -110,6 +110,8 @@ scratch database. It does not reset the configured development/test databases.
 HTTP checks use port 3101 and stop their
 temporary server afterward. Run the suites sequentially because they share the
 test fixtures.
+Let temporary servers stop before rebuilding. HTTP checks change fixture accounts
+and content; rerun integration before retrying a failed HTTP sequence from the start.
 
 To use an already installed Google Chrome instead of downloading Chromium, set
 `PLAYWRIGHT_CHANNEL=chrome` before running browser tests (PowerShell:

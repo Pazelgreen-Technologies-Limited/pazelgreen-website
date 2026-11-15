@@ -64,6 +64,7 @@ See [admin workflows](payload-handbook.md#using-the-admin-panel).
 | `pnpm db:status` | Inspect container state |
 | `pnpm db:exec <args>` | Run a Compose exec command with URL-derived settings |
 | `pnpm cms:migrate` | Apply pending migrations to the database selected by APP_ENV |
+| `pnpm cms:deliver` | Process up to 50 due applications; run manually locally or schedule every minute when deployed |
 | `pnpm exec payload migrate:status` | Show migration status |
 
 Our database helper scripts refuse non-development APP_ENV values. Local optimized
@@ -120,7 +121,10 @@ Integration tests use real PostgreSQL and Mailpit. HTTP checks need their fixtur
 and a fresh production build; the script starts/stops its own test server on
 `127.0.0.1:3101`. Browser checks use a separate temporary server on port 3102 and
 need Chromium (or PLAYWRIGHT_CHANNEL=chrome for installed Google Chrome). Run suites
-sequentially because they share test fixtures. CI provisions test services and runs these checks; it does not
+sequentially because they share test fixtures. Do not rebuild until temporary
+servers stop. HTTP checks mutate fixtures; rerun integration before retrying a
+failed HTTP sequence from the beginning. Mailpit must be local; integration tests
+reject external SMTP hosts. CI provisions test services and runs these checks; it does not
 provision production or deploy the website.
 
 ## Environment selection
@@ -149,6 +153,9 @@ CI test environment, and build the release with its required configuration. Back
 up existing production data and apply `pnpm cms:migrate` once in a controlled
 release job before serving code that needs the new schema. Supply bootstrap credentials
 if no admin exists, then serve with `pnpm start`; its prestart check creates the admin.
+For recruitment, provision the `pnpm cms:deliver` scheduler with the same environment
+and configure private recipients. The application process does not run the queue
+worker automatically. See [recruitment operations](recruitment.md).
 
 Use `pnpm start` as the deployment command so its admin check runs; invoking `next start` directly bypasses that check.
 `pnpm start` does not start Docker or apply migrations. Build success does not
@@ -207,10 +214,13 @@ No actual vacancies or example department/position codes are seeded.
 ## Current limits and implementation status
 
 T01–T10 provide the CMS foundation, company settings, SEO, blog, careers,
-private recruitment, [backend-only FAQs](faqs-editing.md) and
+private recruitment, [backend-only FAQs](faqs-editing.md),
 [scheduled announcements](announcements-editing.md) and
 [reviewed legal pages](legal-editing.md). Read [recruitment operations](recruitment.md) before enabling
 applications: approve notice/retention settings, configure private recipients and
 schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setup.
 See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).
+T11 is next: indexing/sitemap/navigation and operations work. T12 covers company
+inputs and deployment/launch acceptance. Earlier status notes live in
+[archived history](../.planning/history.md), not the current handoff.

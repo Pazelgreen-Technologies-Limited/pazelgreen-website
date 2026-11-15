@@ -115,6 +115,8 @@ pnpm test:browser
 ```
 
 Run database/HTTP/browser suites sequentially because they share fixtures. Browser
+and HTTP servers must stop before rebuilding; retry failed HTTP sequences only
+after integration has restored their fixtures. Browser
 tests use Chromium (`pnpm exec playwright install chromium`) or installed Chrome
 with `PLAYWRIGHT_CHANNEL=chrome`. Tests cover role permissions, draft privacy,
 atomic concurrent publication, retries, failed allocation rollback, Lagos year

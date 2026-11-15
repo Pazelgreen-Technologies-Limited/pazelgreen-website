@@ -64,6 +64,9 @@ Where `<type>` is one of:
 - Before CMS work, read [the task plan](.planning/task.md) and
   [the progress record](.planning/progress.md). They define the agreed scope,
   decisions, task order, validation requirements, and next action.
+- progress.md is the current handoff snapshot. Historical notes and superseded
+  next actions are kept separately in .planning/history.md; do not treat archived
+  pending/in-progress statements as current status.
 - Inspect the working tree and relevant local Next.js guides before implementation.
   Preserve other contributors' changes.
 - Update progress.md after meaningful work with task IDs, changed files, actual

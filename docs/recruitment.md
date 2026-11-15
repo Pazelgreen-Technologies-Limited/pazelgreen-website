@@ -29,7 +29,8 @@ Required fields are full name, email, PDF/DOCX CV up to 5 MB and acknowledgement
 Phone, portfolio/LinkedIn URL and message are optional. CVs use random filenames
 outside Next's public directory. Both record reads and actual file downloads
 require active CMS access. Downloads use private/no-store and attachment headers.
-Private CVs cannot be replaced or deleted while attached to an application.
+Private CV bytes cannot be replaced. Files attached to applications cannot be
+deleted through the normal file API.
 
 The server checks actual file content, bounded ZIP expansion for DOCX, upload
 size, safe portfolio URLs and current published/open/unexpired advert state.
@@ -58,8 +59,9 @@ scanning. Treat CVs as untrusted documents when opening them.
 Application success means the database commit succeeded. Sending is independent.
 Candidate Delivery and Staff Delivery show pending/sent/failed in Applications;
 Delivery Attempts and Next Delivery At show retry progress. Missing recipients
-fail staff delivery visibly while candidate delivery can succeed. Failures retry
-with exponential backoff capped at one day; no record or ID is recreated.
+fail staff delivery visibly while candidate delivery can succeed. Retry delays
+start at two minutes and double up to 1,024 minutes (17 hours 4 minutes); no record
+or ID is recreated. App startup does not run this worker automatically.
 Overlapping workers lock rows with SKIP LOCKED. Successful destinations are skipped.
 Notification emails to staff contain a reference and authenticated CMS link,
 without candidate details or CV attachments. SMTP errors are not logged with data.
