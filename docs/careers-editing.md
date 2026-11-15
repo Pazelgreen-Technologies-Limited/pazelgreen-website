@@ -88,10 +88,10 @@ metadata lives on that job. Both require admin approval.
 
 ## Applications and launch inputs
 
-T06 supplies role information and eligibility states. Online applications, private
-CVs, applicant IDs and notifications are **T07**, and are not accepting submissions
-yet. Open detail pages explain that the application form will be available soon;
-there is no placeholder submission endpoint or candidate data collection.
+T06 supplies role information and eligibility states. T07 adds applications, private
+CVs, applicant IDs and queued notifications. See [recruitment operations](recruitment.md)
+for approved notice/retention setup and the delivery scheduler. Applications stay disabled
+until that setup is approved and published. Closed/expired roles reject submissions.
 
 Before launch, the company must confirm its dictionaries, real vacancies and
 deadline instants. No real vacancies are seeded. Approved recruitment privacy

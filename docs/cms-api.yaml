@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Pazelgreen CMS foundation endpoints
-  version: 0.1.0
-  description: Custom authentication and preview endpoints through T06. Payload also generates collection REST APIs; all server access rules apply.
+  title: Pazelgreen custom CMS endpoints
+  version: 0.2.0
+  description: Custom endpoints through T07. Payload collection REST APIs enforce server access rules. Applications, hiring history and CVs require active CMS access.
 servers:
   - url: http://localhost:3000/api
 paths:
@@ -22,7 +22,7 @@ paths:
                 password: { type: string, minLength: 12, maxLength: 256, writeOnly: true }
       responses:
         '201': { description: Account activated; sign in through Payload login }
-        '400': { description: Invalid input, expired/consumed invitation or failed activation; no account committed }
+        '400': { description: Invalid input or expired/consumed invitation }
         '503': { description: Database transaction unavailable }
   /preview/{collection}/{id}:
     get:
@@ -30,21 +30,53 @@ paths:
       security: [{ payloadCookie: [] }]
       parameters:
         - { name: collection, in: path, required: true, schema: { type: string, enum: [media, posts, categories, jobs] } }
-        - { name: id, in: path, required: true, schema: { type: string, pattern: '^[1-9][0-9]*
-        '200': { description: Draft JSON with private no-store caching and noindex }
-        '403': { description: Authentication required or inactive account }
-        '404': { description: Collection/document not found }
-components:
-  securitySchemes:
-    payloadCookie:
-      type: apiKey
-      in: cookie
-      name: payload-token
- } }
+        - { name: id, in: path, required: true, schema: { type: string, pattern: '^[1-9][0-9]*$' } }
       responses:
         '200': { description: Draft JSON with private no-store caching and noindex }
-        '403': { description: Authentication required or inactive account }
+        '403': { description: Active CMS authentication required }
         '404': { description: Collection/document not found }
+  /recruitment/apply:
+    post:
+      summary: Durably submit a private application or recover an identical retry
+      description: Requires Origin equal to SERVER_URL. Shared hourly quotas apply. Response never includes candidate details. Reuse the same random key and identical payload after an interrupted response.
+      security: []
+      parameters:
+        - { name: Origin, in: header, required: true, schema: { type: string, format: uri } }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [key, job, fullName, email, noticeVersion, consent, cv]
+              properties:
+                key: { type: string, format: uuid }
+                job: { type: string, pattern: '^[1-9][0-9]*$' }
+                fullName: { type: string, maxLength: 160 }
+                email: { type: string, format: email, maxLength: 254 }
+                phone: { type: string, maxLength: 50, description: Empty string if omitted }
+                portfolio: { type: string, maxLength: 1000, description: HTTP(S) URL or empty string }
+                message: { type: string, maxLength: 4000, description: Empty string if omitted }
+                noticeVersion: { type: string, maxLength: 100 }
+                consent: { type: string, enum: ['yes'] }
+                website: { type: string, maxLength: 0, description: Honeypot; leave empty }
+                cv: { type: string, format: binary, description: Valid PDF/DOCX bytes, maximum 5 MB }
+      responses:
+        '201':
+          description: Committed application or identical retry; email queued separately
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [reference]
+                properties:
+                  reference: { type: string, example: 'D-TE | DH-2027-01-001' }
+        '400': { description: Invalid fields or CV }
+        '403': { description: Incorrect or missing Origin }
+        '409': { description: Job unavailable, recruitment disabled, notice changed or retry payload conflict }
+        '413': { description: Request body exceeds bounded upload limit }
+        '429': { description: Shared submission quota exceeded; retry later }
+        '503': { description: Submission unavailable; retain key and retry }
 components:
   securitySchemes:
     payloadCookie:

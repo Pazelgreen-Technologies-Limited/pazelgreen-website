@@ -11,6 +11,10 @@ import { hashInvitation, Invitations } from "../../cms/invitations";
 import { previewEndpoint } from "../../cms/preview";
 import { ensureFirstAdmin } from "../../cms/bootstrap";
 import { isAdmin } from "../../cms/access";
+import { submitApplication } from "../../cms/submit-application";
+import { deliverApplications } from "../../cms/deliver-applications";
+import { randomUUID } from "node:crypto";
+import { cvPDF } from "../fixtures/cv";
 
 let payload: Payload;
 let admin: User;
@@ -56,6 +60,7 @@ beforeAll(async () => {
   await payload.db.migrate();
   // Only this verified disposable local test database is reset; migrations remain.
   await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v, employment_types, _employment_types_v, departments, _departments_v, position_codes, _position_codes_v, jobs, _jobs_v, annual_advert_counters RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE applications, hiring_history, applicant_counters, recruitment_rate_limits, recruitment_settings, _recruitment_settings_v, recruitment_delivery, recruitment_delivery_recipients RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -661,5 +666,91 @@ describe("blog publication and public relationships", () => {
     await payload.update({ collection: "posts", id: temporary.id, data: { _status: "draft" }, overrideAccess: false, user: asUser(admin) });
     expect((await payload.find({ collection: "posts", where: { slug: { equals: "withdrawn-story" } }, overrideAccess: false })).totalDocs).toBe(0);
     expect((await payload.findVersions({ collection: "posts", where: { parent: { equals: temporary.id } }, overrideAccess: false, user: asUser(staff) })).totalDocs).toBeGreaterThan(0);
+  });
+});
+
+describe("private recruitment submissions and durable email", () => {
+  let job: Job;
+  const editor = () => ({ overrideAccess: false, user: asUser(staff) });
+  const approver = () => ({ overrideAccess: false, user: asUser(admin) });
+  function form(key = randomUUID(), email = "candidate@pazelgreen.test", jobID = job.id) {
+    const value = new FormData();
+    for (const [name, data] of Object.entries({ key, job: String(jobID), fullName: "Test candidate", email, phone: "", portfolio: "", message: "", noticeVersion: "test-v1", consent: "yes", website: "" })) value.set(name, data);
+    value.set("cv", new File([new Uint8Array(cvPDF())], "cv.pdf", { type: "application/pdf" }));
+    return value;
+  }
+  it("requires approved recruitment settings and rejects public direct creation", async () => {
+    job = (await payload.find({ collection: "jobs", where: { slug: { equals: "field-systems-engineer" } }, draft: false, overrideAccess: true })).docs[0];
+    await expect(submitApplication(payload, form())).rejects.toThrow("not currently available");
+    await expect(payload.create({ collection: "applications", data: {} as never, ...editor() })).rejects.toThrow();
+    await payload.updateGlobal({ slug: "recruitment-settings", data: { enabled: true }, draft: true, ...editor() });
+    await payload.updateGlobal({ slug: "recruitment-settings", data: { reviewState: "in-review" }, draft: true, ...editor() });
+    await expect(payload.updateGlobal({ slug: "recruitment-settings", data: { _status: "published" }, ...approver() })).rejects.toThrow("privacy notice");
+    await payload.updateGlobal({ slug: "recruitment-settings", data: { privacyNotice: "Test recruitment notice. Fixture only, not company policy.", noticeVersion: "test-v1", retentionDays: 30 }, draft: true, ...editor() });
+    await payload.updateGlobal({ slug: "recruitment-settings", data: { reviewState: "in-review" }, draft: true, ...editor() });
+    await payload.updateGlobal({ slug: "recruitment-settings", data: { _status: "published" }, ...approver() });
+  });
+  it("serializes duplicate retries and allocates different per-advert IDs concurrently", async () => {
+    const token = randomUUID();
+    const retry = await Promise.all([submitApplication(payload, form(token)), submitApplication(payload, form(token))]);
+    expect(retry[0]).toEqual(retry[1]);
+    expect(retry[0].reference).toBe(`${job.reference}-001`);
+    const second = await Promise.all([submitApplication(payload, form()), submitApplication(payload, form())]);
+    expect(new Set(second.map(item => item.reference)).size).toBe(2);
+    expect(second.map(item => item.reference).sort()).toEqual([`${job.reference}-002`, `${job.reference}-003`]);
+    expect((await payload.find({ collection: "applications", where: { job: { equals: job.id } }, ...editor() })).docs.filter(item => item.duplicate)).toHaveLength(2);
+    await expect(submitApplication(payload, form(token, "changed@pazelgreen.test"))).rejects.toMatchObject({ status: 409 });
+    expect((await payload.count({ collection: "applications", overrideAccess: true })).totalDocs).toBe(3);
+  });
+  it("rejects expired, closed, unpublished, stale-notice and invalid-upload submissions without allocation", async () => {
+    for (const slug of ["closed-vacancy", "expired-vacancy", "private-vacancy", "withdrawn-vacancy"]) {
+      const advert = (await payload.find({ collection: "jobs", where: { slug: { equals: slug } }, draft: false, overrideAccess: true })).docs[0];
+      await expect(submitApplication(payload, form(randomUUID(), "blocked@pazelgreen.test", advert.id))).rejects.toThrow("no longer accepting");
+    }
+    const stale = form(); stale.set("noticeVersion", "old");
+    await expect(submitApplication(payload, stale)).rejects.toMatchObject({ status: 409 });
+    const invalid = form(); invalid.set("cv", new File(["fake"], "cv.pdf"));
+    await expect(submitApplication(payload, invalid)).rejects.toMatchObject({ status: 400 });
+    const consent = form(); consent.set("consent", "no");
+    await expect(submitApplication(payload, consent)).rejects.toMatchObject({ status: 400 });
+    expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(3);
+  });
+  it("keeps applications private while staff update hiring state with immutable history", async () => {
+    for (const collection of ["applications", "hiring-history"] as const) await expect(payload.find({ collection, overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.findGlobal({ slug: "recruitment-delivery", ...editor() })).rejects.toMatchObject({ status: 403 });
+    const application = (await payload.find({ collection: "applications", depth: 0, ...editor() })).docs[0];
+    const changed = await payload.update({ collection: "applications", id: application.id, data: { status: "shortlisted", notes: "Test private note", assignedTo: staff.id, reference: "forged" }, ...editor() });
+    expect(changed.status).toBe("shortlisted"); expect(changed.reference).toBe(application.reference);
+    expect((await payload.find({ collection: "hiring-history", where: { application: { equals: application.id } }, ...editor() })).totalDocs).toBe(2);
+    await expect(payload.db.pool.query("UPDATE applications SET reference='forged' WHERE id=$1", [application.id])).rejects.toThrow("immutable");
+    await expect(payload.delete({ collection: "private-files", id: Number(application.cv), ...approver() })).rejects.toThrow("retention");
+    await expect(payload.update({ collection: "hiring-history", id: 1, data: { notes: "erased" }, ...editor() })).rejects.toThrow();
+  });
+  it("preserves saved applications through SMTP failure and retries only pending delivery", async () => {
+    await payload.updateGlobal({ slug: "recruitment-delivery", data: { recipients: [{ email: "recruitment@pazelgreen.test" }] }, ...approver() });
+    // Explicitly make fixtures due; host/container clocks can differ slightly.
+    await payload.db.pool.query("UPDATE applications SET next_delivery_at=NOW() - INTERVAL '1 minute'");
+    const send = vi.spyOn(payload, "sendEmail").mockRejectedValue(new Error("simulated SMTP failure"));
+    try {
+      expect(await deliverApplications(payload)).toBe(3);
+      const failed = (await payload.find({ collection: "applications", overrideAccess: true })).docs;
+      expect(failed.every(item => item.candidateDelivery === "failed" && item.staffDelivery === "failed")).toBe(true);
+      expect(await deliverApplications(payload)).toBe(0);
+      await payload.db.pool.query("UPDATE applications SET next_delivery_at=NOW()");
+      send.mockResolvedValue({});
+      await Promise.all([deliverApplications(payload), deliverApplications(payload)]);
+      expect((await payload.find({ collection: "applications", overrideAccess: true })).docs.every(item => item.candidateDelivery === "sent" && item.staffDelivery === "sent")).toBe(true);
+      const calls = send.mock.calls.length;
+      expect(await deliverApplications(payload)).toBe(0);
+      expect(send.mock.calls).toHaveLength(calls);
+      expect((await payload.count({ collection: "applications", overrideAccess: true })).totalDocs).toBe(3);
+    } finally { send.mockRestore(); }
+  });
+  it("limits intentional repeat applications and preserves overflow padding", async () => {
+    await payload.db.pool.query("UPDATE applicant_counters SET value=999 WHERE job_id=$1", [job.id]);
+    expect((await submitApplication(payload, form())).reference).toBe(`${job.reference}-1000`);
+    await submitApplication(payload, form());
+    await expect(submitApplication(payload, form())).rejects.toMatchObject({ status: 429 });
+    expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(1001);
   });
 });

@@ -25,6 +25,7 @@
     "cms:migrate": "payload migrate",
     "cms:migration:create": "payload migrate:create",
     "cms:bootstrap": "tsx scripts/bootstrap-admin.ts",
+    "cms:deliver": "tsx scripts/deliver-applications.ts",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "test:http": "tsx tests/http/cms-smoke.ts",

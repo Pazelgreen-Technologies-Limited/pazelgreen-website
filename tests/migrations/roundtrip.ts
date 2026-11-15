@@ -42,8 +42,10 @@ async function verifyScratchDatabase() {
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
     assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types WHERE _status = 'published'")).rows[0].count, 3);
     await runLatestMigration(payload, "down");
-    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, null);
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.applications') AS relation")).rows[0].relation, null);
     await runLatestMigration(payload, "up");
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.applications') AS relation")).rows[0].relation, "applications");
+    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.applicant_counters') AS relation")).rows[0].relation, "applicant_counters");
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
     assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types")).rows[0].count, 3);
     console.info("Migration round trip passed: fresh schema, latest migration down, latest migration reapplied.");

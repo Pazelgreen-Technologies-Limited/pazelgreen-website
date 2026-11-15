@@ -79,6 +79,8 @@ export interface Config {
     'position-codes': PositionCode;
     jobs: Job;
     'annual-advert-counters': AnnualAdvertCounter;
+    applications: Application;
+    'hiring-history': HiringHistory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +100,8 @@ export interface Config {
     'position-codes': PositionCodesSelect<false> | PositionCodesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     'annual-advert-counters': AnnualAdvertCountersSelect<false> | AnnualAdvertCountersSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
+    'hiring-history': HiringHistorySelect<false> | HiringHistorySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -110,10 +114,14 @@ export interface Config {
   globals: {
     'company-settings': CompanySetting;
     'page-seo': PageSeo;
+    'recruitment-settings': RecruitmentSetting;
+    'recruitment-delivery': RecruitmentDelivery;
   };
   globalsSelect: {
     'company-settings': CompanySettingsSelect<false> | CompanySettingsSelect<true>;
     'page-seo': PageSeoSelect<false> | PageSeoSelect<true>;
+    'recruitment-settings': RecruitmentSettingsSelect<false> | RecruitmentSettingsSelect<true>;
+    'recruitment-delivery': RecruitmentDeliverySelect<false> | RecruitmentDeliverySelect<true>;
   };
   locale: null;
   widgets: {
@@ -502,6 +510,52 @@ export interface AnnualAdvertCounter {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: number;
+  reference: string;
+  job: number | Job;
+  sequence: number;
+  submissionKey: string;
+  fingerprint: string;
+  fullName: string;
+  email: string;
+  phone?: string | null;
+  portfolio?: string | null;
+  message?: string | null;
+  cv: number | PrivateFile;
+  noticeVersion: string;
+  noticeSnapshot: string;
+  consentedAt: string;
+  retentionReviewAt: string;
+  duplicate?: boolean | null;
+  candidateDelivery?: ('pending' | 'sent' | 'failed') | null;
+  staffDelivery?: ('pending' | 'sent' | 'failed') | null;
+  deliveryAttempts?: number | null;
+  nextDeliveryAt: string;
+  status: 'new' | 'in-review' | 'shortlisted' | 'interview' | 'offer' | 'hired' | 'rejected' | 'withdrawn';
+  assignedTo?: (number | null) | User;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hiring-history".
+ */
+export interface HiringHistory {
+  id: number;
+  application: number | Application;
+  actor: string;
+  status: string;
+  notes?: string | null;
+  assignee?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -571,6 +625,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'annual-advert-counters';
         value: number | AnnualAdvertCounter;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: number | Application;
+      } | null)
+    | ({
+        relationTo: 'hiring-history';
+        value: number | HiringHistory;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -888,6 +950,50 @@ export interface AnnualAdvertCountersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  reference?: T;
+  job?: T;
+  sequence?: T;
+  submissionKey?: T;
+  fingerprint?: T;
+  fullName?: T;
+  email?: T;
+  phone?: T;
+  portfolio?: T;
+  message?: T;
+  cv?: T;
+  noticeVersion?: T;
+  noticeSnapshot?: T;
+  consentedAt?: T;
+  retentionReviewAt?: T;
+  duplicate?: T;
+  candidateDelivery?: T;
+  staffDelivery?: T;
+  deliveryAttempts?: T;
+  nextDeliveryAt?: T;
+  status?: T;
+  assignedTo?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hiring-history_select".
+ */
+export interface HiringHistorySelect<T extends boolean = true> {
+  application?: T;
+  actor?: T;
+  status?: T;
+  notes?: T;
+  assignee?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1035,6 +1141,54 @@ export interface PageSeo {
   createdAt?: string | null;
 }
 /**
+ * Applications stay disabled until approved notice, version and retention duration are published. Obtain company/legal approval before enabling.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recruitment-settings".
+ */
+export interface RecruitmentSetting {
+  id: number;
+  enabled?: boolean | null;
+  privacyNotice?: string | null;
+  noticeVersion?: string | null;
+  /**
+   * Company-approved duration; no default. Retention review dates are calculated on receipt. Deletion requires an authorized operational review.
+   */
+  retentionDays?: number | null;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Private recipients. Run pnpm cms:deliver on a scheduler every minute. SMTP delivery is at least once.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recruitment-delivery".
+ */
+export interface RecruitmentDelivery {
+  id: number;
+  recipients?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "company-settings_select".
  */
@@ -1139,6 +1293,44 @@ export interface PageSeoSelect<T extends boolean = true> {
   reviewedAt?: T;
   publishedAt?: T;
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recruitment-settings_select".
+ */
+export interface RecruitmentSettingsSelect<T extends boolean = true> {
+  enabled?: T;
+  privacyNotice?: T;
+  noticeVersion?: T;
+  retentionDays?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recruitment-delivery_select".
+ */
+export interface RecruitmentDeliverySelect<T extends boolean = true> {
+  recipients?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

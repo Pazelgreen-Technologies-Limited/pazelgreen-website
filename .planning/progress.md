@@ -1,7 +1,7 @@
 # CMS implementation progress
 
-Last updated: 2026-11-14.
-Current phase: T01–T06 complete and verified; next planned implementation is T07.
+Last updated: 2026-11-15.
+Current phase: T01–T07 complete; user authorized T08–T10 next with incremental commits and documentation.
 
 ## Start here
 
@@ -84,13 +84,10 @@ Current phase: T01–T06 complete and verified; next planned implementation is T
 
 ## Next concrete action
 
-T07: implement private applications/CVs, atomic per-advert applicant sequences,
-idempotent durable submission, public application forms and success references,
-private hiring statuses/notes/history, acknowledgements and retry-safe staff
-notifications. Recheck published/open/unexpired eligibility on the server at
-submission, preserve the permanent advert reference and snapshot rules, and keep
-candidate personal data out of logs. Recruitment recipients and approved
-privacy/retention copy remain launch inputs; do not invent company policy.
+T08 backend-only FAQs is next, followed by T09 announcements and T10 legal pages.
+The user authorized T07–T10 with commits/docs as work progresses. Recruitment
+recipients, scheduler deployment and approved privacy/retention copy remain launch
+inputs; do not invent company policy. T11/T12 remain later work.
 Startup now ensures a first administrator exists from server environment secrets;
 existing administrators are preserved. Use supported
 Node (24.22.2 is pinned); this machine's system Node remains 22.13.0. A portable
@@ -555,3 +552,49 @@ Verification so far:
   Bash workflow. Restored only Next's automatic AGENTS.md edits after verification.
 - No application code or credentials changed. T01–T06 remain complete; next CMS
   task is T07 as described in Next concrete action above.
+
+### 2026-11-15 - T07 implementation and verification underway
+
+- Added private Applications/Hiring History, reviewed Recruitment Settings and
+  admin-only private delivery recipients. Notice/version/retention approval gates
+  forms; no company policy, recipients or real candidates were seeded.
+- Added same-origin bounded multipart submission, byte-validated private PDF/DOCX
+  uploads, per-advert atomic counters, transaction-scoped retry keys, immutable
+  applicant identity, duplicate flags and shared database abuse buckets. Public
+  role eligibility is rechecked under the publication lock. Success returns only
+  the reference; candidate information is excluded from application logs.
+- Added route-local accessible application form, durable email queue/delivery CLI,
+  exponential retries and private status/notes/assignment history. SMTP is at least
+  once across crashes; production scheduler/recipients remain setup requirements.
+- Migration 20261115_085557 adds schema/counters/identity trigger. Generated types,
+  recruitment operator guide, integration/unit/browser/HTTP checks are included.
+- Initial regression checks: existing 46 integration tests passed. Corrected an
+  invalid PDF fixture (Payload performs deeper parsing), a populated-CV test ID,
+  and due-time test setup for slight host/container clock differences. Production
+  build and TypeScript passed. Final integration/migration/browser checks pending;
+  T07 is not marked complete yet. T08 FAQ module prepared but not registered.
+- Next: finish T07 verification, document results and commit; then T08–T10 in order.
+
+### 2026-11-15 - T07 verified and complete
+
+- Final integration: 52 passed; unit: 58 passed; lint and TypeScript passed.
+  Fresh-schema/latest-down/latest-up migration verification passed in a new
+  scratch database with cleanup. Production build passed after the origin fix.
+- Real Chrome desktop/mobile: all 20 checks passed, including deliberately lost
+  response recovery returning the same application reference, anonymous private
+  record denial and cross-origin rejection. Reviewed mobile success screenshot;
+  reference wraps without horizontal overflow. Existing blog/careers checks pass.
+  Next emitted one stream-close message during navigation; assertions passed.
+- HTTP smoke suite passed production public/admin/access/preview/CV checks.
+  Browser testing caught request.url using an internal Next host: now compare
+  Origin with configured SERVER_URL. Slight host/container clock skew required
+  explicitly due queue fixtures; operational retries already run on a scheduler.
+- Final small refinements permit omitted optional API fields and PDF 2.0 headers;
+  unit tests passed afterward. The next stage reruns the integration regression.
+- Updated README, setup, handbook, careers guide, recruitment runbook and API
+  contract (also corrected pre-existing malformed preview YAML). No real candidate
+  records, policies or notifications were created. Tests use local disposable DB
+  and Mailpit; development migration will be applied after the T07–T10 batch.
+- SMTP delivery is explicitly at least once; a production scheduler, ingress abuse
+  controls, approved policy/retention procedure and recipients remain T12 inputs.
+  T07 complete. T08 FAQ module is prepared but not yet registered/committed.

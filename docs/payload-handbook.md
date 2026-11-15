@@ -117,7 +117,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | Public Home, About, Solutions, Join Us and Contact pages with shared company settings and SEO | Verified production contacts, hours and social URLs: T12 |
 | `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
 | Image media library; reviewed jobs, dictionaries, permanent advert references and careers pages | Approved real vacancies and full code list: T12 |
-| Restricted PDF/DOCX storage infrastructure | Candidate applications, full CV workflow and recruitment emails: T07 |
+| Private applications/CVs, permanent applicant IDs, hiring history and queued recruitment emails | Approved recruitment notice/retention, recipients and production scheduler: T12 |
 | Audit events, protected media JSON preview and SQL migrations | Backend-only FAQs: T08; announcements: T09; legal pages: T10 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
@@ -842,11 +842,12 @@ blocks such as access rules, hooks and versions. Our specific roles, invitations
 last-admin protection and approval requirements are implemented in this repository.
 
 **Can the public submit CVs now?** Not through a completed application feature.
-Private storage exists, but public applications, candidate validation, notifications
-and retention handling are planned in T07.
+Private applications, candidate validation, notifications and retention review dates
+are implemented in T07. Read [recruitment operations](recruitment.md) before enabling
+the form and scheduling delivery. Company-approved policy remains a launch input.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T07: applications, private CVs and hiring workflow. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T08: backend-only FAQs. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
 
 ## Editing company settings and page SEO
@@ -863,4 +864,4 @@ Public pages and metadata read only the last approved publication.
 Use the [blog editor guide](blog-editing.md) for article fields, published media,
 authenticated previews, editorial approval, SEO, filtering/pagination and browser
 verification. Normal public article URLs always use approved data, including when
-an editor is signed in. Job/application work remains a separate later task.
+an editor is signed in. See the careers and recruitment guides for job applications.

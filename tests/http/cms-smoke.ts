@@ -36,7 +36,7 @@ try {
   for (const route of ["/", "/about", "/solutions", "/join-us", "/contact", "/admin/login", "/admin/accept-invitation", "/admin/create-first-user"]) {
     assert.equal((await api(route)).status, 200, route);
   }
-  for (const route of ["/api/users", "/api/private-files", "/api/preview/media/1"]) assert.equal((await api(route)).status, 403, route);
+  for (const route of ["/api/users", "/api/private-files", "/api/applications", "/api/hiring-history", "/api/preview/media/1"]) assert.equal((await api(route)).status, 403, route);
   assert.equal((await api("/api/users/first-register", undefined, { email: "http-blocked@pazelgreen.test", name: "Blocked", password: "test-only-password-123", role: "admin" })).status, 403);
   assert.equal((await api("/api/invitations/accept", undefined, {})).status, 400);
 

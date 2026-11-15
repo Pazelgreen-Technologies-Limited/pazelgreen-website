@@ -19,6 +19,7 @@ and what changes between local development and production.
 | [Setup command reference](docs/cms-setup.md) | Commands for local setup, first-admin creation, tests and releases |
 | [Blog editor guide](docs/blog-editing.md) | Writing, previewing, reviewing and publishing blog articles |
 | [Careers editor guide](docs/careers-editing.md) | Code dictionaries, job approval, permanent advert references and public states |
+| [Recruitment operations](docs/recruitment.md) | Private applications/CVs, hiring history, privacy settings and email retries |
 | [Custom CMS API contract](docs/cms-api.yaml) | Invitation activation and authenticated draft-preview endpoints |
 | [Implementation plan](.planning/task.md) | Agreed CMS scope, task order and acceptance criteria |
 | [Progress record](.planning/progress.md) | Completed work, verification evidence and the next task |
@@ -35,12 +36,13 @@ admin, with staff drafts and admin approval. Footer/Contact share published deta
 The Blog group (T05) now provides posts/categories, authenticated draft previews,
 public articles and a filtered/paginated blog listing. Careers (T06) provides code
 dictionaries, reviewed jobs, permanent annual advert references, public careers
-pages and dynamic Join Us openings. Applications, FAQs, announcements and legal
-pages remain planned.
+pages and dynamic Join Us openings. Recruitment (T07) adds private applications,
+CVs, applicant references, hiring workflow and queued emails. FAQs, announcements
+and legal pages remain planned.
 Most other public marketing content is hardcoded.
 Contact-form delivery and newsletter integration are outside this CMS scope.
 See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T07: applications, private CVs and hiring workflow**.
+The next planned task is **T08: backend-only FAQs**.
 
 ## Run locally
 
@@ -120,6 +122,7 @@ pushing Git commits does not share or back them up.
 | `pnpm dev` | Start local services, migrate, ensure an admin and run the development app |
 | `pnpm db:up` / `pnpm db:stop` | Start/stop local services without deleting data |
 | `pnpm cms:migrate` | Apply committed migrations to the selected database |
+| `pnpm cms:deliver` | Deliver due recruitment acknowledgements/notifications; schedule every minute |
 | `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated Payload types/admin imports |
 | `pnpm cms:migration:create <name>` | Generate a schema migration for review |
 | `pnpm lint` / `pnpm typecheck` | Check code style and TypeScript |

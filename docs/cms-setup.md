@@ -206,8 +206,9 @@ No actual vacancies or example department/position codes are seeded.
 
 ## Current limits and implementation status
 
-T01–T06 provide the CMS foundation, company settings, SEO, blog and careers.
-Applications/private CV workflow and recruitment emails are next in T07. The current
-media preview is authenticated JSON; private PDF/DOCX storage is not a complete
-application system. See [current functionality](payload-handbook.md#what-is-available-today),
+T01–T07 provide the CMS foundation, company settings, SEO, blog, careers and
+private recruitment. Read [recruitment operations](recruitment.md) before enabling
+applications: approve notice/retention settings, configure private recipients and
+schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setup.
+See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).

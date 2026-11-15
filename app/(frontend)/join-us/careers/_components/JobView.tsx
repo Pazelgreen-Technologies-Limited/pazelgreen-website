@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Job } from "@/payload-types";
 import { jobIsOpen } from "@/cms/career-rules";
+import { ApplicationSection } from "./ApplicationSection";
 
 export function JobView({ job, preview = false }: { job: Job; preview?: boolean }) {
   const open = jobIsOpen(job);
@@ -29,7 +30,7 @@ export function JobView({ job, preview = false }: { job: Job; preview?: boolean 
       </section>)}
       <section aria-label="Applications" className="mt-12 rounded-xl border border-green-950/15 p-6">
         <h2 className="text-xl font-bold text-green-950">{open ? "Interested in this role?" : "Applications are closed"}</h2>
-        <p className="mt-3 leading-relaxed text-gray-600">{open ? "Online applications will be available here soon. Please check back for the application form." : "This advert is no longer accepting applications. Explore our current openings for other opportunities."}</p>
+        {open ? preview ? <p className="mt-3 text-gray-600">Applications are disabled in draft previews.</p> : <ApplicationSection job={job.id} /> : <p className="mt-3 leading-relaxed text-gray-600">This advert is no longer accepting applications. Explore our current openings for other opportunities.</p>}
         {!open && <Link href="/join-us/careers" className="mt-4 inline-block font-bold text-green-800 underline underline-offset-4">Explore open positions</Link>}
       </section>
     </article>
