@@ -61,6 +61,7 @@ beforeAll(async () => {
   // Only this verified disposable local test database is reset; migrations remain.
   await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v, employment_types, _employment_types_v, departments, _departments_v, position_codes, _position_codes_v, jobs, _jobs_v, annual_advert_counters RESTART IDENTITY CASCADE`);
   await payload.db.drizzle.execute(sql`TRUNCATE applications, hiring_history, applicant_counters, recruitment_rate_limits, recruitment_settings, _recruitment_settings_v, recruitment_delivery, recruitment_delivery_recipients RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE faqs, _faqs_v RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -666,6 +667,33 @@ describe("blog publication and public relationships", () => {
     await payload.update({ collection: "posts", id: temporary.id, data: { _status: "draft" }, overrideAccess: false, user: asUser(admin) });
     expect((await payload.find({ collection: "posts", where: { slug: { equals: "withdrawn-story" } }, overrideAccess: false })).totalDocs).toBe(0);
     expect((await payload.findVersions({ collection: "posts", where: { parent: { equals: temporary.id } }, overrideAccess: false, user: asUser(staff) })).totalDocs).toBeGreaterThan(0);
+  });
+});
+
+describe("backend-only FAQs", () => {
+  it("keeps approved answers and versions private and enforces staff review", async () => {
+    const editor = { overrideAccess: false, user: asUser(staff) };
+    const approver = { overrideAccess: false, user: asUser(admin) };
+    const faq = await payload.create({ collection: "faqs", draft: true, data: { question: "Private test question?", answer: blogBody("Approved internal answer"), group: "Internal", sortOrder: 2 }, ...editor });
+    await payload.update({ collection: "faqs", id: faq.id, data: { reviewState: "in-review" }, ...editor });
+    await expect(payload.update({ collection: "faqs", id: faq.id, data: { _status: "published" }, ...editor })).rejects.toThrow("administrators");
+    await payload.update({ collection: "faqs", id: faq.id, data: { _status: "published" }, ...approver });
+    await expect(payload.find({ collection: "faqs", overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+    await expect(payload.findByID({ collection: "faqs", id: faq.id, overrideAccess: false })).rejects.toThrow();
+    await expect(payload.findVersions({ collection: "faqs", overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+    await payload.update({ collection: "faqs", id: faq.id, data: { answer: blogBody("Private replacement") }, ...editor });
+    const live = await payload.findByID({ collection: "faqs", id: faq.id, draft: false, ...editor });
+    expect(JSON.stringify(live.answer)).toContain("Approved internal answer");
+    const draft = await payload.findByID({ collection: "faqs", id: faq.id, draft: true, ...editor });
+    expect(draft.reviewState).toBe("draft");
+    expect(JSON.stringify(draft.answer)).toContain("Private replacement");
+    await expect(payload.delete({ collection: "faqs", id: faq.id, ...editor })).rejects.toThrow();
+  });
+  it("rejects unsupported answer content at approval", async () => {
+    const faq = await payload.create({ collection: "faqs", draft: true, data: { question: "Malformed answer?", answer: blogBody("Safe draft") }, overrideAccess: false, user: asUser(staff) });
+    await payload.update({ collection: "faqs", id: faq.id, data: { answer: blogBody("Upload not allowed", 1) }, overrideAccess: false, user: asUser(staff) });
+    await payload.update({ collection: "faqs", id: faq.id, data: { reviewState: "in-review" }, overrideAccess: false, user: asUser(staff) });
+    await expect(payload.update({ collection: "faqs", id: faq.id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow("cannot contain uploads");
   });
 });
 

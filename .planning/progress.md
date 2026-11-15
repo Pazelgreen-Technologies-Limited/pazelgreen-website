@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-15.
-Current phase: T01–T07 complete; user authorized T08–T10 next with incremental commits and documentation.
+Current phase: T01–T08 complete; T09–T10 authorized next with incremental commits and documentation.
 
 ## Start here
 
@@ -84,7 +84,7 @@ Current phase: T01–T07 complete; user authorized T08–T10 next with increment
 
 ## Next concrete action
 
-T08 backend-only FAQs is next, followed by T09 announcements and T10 legal pages.
+T09 announcements is next, followed by T10 legal pages.
 The user authorized T07–T10 with commits/docs as work progresses. Recruitment
 recipients, scheduler deployment and approved privacy/retention copy remain launch
 inputs; do not invent company policy. T11/T12 remain later work.
@@ -598,3 +598,21 @@ Verification so far:
 - SMTP delivery is explicitly at least once; a production scheduler, ingress abuse
   controls, approved policy/retention procedure and recipients remain T12 inputs.
   T07 complete. T08 FAQ module is prepared but not yet registered/committed.
+
+### 2026-11-15 - T08 FAQ verification
+
+- Registered cms/faqs.ts: restricted rich-text answers, optional grouping/order,
+  shared staff-draft/admin-approval, and staff-only reads even when published.
+  No public page, preview, search or sitemap integration was added.
+- Generated migration 20261115_092113_faqs and types; admin import map unchanged.
+  Guarded rollback FK removal after CASCADE. Normalized generated SQL whitespace,
+  including the preceding recruitment migration; no SQL behavior changed there.
+- Integration: 54 passed, including anonymous list/detail/history denial, staff
+  publication/deletion denial, preserved approved answer during edits and rejected
+  embedded uploads. Recruitment regression passed. Lint/TypeScript and latest
+  migration fresh/down/up passed. Build/real HTTP denial checks in progress.
+- Added docs/faqs-editing.md and updated README/handbook. T09 announcement model
+  and pure selection helper are prepared separately, not registered yet.
+- Final production build and HTTP smoke checks passed, including anonymous FAQ
+  list/document/version requests returning 403. T08 is complete; no real FAQ
+  content was seeded. Next: register/implement T09 announcements and navigation.

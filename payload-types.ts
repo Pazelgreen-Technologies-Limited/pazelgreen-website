@@ -81,6 +81,7 @@ export interface Config {
     'annual-advert-counters': AnnualAdvertCounter;
     applications: Application;
     'hiring-history': HiringHistory;
+    faqs: Faq;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -102,6 +103,7 @@ export interface Config {
     'annual-advert-counters': AnnualAdvertCountersSelect<false> | AnnualAdvertCountersSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'hiring-history': HiringHistorySelect<false> | HiringHistorySelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -555,6 +557,48 @@ export interface HiringHistory {
   createdAt: string;
 }
 /**
+ * Backend only. Approval does not make FAQs available to anonymous visitors.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  group?: string | null;
+  sortOrder: number;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -633,6 +677,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'hiring-history';
         value: number | HiringHistory;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -991,6 +1039,28 @@ export interface HiringHistorySelect<T extends boolean = true> {
   assignee?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  group?: T;
+  sortOrder?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

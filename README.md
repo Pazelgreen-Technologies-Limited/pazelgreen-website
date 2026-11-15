@@ -20,6 +20,7 @@ and what changes between local development and production.
 | [Blog editor guide](docs/blog-editing.md) | Writing, previewing, reviewing and publishing blog articles |
 | [Careers editor guide](docs/careers-editing.md) | Code dictionaries, job approval, permanent advert references and public states |
 | [Recruitment operations](docs/recruitment.md) | Private applications/CVs, hiring history, privacy settings and email retries |
+| [FAQ editor guide](docs/faqs-editing.md) | Internal questions/answers and private editorial approval |
 | [Custom CMS API contract](docs/cms-api.yaml) | Invitation activation and authenticated draft-preview endpoints |
 | [Implementation plan](.planning/task.md) | Agreed CMS scope, task order and acceptance criteria |
 | [Progress record](.planning/progress.md) | Completed work, verification evidence and the next task |
@@ -37,12 +38,12 @@ The Blog group (T05) now provides posts/categories, authenticated draft previews
 public articles and a filtered/paginated blog listing. Careers (T06) provides code
 dictionaries, reviewed jobs, permanent annual advert references, public careers
 pages and dynamic Join Us openings. Recruitment (T07) adds private applications,
-CVs, applicant references, hiring workflow and queued emails. FAQs, announcements
-and legal pages remain planned.
+CVs, applicant references, hiring workflow and queued emails. FAQs (T08) provide
+private reviewed questions/answers. Announcements and legal pages remain planned.
 Most other public marketing content is hardcoded.
 Contact-form delivery and newsletter integration are outside this CMS scope.
 See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T08: backend-only FAQs**.
+The next planned task is **T09: scheduled announcements**.
 
 ## Run locally
 

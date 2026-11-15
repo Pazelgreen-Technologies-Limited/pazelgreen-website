@@ -17,6 +17,7 @@ import { PageSEO } from "./cms/page-seo";
 import { Categories, Posts } from "./cms/blog";
 import { AnnualAdvertCounters, Departments, EmploymentTypes, Jobs, PositionCodes } from "./cms/careers";
 import { Applications, HiringHistory, RecruitmentDelivery, RecruitmentSettings } from "./cms/recruitment";
+import { FAQs } from "./cms/faqs";
 
 nextEnv.loadEnvConfig(process.cwd());
 const env = getServerEnvironment();
@@ -32,7 +33,7 @@ export default buildConfig({
   email: nodemailerAdapter({ defaultFromAddress: env.emailFrom, defaultFromName: "Pazelgreen", transportOptions: env.smtp, skipVerify: true }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Invitations, AuditEvents, createMedia(env.publicStorage), createPrivateFiles(env.privateStorage), Categories, Posts, EmploymentTypes, Departments, PositionCodes, Jobs, AnnualAdvertCounters, Applications, HiringHistory],
+  collections: [Users, Invitations, AuditEvents, createMedia(env.publicStorage), createPrivateFiles(env.privateStorage), Categories, Posts, EmploymentTypes, Departments, PositionCodes, Jobs, AnnualAdvertCounters, Applications, HiringHistory, FAQs],
   globals: [CompanySettings, PageSEO, RecruitmentSettings, RecruitmentDelivery],
   endpoints: [previewEndpoint],
   typescript: { outputFile: path.resolve(root, "payload-types.ts") },

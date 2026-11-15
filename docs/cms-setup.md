@@ -206,8 +206,8 @@ No actual vacancies or example department/position codes are seeded.
 
 ## Current limits and implementation status
 
-T01–T07 provide the CMS foundation, company settings, SEO, blog, careers and
-private recruitment. Read [recruitment operations](recruitment.md) before enabling
+T01–T08 provide the CMS foundation, company settings, SEO, blog, careers,
+private recruitment and [backend-only FAQs](faqs-editing.md). Read [recruitment operations](recruitment.md) before enabling
 applications: approve notice/retention settings, configure private recipients and
 schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setup.
 See [current functionality](payload-handbook.md#what-is-available-today),

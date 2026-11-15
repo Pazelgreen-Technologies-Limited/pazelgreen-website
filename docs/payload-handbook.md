@@ -118,7 +118,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | `/admin`, admin/staff users and invitations; blog/category editing and public blog pages | Initial approved blog content: T12 |
 | Image media library; reviewed jobs, dictionaries, permanent advert references and careers pages | Approved real vacancies and full code list: T12 |
 | Private applications/CVs, permanent applicant IDs, hiring history and queued recruitment emails | Approved recruitment notice/retention, recipients and production scheduler: T12 |
-| Audit events, protected media JSON preview and SQL migrations | Backend-only FAQs: T08; announcements: T09; legal pages: T10 |
+| Audit events, protected media JSON preview, SQL migrations and private reviewed FAQs | Announcements: T09; legal pages: T10 |
 | Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
 
 Most marketing content is still written directly in frontend components. Do not
@@ -847,7 +847,7 @@ are implemented in T07. Read [recruitment operations](recruitment.md) before ena
 the form and scheduling delivery. Company-approved policy remains a launch input.
 
 **What should we do next?** Finish your local account setup and inspect the admin.
-The next planned implementation is T08: backend-only FAQs. Production hosting, real content, approved policies and the remaining
+The next planned implementation is T09: scheduled announcements. Production hosting, real content, approved policies and the remaining
 feature/launch tasks must be completed before treating this foundation as launch-ready.
 
 ## Editing company settings and page SEO

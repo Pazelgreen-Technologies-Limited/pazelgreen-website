@@ -1,6 +1,6 @@
 # Payload CMS implementation plan
 
-Status: T01–T07 implemented and verified. T08–T12 remain pending.
+Status: T01–T08 implemented and verified. T09–T12 remain pending.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
@@ -193,7 +193,7 @@ and sitemaps. Search engines may choose different displayed text.
   open/closed/expiry behavior, and dynamic Join Us openings.
 - [x] T07: Implement applications, per-advert IDs, private CVs, hiring workflow,
   acknowledgements, staff notifications, and retry-safe delivery.
-- [ ] T08: Implement backend-only FAQs and test denied anonymous reads.
+- [x] T08: Implement backend-only FAQs and test denied anonymous reads.
 - [ ] T09: Implement announcements, scheduling, selection, and responsive navbar.
 - [ ] T10: Implement legal pages and SEO for newly built routes.
 - [ ] T11: Complete cache invalidation, sitemap behavior, integration/E2E tests,
