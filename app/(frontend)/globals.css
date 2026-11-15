@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #121212;
+  --announcement-height: 0px;
 }
 
 @theme {
@@ -31,6 +32,7 @@
 } */
 
 body {
+  padding-top: var(--announcement-height);
   background: var(--background);
   color: var(--foreground);
 }

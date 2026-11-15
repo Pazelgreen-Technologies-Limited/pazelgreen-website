@@ -5,6 +5,8 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { AnnouncementBar } from "./AnnouncementBar";
+import type { AnnouncementSnapshot } from "@/cms/announcement-rules";
 
 // Nav links shown on desktop
 const navLinks = [
@@ -16,15 +18,16 @@ const navLinks = [
   { label: "Contact Us", href: "/contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ announcement }: { announcement: AnnouncementSnapshot }) {
   const pathname = usePathname();
   // Controls whether the mobile menu is open or closed
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 w-full mt-4 z-50 text-white font-sans">
-      <div className="bg-navbar px-6 py-4 backdrop-blur-md">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between">
+    <header className="fixed top-0 w-full z-50 text-white font-sans">
+      <AnnouncementBar initial={announcement} />
+      <div className="mt-4 bg-navbar px-6 py-4 backdrop-blur-md">
+        <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between">
           {/* Logo + brand name */}
           <Link href="/" className="flex items-center gap-2">
             <Image
@@ -39,7 +42,7 @@ export default function Navbar() {
           </Link>
 
           {/* Center nav links */}
-          <ul className="hidden items-center gap-8 md:flex">
+          <ul className="hidden items-center gap-8 xl:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
 
@@ -68,7 +71,8 @@ export default function Navbar() {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation menu"
             aria-expanded={isOpen}
-            className="relative flex h-8 w-8 flex-col items-end justify-center gap-0 md:hidden"
+            aria-controls="mobile-navigation"
+            className="relative flex h-8 w-8 flex-col items-end justify-center gap-0 xl:hidden"
           >
             {/*
             Each bar is a plain span.
@@ -108,8 +112,9 @@ export default function Navbar() {
 
         {/* ========================================= */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden
-          ${isOpen ? "max-h-96 border-t border-gray-800" : "max-h-0"}`}
+          id="mobile-navigation"
+          hidden={!isOpen}
+          className="max-h-[calc(100dvh-140px-var(--announcement-height))] overflow-y-auto border-t border-gray-800 xl:hidden"
         >
           <ul className="flex flex-col px-6 py-4 gap-4">
             {navLinks.map((link, index) => {

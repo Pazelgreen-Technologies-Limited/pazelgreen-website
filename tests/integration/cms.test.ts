@@ -15,6 +15,7 @@ import { submitApplication } from "../../cms/submit-application";
 import { deliverApplications } from "../../cms/deliver-applications";
 import { randomUUID } from "node:crypto";
 import { cvPDF } from "../fixtures/cv";
+import { announcementSnapshot } from "../../cms/announcement-rules";
 
 let payload: Payload;
 let admin: User;
@@ -62,6 +63,7 @@ beforeAll(async () => {
   await payload.db.drizzle.execute(sql`TRUNCATE users, invitations, audit_events, media, private_files, company_settings, _company_settings_v, page_seo, _page_seo_v, posts, _posts_v, categories, _categories_v, employment_types, _employment_types_v, departments, _departments_v, position_codes, _position_codes_v, jobs, _jobs_v, annual_advert_counters RESTART IDENTITY CASCADE`);
   await payload.db.drizzle.execute(sql`TRUNCATE applications, hiring_history, applicant_counters, recruitment_rate_limits, recruitment_settings, _recruitment_settings_v, recruitment_delivery, recruitment_delivery_recipients RESTART IDENTITY CASCADE`);
   await payload.db.drizzle.execute(sql`TRUNCATE faqs, _faqs_v RESTART IDENTITY CASCADE`);
+  await payload.db.drizzle.execute(sql`TRUNCATE announcements, _announcements_v RESTART IDENTITY CASCADE`);
   await expect(ensureFirstAdmin(payload, {})).rejects.toThrow("No administrator exists");
   await expect(ensureFirstAdmin(payload, { BOOTSTRAP_ADMIN_EMAIL: "first@pazelgreen.test", BOOTSTRAP_ADMIN_PASSWORD: "short" })).rejects.toThrow("12–256");
   const conflict = await createAccount("conflict@pazelgreen.test", "staff");
@@ -667,6 +669,38 @@ describe("blog publication and public relationships", () => {
     await payload.update({ collection: "posts", id: temporary.id, data: { _status: "draft" }, overrideAccess: false, user: asUser(admin) });
     expect((await payload.find({ collection: "posts", where: { slug: { equals: "withdrawn-story" } }, overrideAccess: false })).totalDocs).toBe(0);
     expect((await payload.findVersions({ collection: "posts", where: { parent: { equals: temporary.id } }, overrideAccess: false, user: asUser(staff) })).totalDocs).toBeGreaterThan(0);
+  });
+});
+
+describe("reviewed announcements", () => {
+  it("selects only eligible published notices and preserves live content during edits", async () => {
+    const editor = { overrideAccess: false, user: asUser(staff) };
+    const approver = { overrideAccess: false, user: asUser(admin) };
+    async function create(message: string, extra = {}) {
+      const notice = await payload.create({ collection: "announcements", draft: true, data: { title: `Internal ${message}`, message, priority: 1, enabled: true, ...extra }, ...editor });
+      await payload.update({ collection: "announcements", id: notice.id, data: { reviewState: "in-review" }, ...editor });
+      await expect(payload.update({ collection: "announcements", id: notice.id, data: { _status: "published" }, ...editor })).rejects.toThrow("administrators");
+      return payload.update({ collection: "announcements", id: notice.id, data: { _status: "published" }, ...approver });
+    }
+    const main = await create("Approved company notice", { linkLabel: "View opportunities", linkURL: "/join-us/careers" });
+    await create("Disabled notice", { enabled: false, priority: 100 });
+    await create("Future notice", { startsAt: "2099-01-01T00:00:00Z", priority: 100 });
+    await create("Expired notice", { endsAt: "2020-01-01T00:00:00Z", priority: 100 });
+    await payload.create({ collection: "announcements", draft: true, data: { title: "Private notice", message: "Private draft announcement", priority: 999 }, ...editor });
+    await payload.update({ collection: "announcements", id: main.id, data: { message: "Private announcement replacement", enabled: false }, ...editor });
+    const records = await payload.find({ collection: "announcements", draft: false, where: { _status: { equals: "published" } }, overrideAccess: true, pagination: false, limit: 0 });
+    expect(announcementSnapshot(records.docs).notice?.message).toBe("Approved company notice");
+    const publicRead = await payload.findByID({ collection: "announcements", id: main.id, overrideAccess: false });
+    expect(publicRead.title).toBeUndefined(); expect(publicRead.reviewNote).toBeUndefined();
+    await expect(payload.findVersions({ collection: "announcements", overrideAccess: false })).rejects.toMatchObject({ status: 403 });
+  });
+  it("validates schedules and paired safe links", async () => {
+    const editor = { overrideAccess: false, user: asUser(staff) };
+    await expect(payload.create({ collection: "announcements", draft: true, data: { title: "Bad dates", message: "Invalid", startsAt: "2030-01-02", endsAt: "2030-01-01" }, ...editor })).rejects.toThrow("after start");
+    await expect(payload.create({ collection: "announcements", draft: true, data: { title: "Bad link", message: "Invalid", linkURL: "javascript:alert(1)" }, ...editor })).rejects.toThrow();
+    const notice = await payload.create({ collection: "announcements", draft: true, data: { title: "Missing label", message: "Invalid", linkURL: "/about" }, ...editor });
+    await payload.update({ collection: "announcements", id: notice.id, data: { reviewState: "in-review" }, ...editor });
+    await expect(payload.update({ collection: "announcements", id: notice.id, data: { _status: "published" }, overrideAccess: false, user: asUser(admin) })).rejects.toThrow("both a link label");
   });
 });
 

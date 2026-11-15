@@ -82,6 +82,7 @@ export interface Config {
     applications: Application;
     'hiring-history': HiringHistory;
     faqs: Faq;
+    announcements: Announcement;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -104,6 +105,7 @@ export interface Config {
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'hiring-history': HiringHistorySelect<false> | HiringHistorySelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -599,6 +601,38 @@ export interface Faq {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * One notice appears above navigation. Dates store exact UTC instants; the admin date picker displays your browser timezone. Use explicit offsets through the API. Highest priority wins, then newest publication, then lowest ID.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements".
+ */
+export interface Announcement {
+  id: number;
+  title: string;
+  message: string;
+  linkLabel?: string | null;
+  linkURL?: string | null;
+  enabled: boolean;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  priority: number;
+  reviewState: 'draft' | 'in-review' | 'changes-requested' | 'published';
+  /**
+   * Required when returning a draft for changes.
+   */
+  reviewNote?: string | null;
+  createdBy?: string | null;
+  modifiedBy?: string | null;
+  reviewedBy?: string | null;
+  publishedBy?: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -681,6 +715,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'announcements';
+        value: number | Announcement;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1049,6 +1087,32 @@ export interface FaqsSelect<T extends boolean = true> {
   answer?: T;
   group?: T;
   sortOrder?: T;
+  reviewState?: T;
+  reviewNote?: T;
+  createdBy?: T;
+  modifiedBy?: T;
+  reviewedBy?: T;
+  publishedBy?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements_select".
+ */
+export interface AnnouncementsSelect<T extends boolean = true> {
+  title?: T;
+  message?: T;
+  linkLabel?: T;
+  linkURL?: T;
+  enabled?: T;
+  startsAt?: T;
+  endsAt?: T;
+  priority?: T;
   reviewState?: T;
   reviewNote?: T;
   createdBy?: T;

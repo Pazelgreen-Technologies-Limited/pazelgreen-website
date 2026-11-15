@@ -1,7 +1,7 @@
 # CMS implementation progress
 
 Last updated: 2026-11-15.
-Current phase: T01–T08 complete; T09–T10 authorized next with incremental commits and documentation.
+Current phase: T01–T09 complete; T10 authorized next with a separate commit and documentation.
 
 ## Start here
 
@@ -84,7 +84,7 @@ Current phase: T01–T08 complete; T09–T10 authorized next with incremental co
 
 ## Next concrete action
 
-T09 announcements is next, followed by T10 legal pages.
+T10 legal pages and route SEO is next.
 The user authorized T07–T10 with commits/docs as work progresses. Recruitment
 recipients, scheduler deployment and approved privacy/retention copy remain launch
 inputs; do not invent company policy. T11/T12 remain later work.
@@ -616,3 +616,33 @@ Verification so far:
 - Final production build and HTTP smoke checks passed, including anonymous FAQ
   list/document/version requests returning 403. T08 is complete; no real FAQ
   content was seeded. Next: register/implement T09 announcements and navigation.
+
+### 2026-11-15 - T09 implementation and verification
+
+- Added reviewed Announcements, deterministic priority/publication/ID selection,
+  request-time sanitized active endpoint and public-layout integration. Internal
+  titles/audit details are excluded. Safe links and end-after-start are enforced;
+  a client admin field shows the actual browser scheduling timezone.
+- Open pages refresh at schedule boundaries/once per minute/on tab visibility;
+  expired notices hide locally on network failure. The fixed header measures bar
+  height and gives public content matching space. Narrow viewports use a labelled,
+  scrollable mobile menu with hidden inactive links and close-on-navigation.
+- Migration 20261115_092830_announcements, types/import map, operator guide,
+  README/handbook/API updates and unit/integration/browser/HTTP tests added.
+- Unit: 62 passed; integration: 56 passed; migration fresh/down/up, lint and
+  TypeScript passed. Draft validation skips field validators in Payload, so an
+  explicit safe-link hook also rejects unsafe draft URLs. Build passed; final
+  build/browser layout verification in progress after a landmark-label refinement.
+- Real schedule passage already passed on both desktop/mobile. Corrected a test
+  selector that ambiguously matched the main menu, category filters and pagination.
+  T09 is not marked complete until the final browser/HTTP checks finish.
+- Final production build passed. All 24 desktop/mobile Chrome checks passed,
+  including actual activation/expiry on an open page, bar/navigation/heading
+  geometry, no horizontal overflow and mobile menu accessibility/navigation.
+  Reviewed the mobile navigation screenshot. Final HTTP checks passed active
+  notice serialization/no-store and public HTML draft exclusion, plus regressions.
+- An earlier HTTP attempt overlapped a rebuild and could not find a finished
+  build; the final run was sequential after build completion and passed. Browser
+  assertions initially used an ambiguous navigation selector; corrected by naming
+  the main navigation landmark. No production deployment or real notices created.
+- T09 complete. T10 model/guide are prepared separately but unregistered.

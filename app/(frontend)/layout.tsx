@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Nunito, Inter } from "next/font/google";
+import { getAnnouncementSnapshot } from "@/lib/announcements";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   description: "Innovating the future of sustainable agriculture",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -32,7 +33,7 @@ export default function RootLayout({
     <html lang="en" className={`${nunito.variable} ${inter.variable}`}>
       <body>
         {/* Shared across all pages */}
-        <Navbar />
+        <Navbar announcement={await getAnnouncementSnapshot()} />
         {children}
         <Footer />
       </body>

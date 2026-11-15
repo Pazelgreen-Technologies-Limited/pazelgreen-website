@@ -21,6 +21,7 @@ and what changes between local development and production.
 | [Careers editor guide](docs/careers-editing.md) | Code dictionaries, job approval, permanent advert references and public states |
 | [Recruitment operations](docs/recruitment.md) | Private applications/CVs, hiring history, privacy settings and email retries |
 | [FAQ editor guide](docs/faqs-editing.md) | Internal questions/answers and private editorial approval |
+| [Announcement guide](docs/announcements-editing.md) | Reviewed notices, scheduling, priority and navigation behavior |
 | [Custom CMS API contract](docs/cms-api.yaml) | Invitation activation and authenticated draft-preview endpoints |
 | [Implementation plan](.planning/task.md) | Agreed CMS scope, task order and acceptance criteria |
 | [Progress record](.planning/progress.md) | Completed work, verification evidence and the next task |
@@ -39,11 +40,12 @@ public articles and a filtered/paginated blog listing. Careers (T06) provides co
 dictionaries, reviewed jobs, permanent annual advert references, public careers
 pages and dynamic Join Us openings. Recruitment (T07) adds private applications,
 CVs, applicant references, hiring workflow and queued emails. FAQs (T08) provide
-private reviewed questions/answers. Announcements and legal pages remain planned.
+private reviewed questions/answers. Announcements (T09) provide reviewed, scheduled
+notices above navigation. Legal pages remain planned.
 Most other public marketing content is hardcoded.
 Contact-form delivery and newsletter integration are outside this CMS scope.
 See the implementation plan before assuming a feature is available in `/admin`.
-The next planned task is **T09: scheduled announcements**.
+The next planned task is **T10: legal pages and route SEO**.
 
 ## Run locally
 
