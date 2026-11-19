@@ -1,19 +1,28 @@
 # Payload CMS implementation plan
 
-Status: T01–T11 implemented and verified. T12 deferred by the user on 2026-11-19.
+Status: T01–T11 and T13 implemented and verified. T12 deferred by the user on 2026-11-19.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 The delivery checklist below is authoritative for completion. Read
 [the current handoff](progress.md) for verified commits, results and concrete
 T11 verification and T12 next steps. Superseded dated milestones are in [history.md](history.md).
-The latest user request defers T12 and authorizes committing the completed T11 work.
+T11 was committed as `a87b7ca`. The user authorized section-level staff permissions
+on 2026-11-19 (T13 below); T12 remains deferred. Supabase is selected for production
+PostgreSQL; current filesystem uploads remain in use and R2 is deferred.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
 Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
 separate TEST_DATABASE_URL. Production must never fall back to Docker. Local
-email is captured by Mailpit. Production database/SMTP providers remain pending;
-the foundation uses persistent mounted public/private filesystem directories,
+email is captured by Mailpit. Supabase is selected for production PostgreSQL;
+SMTP and deployment remain pending. The foundation uses persistent mounted public/private filesystem directories,
 with a storage adapter required before choosing ephemeral hosting.
+
+Netlify handoff (2026-11-19): environment variables and a push alone are insufficient.
+Durable public/private upload storage is the first deployment blocker, followed by
+controlled Supabase migrations, explicit admin bootstrap, production SMTP,
+hosted build verification and recruitment delivery scheduling if enabled.
+See [Netlify deployment](../docs/netlify-deployment.md). This records prerequisites;
+T12 and R2 remain deferred and no production deployment is claimed.
 
 ## Objective and scope
 
@@ -43,7 +52,8 @@ Announcements and Home SEO remain included despite exclusion of homepage editing
 - Two roles: admin and staff. Staff are editors; do not add a third editor role.
 - Admins create/invite, deactivate, and delete staff, assign roles, approve and
   publish public content, and archive records.
-- Staff create/edit drafts and submit for review. They cannot publish/approve,
+- Staff with section Modify access create/edit any draft in that section and submit
+  for review. Section View is read-only. They cannot publish/approve,
   manage users, change roles, or permanently delete records.
 - Allow restricted self-service profile/password updates without role changes.
 - Use secure invitations/activation, not emailed passwords. Bootstrap the first
@@ -57,11 +67,27 @@ Announcements and Home SEO remain included despite exclusion of homepage editing
 - Apply review to all public CMS content: settings, categories, media exposure,
   jobs, announcements, legal pages, and SEO. Admin approval also controls public
   job open/closed changes; automatic expiry applies independently.
-- Staff/admins can immediately update private hiring statuses, notes, and
+- Staff with Recruitment Modify access and admins can immediately update private hiring statuses, notes, and
   assignments; these operational actions need no editorial approval.
 - Record creator/modifier/reviewer/publisher, timestamps, and hiring history.
 - Enforce permissions server-side on every exposed API and upload/download
   endpoint. Public reads must never reveal drafts or private application records.
+
+## Section permissions (T13, agreed 2026-11-19)
+
+- Admins assign No access, View, or Modify per staff member and section.
+- Sections: Blog (all posts/categories), Media, Careers (jobs/recruitment settings),
+  Recruitment (applications/CVs/history), Company details, Page SEO, FAQs,
+  Announcements, Legal pages. Media permissions are independent of Blog.
+- Modify permits creating/editing all records in that section, regardless of author.
+- Admin publishing, deletion, dictionaries, recipients and user management remain
+  restricted as before. View includes drafts/previews/history; public approved content
+  stays publicly readable without granting CMS access.
+- Staff cannot grant themselves permissions. New/existing staff default to No access;
+  admins explicitly assign access. Invitations carry permissions to activated users.
+- Enforce in Payload UI, APIs, draft previews, versions and private CV downloads.
+  Permission changes revoke sessions; no third role or record ownership constraints.
+- [x] T13: Implement schema/migration, section access, invitations, tests and docs.
 
 ## Company details
 
@@ -97,7 +123,7 @@ TE=Technology & Engineering and DH=Department Head are user-provided examples.
 The complete code list is pending; do not treat example seeds as a final list.
 Admins manage dictionaries, with normalized unique codes and delimiter validation.
 Retire referenced entries instead of deleting them. Position codes may be used
-by jobs across departments. Staff can select codes, not change the dictionaries.
+by jobs across departments. Staff with Careers Modify can select codes, not change the dictionaries.
 
 Advert reference:
 - Example: D-TE | DH-2027-01. REF-ID: is a display label, not stored ID content.
@@ -144,12 +170,12 @@ must not lose a saved application: retry delivery and show failures to staff.
 Delivery is operated by scheduling `pnpm cms:deliver` every minute; startup does
 not run the worker. SMTP is at least once across crashes, while application/ID
 creation remains idempotent. The existing private user directory limits staff's
-assignment picker to themselves; admins can select active colleagues.
+assignment picker to themselves; admins can select active colleagues with Recruitment access.
 Statuses: New, In Review, Shortlisted, Interview, Offer, Hired, Rejected, Withdrawn.
 Support filters by job/status, optional staff assignment, and private notes/history.
 Do not automatically send rejection/offer/status emails in this phase.
 
-Restrict applicant details/CVs/notes to staff/admins. No public enumeration or
+Restrict applicant details/CVs/notes to admins and staff with Recruitment access. No public enumeration or
 public media URLs. Validate upload content/type/size server-side, implement abuse
 controls, and keep applicant personal data out of logs.
 Document a configurable retention policy. Company approval of duration and

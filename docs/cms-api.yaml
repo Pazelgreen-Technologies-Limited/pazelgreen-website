@@ -33,14 +33,14 @@ paths:
         '503': { description: Database transaction unavailable }
   /preview/{collection}/{id}:
     get:
-      summary: Read latest draft JSON as authenticated active staff/admin
+      summary: Read latest draft JSON with active account and section View or Modify access
       security: [{ payloadCookie: [] }]
       parameters:
         - { name: collection, in: path, required: true, schema: { type: string, enum: [media, posts, categories, jobs, legal-pages] } }
         - { name: id, in: path, required: true, schema: { type: string, pattern: '^[1-9][0-9]*$' } }
       responses:
         '200': { description: Draft JSON with private no-store caching and noindex }
-        '403': { description: Active CMS authentication required }
+        '403': { description: Active CMS authentication and section access required }
         '404': { description: Collection/document not found }
   /recruitment/apply:
     post:

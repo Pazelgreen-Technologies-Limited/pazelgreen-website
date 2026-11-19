@@ -141,6 +141,10 @@ see [environment configuration](payload-handbook.md#understanding-environment-va
 
 ## Production release reference
 
+For Netlify, follow the [deployment handoff](netlify-deployment.md). Environment
+variables alone are insufficient: durable upload storage, controlled migrations,
+explicit first-admin setup and a verified hosted build remain required.
+
 Use [CMS operations](cms-operations.md) for migration recovery, coordinated backups,
 isolated restore rehearsal, scheduler monitoring, indexing and editor onboarding.
 Collect company/deployment decisions in the [T12 checklist](../.planning/t12-checklist.md).
@@ -161,7 +165,8 @@ For recruitment, provision the `pnpm cms:deliver` scheduler with the same enviro
 and configure private recipients. The application process does not run the queue
 worker automatically. See [recruitment operations](recruitment.md).
 
-Use `pnpm start` as the deployment command so its admin check runs; invoking `next start` directly bypasses that check.
+For a persistent Node server, use `pnpm start` so its admin check runs; invoking `next start` directly bypasses that check.
+Netlify's standard Next.js deployment needs the explicit bootstrap procedure linked above.
 `pnpm start` does not start Docker or apply migrations. Build success does not
 verify SMTP delivery or storage persistence. Verify the deployed HTTPS site,
 login/invitation delivery, approved content and denied private access, and rehearse
@@ -226,7 +231,21 @@ schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setu
 See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).
 T11 adds request-time indexing/sitemap behavior, browser refreshes, navigation
-corrections and the [operations handoff](cms-operations.md). T12 covers company
-inputs and deployment/launch acceptance through the [answer checklist](../.planning/t12-checklist.md).
+corrections and the [operations handoff](cms-operations.md); it is complete.
+T12 is deferred at the user's request. When resumed, it covers company inputs and
+deployment/launch acceptance through the [answer checklist](../.planning/t12-checklist.md).
 Earlier status notes live in
 [archived history](../.planning/history.md), not the current handoff.
+
+## Staff permission migration
+
+The section-permissions migration defaults existing staff and pending invitations
+to No access. After applying migrations, sign in as an admin and explicitly assign
+sections on each user; admins retain full access. Permission changes revoke staff
+sessions. See [staff permissions](staff-permissions.md). Current uploads remain on
+the filesystem; Supabase is selected for PostgreSQL and R2 remains deferred.
+
+Next also supports `pnpm exec next build --webpack` for a production build using
+webpack. T13 acceptance uses this mode because the default Turbopack build hit a
+Google-font resolver failure on this machine. The default package script remains
+unchanged; a webpack pass does not establish that the Turbopack issue is resolved.

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
-import { adminOnly, staffOnly } from "./access";
+import { adminOnly } from "./access";
+import { sectionAccess } from "./permissions";
 import { withReview } from "./workflow";
 import { validateCV } from "./recruitment-rules";
 
@@ -19,7 +20,7 @@ export const createMedia = (directory: string): CollectionConfig => withReview({
 export const createPrivateFiles = (directory: string): CollectionConfig => ({
   slug: "private-files",
   admin: { useAsTitle: "filename", group: "Administration" },
-  access: { read: staffOnly, create: adminOnly, update: adminOnly, delete: adminOnly },
+  access: { read: sectionAccess("recruitment"), create: adminOnly, update: adminOnly, delete: adminOnly },
   upload: { staticDir: directory, mimeTypes: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
     modifyResponseHeaders: ({ headers }) => { headers.set("Cache-Control", "private, no-store"); headers.set("X-Robots-Tag", "noindex, nofollow"); headers.set("X-Content-Type-Options", "nosniff"); headers.set("Content-Disposition", "attachment"); return headers; } },
   fields: [],

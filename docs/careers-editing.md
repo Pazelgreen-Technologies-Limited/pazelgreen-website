@@ -6,7 +6,7 @@ Each role has its own URL at `/join-us/careers/<slug>`.
 
 ## Set up reference dictionaries
 
-Administrators manage dictionaries; staff can read and select entries. All three
+Administrators manage dictionaries; staff with Careers access can read entries; Careers Modify permits selecting them on adverts. All three
 dictionaries use the review workflow: save a draft, save `in-review`, then publish
 as an admin without changing the submitted content.
 
@@ -83,6 +83,13 @@ pages query approved data at request time without a rebuild or another publish.
 Closed/expired detail URLs remain informative and show applications are closed.
 Unpublished and draft-only detail URLs return a not-found page.
 
+Displayed deadlines also refresh already open careers listings, Join Us openings
+and job details. Inactive browser tabs may throttle timers; returning to the tab
+refreshes approved data. The server independently rejects late applications.
+Closed/expired approved details emit `noindex, follow` and leave the request-time
+sitemap. Reopening restores index eligibility without changing the advert ID.
+See [publishing, caching and indexing](cms-operations.md#publishing-caching-and-indexing).
+
 Listing metadata lives under **Website → Page SEO → Careers listing**. A job's
 metadata lives on that job. Both require admin approval.
 
@@ -129,3 +136,7 @@ migration; that can remove its tables/data. This is a disposable-database check,
 not a production recovery strategy.
 Production recovery must preserve counters alongside adverts and application data
 in consistent database backups. Never reset counters to fill a sequence gap.
+
+Staff need the corresponding section permission to view drafts or modify records.
+Admins assign access per section; publication remains admin-only. See
+[staff permissions](staff-permissions.md).

@@ -62,6 +62,10 @@ advertise their successful delivery as a launch acceptance result.
 
 ## Release and migration recovery
 
+The process below assumes a persistent Node server. For Netlify's Next.js
+deployment, use the [Netlify handoff](netlify-deployment.md) for explicit bootstrap,
+durable storage and separate worker requirements; `pnpm start` is not its startup path.
+
 1. Identify the release commit, migration list and selected environment. Check
    the database identity through the provider console and a database session;
    `APP_ENV` validation does not establish that a supplied production URL is correct.
@@ -214,3 +218,7 @@ and recruitment retention regularly using the [recruitment runbook](recruitment.
    revoke/deactivate departing users, review due retention and request restoration.
    Confirm each editor can complete their assigned workflow before granting launch
    readiness. Admins manage users and dictionaries; staff cannot publish or escalate.
+
+For onboarding, admins must assign section access on the invitation or user record.
+New and existing staff default to No access after the permissions migration.
+See [staff permissions](staff-permissions.md) for View/Modify rules and rollout.

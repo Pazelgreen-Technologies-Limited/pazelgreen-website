@@ -1,6 +1,6 @@
 import { APIError } from "payload";
 import { lexicalEditor, ParagraphFeature, HeadingFeature, BoldFeature, ItalicFeature, OrderedListFeature, UnorderedListFeature, LinkFeature, FixedToolbarFeature } from "@payloadcms/richtext-lexical";
-import { staffOnly } from "./access";
+import { sectionAccess } from "./permissions";
 import { withReview } from "./workflow";
 import { inspectArticleBody } from "./blog-content";
 
@@ -8,7 +8,7 @@ import { inspectArticleBody } from "./blog-content";
 export const FAQs = withReview({
   slug: "faqs", labels: { singular: "FAQ", plural: "FAQs" },
   admin: { useAsTitle: "question", group: "Content", defaultColumns: ["question", "group", "sortOrder", "reviewState"], description: "Backend only. Approval does not make FAQs available to anonymous visitors." },
-  access: { read: staffOnly },
+  access: { read: sectionAccess("faqs") },
   fields: [
     { name: "question", type: "text", required: true, maxLength: 500 },
     { name: "answer", type: "richText", required: true, editor: lexicalEditor({ features: [ParagraphFeature(), HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }), BoldFeature(), ItalicFeature(), OrderedListFeature(), UnorderedListFeature(), LinkFeature({ enabledCollections: [], disableAutoLinks: true }), FixedToolbarFeature()] }) },

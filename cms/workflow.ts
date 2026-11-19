@@ -1,6 +1,7 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest } from "payload";
 import { sql } from "@payloadcms/db-postgres";
-import { adminOnly, isAdmin, isStaff, publishedOrStaff, staffOnly } from "./access";
+import { adminOnly, isAdmin } from "./access";
+import { canAccessSection, contentSection, sectionAccess } from "./permissions";
 import { audit } from "./audit";
 import { transactionDatabase } from "./transactions";
 
@@ -61,17 +62,27 @@ export function applyReviewChange({ data, originalDoc, operation, req, upload = 
 
 /** Apply to every later public content collection. All drafts stay authenticated. */
 export function withReview(config: CollectionConfig): CollectionConfig {
+  const section = contentSection(config.slug);
   return {
     ...config,
+    admin: { ...config.admin, hidden: ({ user }) => !canAccessSection(user, section) },
     versions: { drafts: true, maxPerDoc: 0 },
-    access: { create: staffOnly, read: publishedOrStaff, update: staffOnly, delete: adminOnly, readVersions: staffOnly, ...config.access },
-    fields: [...config.fields, ...auditFields.map((field) => ({ ...field, access: { read: ({ req }: { req: PayloadRequest }) => isStaff(req.user) } }))],
+    access: {
+      create: sectionAccess(section, "modify"),
+      read: ({ req }) => canAccessSection(req.user, section) || { _status: { equals: "published" } },
+      update: sectionAccess(section, "modify"), delete: adminOnly, readVersions: sectionAccess(section), ...config.access,
+    },
+    fields: [...config.fields, ...auditFields.map((field) => ({ ...field, access: { read: ({ req }: { req: PayloadRequest }) => canAccessSection(req.user, section) } }))],
     hooks: {
       ...config.hooks,
       beforeOperation: [async ({ args, operation, req }) => {
         if (operation === "restoreVersion") throw new APIError("Copy historical content into a new draft and submit it for review.", 403);
+        // Populated relationships still apply their own read filter. Let them fall
+        // back to approved content when a reader cannot view the related drafts.
+        const populatedRead = "currentDepth" in args && Boolean(args.currentDepth);
+        if (operation === "read" && "draft" in args && args.draft && !populatedRead && req.user && !canAccessSection(req.user, section)) throw new APIError("You do not have access to drafts in this section.", 403);
         if (operation === "create" || operation === "update") {
-          if (!isStaff(req.user)) throw new APIError("An active CMS account is required.", 403);
+          if (!canAccessSection(req.user, section, "modify")) throw new APIError("Modify permission is required for this section.", 403);
           if (operation === "update") {
             if (!("id" in args) || !args.id) throw new APIError("Review content one document at a time.", 400);
             const transaction = await req.transactionID;

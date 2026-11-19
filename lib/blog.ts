@@ -7,6 +7,7 @@ import config from "@payload-config";
 import type { Post } from "@/payload-types";
 import { blogSlugPattern, inspectArticleBody, relationID } from "@/cms/blog-content";
 import { blogPageSize } from "./blog-query";
+import { canAccessSection } from "@/cms/permissions";
 
 export const getBlogCategories = cache(async () => {
   await connection();
@@ -46,5 +47,5 @@ export async function getArticleMedia(post: Post, user?: PayloadRequest["user"])
   const payload = await getPayload({ config });
   // Resolve IDs through Payload; never render arbitrary URLs embedded in node data.
   return (await payload.find({ collection: "media", where: { id: { in: [...ids] } }, limit: ids.size,
-    draft: Boolean(user), overrideAccess: false, user, depth: 0 })).docs;
+    draft: canAccessSection(user ?? null, "media"), overrideAccess: false, user, depth: 0 })).docs;
 }

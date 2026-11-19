@@ -11,6 +11,7 @@ import { hashInvitation, Invitations } from "../../cms/invitations";
 import { previewEndpoint } from "../../cms/preview";
 import { ensureFirstAdmin } from "../../cms/bootstrap";
 import { isAdmin } from "../../cms/access";
+import { allSectionPermissions, canAccessSection } from "../../cms/permissions";
 import { submitApplication } from "../../cms/submit-application";
 import { deliverApplications } from "../../cms/deliver-applications";
 import { randomUUID } from "node:crypto";
@@ -26,7 +27,7 @@ const image = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQ
 const asUser = (user: User) => ({ ...user, collection: "users" as const });
 
 async function createAccount(email: string, role: "admin" | "staff") {
-  return payload.create({ collection: "users", data: { email, name: role, role, active: true, password }, overrideAccess: true, context: { acceptInvitation: true } });
+  return payload.create({ collection: "users", data: { email, name: role, role, active: true, password, permissions: allSectionPermissions }, overrideAccess: true, context: { acceptInvitation: true } });
 }
 
 async function request(user?: User): Promise<PayloadRequest> {
@@ -175,7 +176,7 @@ describe("invitations", () => {
     expect((await accept(weak)).status).toBe(400);
   });
   it("emails expiring single-use links and serializes simultaneous redemption", async () => {
-    const invitation = await payload.create({ collection: "invitations", data: { email: "invitee@pazelgreen.test", name: "Invitee", role: "staff" }, overrideAccess: false, user: asUser(admin) });
+    const invitation = await payload.create({ collection: "invitations", data: { email: "invitee@pazelgreen.test", name: "Invitee", role: "staff", permissions: { blog: "modify", media: "read" } }, overrideAccess: false, user: asUser(admin) });
     expect(invitation.tokenHash).toBeUndefined();
     const messages = await (await fetch("http://127.0.0.1:8025/api/v1/messages")).json();
     const message = messages.messages.find((item: { To: { Address: string }[] }) => item.To.some((to) => to.Address === "invitee@pazelgreen.test"));
@@ -189,6 +190,10 @@ describe("invitations", () => {
     const responses = await Promise.all([redeem(token), redeem(token)]);
     expect(responses.map((response) => response.status).sort()).toEqual([201, 400]);
     expect((await payload.count({ collection: "users", where: { email: { equals: "invitee@pazelgreen.test" } }, overrideAccess: true })).totalDocs).toBe(1);
+    const activated = (await payload.find({ collection: "users", where: { email: { equals: "invitee@pazelgreen.test" } }, overrideAccess: true })).docs[0];
+    expect(activated.permissions?.blog).toBe("modify");
+    expect(activated.permissions?.media).toBe("read");
+    expect(activated.permissions?.recruitment).toBe("none");
     expect((await redeem(token)).status).toBe(400);
     await expect(payload.login({ collection: "users", data: { email: "invitee@pazelgreen.test", password } })).resolves.toHaveProperty("token");
   });
@@ -843,7 +848,7 @@ describe("private recruitment submissions and durable email", () => {
       const failed = (await payload.find({ collection: "applications", overrideAccess: true })).docs;
       expect(failed.every(item => item.candidateDelivery === "failed" && item.staffDelivery === "failed")).toBe(true);
       expect(await deliverApplications(payload)).toBe(0);
-      await payload.db.pool.query("UPDATE applications SET next_delivery_at=NOW()");
+      await payload.db.pool.query("UPDATE applications SET next_delivery_at=NOW() - INTERVAL '1 minute'");
       send.mockResolvedValue({});
       await Promise.all([deliverApplications(payload), deliverApplications(payload)]);
       expect((await payload.find({ collection: "applications", overrideAccess: true })).docs.every(item => item.candidateDelivery === "sent" && item.staffDelivery === "sent")).toBe(true);
@@ -880,5 +885,93 @@ describe("private recruitment submissions and durable email", () => {
     expect(await deliverApplications(payload)).toBe(3);
     const saved = await payload.find({ collection: "applications", overrideAccess: true });
     expect(saved.docs.every(item => item.candidateDelivery === "sent" && item.staffDelivery === "sent")).toBe(true);
+  });
+});
+
+
+describe("section-level staff permissions", () => {
+  let editor: User;
+  let viewer: User;
+  let restricted: User;
+  let postID: number;
+  const options = (user: User) => ({ user: asUser(user), overrideAccess: false });
+
+  it("defaults to no access and allows an admin to assign section access", async () => {
+    restricted = await payload.create({ collection: "users", data: { email: "restricted@pazelgreen.test", name: "Restricted", role: "staff", active: true, password }, overrideAccess: true, context: { acceptInvitation: true } });
+    expect(restricted.permissions?.blog).toBe("none");
+    expect(canAccessSection(asUser(restricted), "blog")).toBe(false);
+    editor = await payload.create({ collection: "users", data: { email: "blog-editor@pazelgreen.test", name: "Blog editor", role: "staff", active: true, password }, overrideAccess: true, context: { acceptInvitation: true } });
+    editor = await payload.update({ collection: "users", id: editor.id, data: { permissions: { blog: "modify", media: "read" } }, ...options(admin) });
+    viewer = await payload.create({ collection: "users", data: { email: "blog-viewer@pazelgreen.test", name: "Blog viewer", role: "staff", active: true, password, permissions: { blog: "read" } }, overrideAccess: true, context: { acceptInvitation: true } });
+    expect(canAccessSection(asUser(editor), "blog", "modify")).toBe(true);
+    expect(canAccessSection(asUser(viewer), "blog", "modify")).toBe(false);
+  });
+
+  it("lets a blog editor modify another author's draft and submit but never publish", async () => {
+    const post = await payload.create({ collection: "posts", draft: true, data: { title: "Permission fixture", slug: "permission-fixture", excerpt: "Private permission fixture", authorName: "Other author", body: blogBody("Private permission body") }, ...options(admin) });
+    postID = post.id;
+    const edited = await payload.update({ collection: "posts", id: postID, draft: true, data: { title: "Edited by assigned blog editor" }, ...options(editor) });
+    expect(edited.title).toBe("Edited by assigned blog editor");
+    expect(edited.createdBy).toBe(String(admin.id));
+    await payload.update({ collection: "posts", id: postID, draft: true, data: { reviewState: "in-review" }, ...options(editor) });
+    await expect(payload.update({ collection: "posts", id: postID, data: { _status: "published" }, ...options(editor) })).rejects.toThrow();
+  });
+
+  it("allows viewing drafts/history but denies view-only writes and unassigned previews", async () => {
+    expect((await payload.findByID({ collection: "posts", id: postID, draft: true, ...options(viewer) })).title).toBe("Edited by assigned blog editor");
+    expect((await payload.findVersions({ collection: "posts", where: { parent: { equals: postID } }, ...options(viewer) })).totalDocs).toBeGreaterThan(0);
+    const illustrated = (await payload.find({ collection: "posts", where: { slug: { equals: "field-notes" } }, draft: true, depth: 1, ...options(viewer) })).docs[0];
+    expect(illustrated.title).toBe("Private revised field notes");
+    expect(typeof illustrated.coverImage).toBe("object");
+    if (illustrated.coverImage && typeof illustrated.coverImage === "object") {
+      expect(illustrated.coverImage._status).toBe("published");
+      expect(illustrated.coverImage.reviewState).toBeUndefined();
+    }
+    await expect(payload.update({ collection: "posts", id: postID, data: { title: "Forbidden edit" }, draft: true, ...options(viewer) })).rejects.toThrow();
+    await expect(payload.create({ collection: "categories", draft: true, data: { name: "Forbidden category" }, ...options(viewer) })).rejects.toThrow();
+    await expect(payload.findByID({ collection: "posts", id: postID, draft: true, ...options(restricted) })).rejects.toThrow();
+    await expect(payload.findVersions({ collection: "posts", ...options(restricted) })).rejects.toThrow();
+    const req = await request(restricted);
+    req.routeParams = { collection: "posts", id: String(postID) };
+    expect((await previewEndpoint.handler(req)).status).toBe(403);
+  });
+
+  it("blocks unrelated company, recruitment, CVs and FAQ access without affecting public reads", async () => {
+    await expect(payload.findGlobal({ slug: "company-settings", draft: true, ...options(editor) })).rejects.toThrow();
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { phone: "Forbidden" }, ...options(editor) })).rejects.toThrow();
+    await expect(payload.findGlobalVersions({ slug: "company-settings", ...options(editor) })).rejects.toThrow();
+    for (const collection of ["applications", "private-files", "hiring-history", "faqs"] as const) await expect(payload.find({ collection, ...options(editor) })).rejects.toThrow();
+    await expect(payload.find({ collection: "posts", overrideAccess: false })).resolves.toHaveProperty("docs");
+    expect((await payload.find({ collection: "posts", ...options(restricted) })).docs.some(post => post.id === postID)).toBe(false);
+    await expect(payload.find({ collection: "media", draft: true, ...options(editor) })).resolves.toHaveProperty("docs");
+    await expect(payload.create({ collection: "media", draft: true, data: { alt: "Forbidden upload" }, file: { name: "forbidden.png", mimetype: "image/png", size: image.length, data: image }, ...options(editor) })).rejects.toThrow();
+  });
+
+  it("supports view-only globals and recruitment without allowing edits", async () => {
+    const reader = await payload.update({ collection: "users", id: restricted.id, data: { permissions: { company: "read", recruitment: "read" } }, ...options(admin) });
+    await expect(payload.findGlobal({ slug: "company-settings", draft: true, ...options(reader) })).resolves.toHaveProperty("globalType");
+    await expect(payload.updateGlobal({ slug: "company-settings", data: { phone: "Forbidden" }, ...options(reader) })).rejects.toThrow();
+    const applications = await payload.find({ collection: "applications", ...options(reader) });
+    expect(applications.totalDocs).toBeGreaterThan(0);
+    await expect(payload.update({ collection: "applications", id: applications.docs[0].id, data: { notes: "Forbidden" }, ...options(reader) })).rejects.toThrow();
+    await expect(payload.find({ collection: "private-files", ...options(reader) })).resolves.toHaveProperty("docs");
+  });
+
+  it("prevents self-escalation and revokes old sessions when permissions change", async () => {
+    // Field access may strip the attempted write or hooks may reject it.
+    await payload.update({ collection: "users", id: editor.id, data: { permissions: allSectionPermissions }, ...options(editor) }).catch(() => undefined);
+    const unchanged = await payload.findByID({ collection: "users", id: editor.id, overrideAccess: true });
+    expect(unchanged.permissions?.recruitment).toBe("none");
+    expect(unchanged.permissions?.blog).toBe("modify");
+    await expect(payload.update({ collection: "users", id: editor.id, data: { permissions: allSectionPermissions }, user: asUser(editor), overrideAccess: true })).rejects.toThrow("Only administrators");
+    const login = await payload.login({ collection: "users", data: { email: editor.email, password } });
+    const headers = new Headers({ Authorization: `JWT ${login.token}` });
+    expect((await payload.auth({ headers })).user).not.toBeNull();
+    await payload.update({ collection: "users", id: editor.id, data: { permissions: { blog: "read" } }, ...options(admin) });
+    expect((await payload.auth({ headers })).user).toBeNull();
+    const updatedLogin = await payload.login({ collection: "users", data: { email: editor.email, password } });
+    expect(canAccessSection(updatedLogin.user ?? null, "blog", "modify")).toBe(false);
+    // Leave this fixture as a blog editor for HTTP/browser acceptance checks.
+    await payload.update({ collection: "users", id: editor.id, data: { permissions: { blog: "modify" } }, ...options(admin) });
   });
 });

@@ -164,6 +164,20 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
+  /**
+   * Modify includes viewing and editing every record in a section. Staff cannot publish, delete content or manage users. Admins always have full access. Blog editors need Media access to select library images; Modify Media also permits uploads.
+   */
+  permissions?: {
+    blog?: ('none' | 'read' | 'modify') | null;
+    media?: ('none' | 'read' | 'modify') | null;
+    careers?: ('none' | 'read' | 'modify') | null;
+    recruitment?: ('none' | 'read' | 'modify') | null;
+    company?: ('none' | 'read' | 'modify') | null;
+    seo?: ('none' | 'read' | 'modify') | null;
+    faqs?: ('none' | 'read' | 'modify') | null;
+    announcements?: ('none' | 'read' | 'modify') | null;
+    legal?: ('none' | 'read' | 'modify') | null;
+  };
   role: 'admin' | 'staff';
   active?: boolean | null;
   password?: string | null;
@@ -198,6 +212,20 @@ export interface Invitation {
   email: string;
   name: string;
   role: 'admin' | 'staff';
+  /**
+   * Modify includes viewing and editing every record in a section. Staff cannot publish, delete content or manage users. Admins always have full access. Blog editors need Media access to select library images; Modify Media also permits uploads.
+   */
+  permissions?: {
+    blog?: ('none' | 'read' | 'modify') | null;
+    media?: ('none' | 'read' | 'modify') | null;
+    careers?: ('none' | 'read' | 'modify') | null;
+    recruitment?: ('none' | 'read' | 'modify') | null;
+    company?: ('none' | 'read' | 'modify') | null;
+    seo?: ('none' | 'read' | 'modify') | null;
+    faqs?: ('none' | 'read' | 'modify') | null;
+    announcements?: ('none' | 'read' | 'modify') | null;
+    legal?: ('none' | 'read' | 'modify') | null;
+  };
   tokenHash?: string | null;
   expiresAt?: string | null;
   acceptedAt?: string | null;
@@ -826,6 +854,19 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  permissions?:
+    | T
+    | {
+        blog?: T;
+        media?: T;
+        careers?: T;
+        recruitment?: T;
+        company?: T;
+        seo?: T;
+        faqs?: T;
+        announcements?: T;
+        legal?: T;
+      };
   role?: T;
   active?: T;
   password?: T;
@@ -856,6 +897,19 @@ export interface InvitationsSelect<T extends boolean = true> {
   email?: T;
   name?: T;
   role?: T;
+  permissions?:
+    | T
+    | {
+        blog?: T;
+        media?: T;
+        careers?: T;
+        recruitment?: T;
+        company?: T;
+        seo?: T;
+        faqs?: T;
+        announcements?: T;
+        legal?: T;
+      };
   tokenHash?: T;
   expiresAt?: T;
   acceptedAt?: T;

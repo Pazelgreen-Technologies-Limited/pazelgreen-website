@@ -1,8 +1,9 @@
 # Recruitment operations
 
-Applications are private and have no applicant login. Staff and admins can filter
-Applications by job/status and update status or notes. Staff can select themselves
-in the assignment picker; admins can select any active colleague. The existing
+Applications are private and have no applicant login. Admins and staff with Recruitment View/Modify can filter Applications by job/status.
+Updating statuses or notes requires Recruitment Modify (or admin). Staff with
+Recruitment Modify can select themselves
+in the assignment picker; admins can select active colleagues with Recruitment access. The existing
 user directory remains private to administrators.
 Hiring History retains the actor ID and each operational change immediately;
 these private actions do not require editorial approval. No status-change emails
@@ -88,3 +89,7 @@ leave orphan bytes. Reconcile unreferenced random files against private_files
 after an appropriate grace period and verified backup; never delete active uploads.
 Old hashed abuse buckets can be pruned after 48 hours from recruitment_rate_limits.
 Do not put candidate data, CV contents or recipient lists in logs/planning files.
+
+Staff need the corresponding section permission to view drafts or modify records.
+Admins assign access per section; publication remains admin-only. See
+[staff permissions](staff-permissions.md).

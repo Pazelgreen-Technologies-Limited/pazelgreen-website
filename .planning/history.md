@@ -839,3 +839,64 @@ The user requested skipping T12 for now and committing the completed T11 work
 before further rearrangements. Updated task/progress/checklist status to preserve
 that decision. No application code changed in this commit-preparation step;
 the T11 test evidence above remains the prior verified result. T12 stays unchecked.
+
+### 2026-11-19 - Post-commit documentation audit
+
+The user requested checking all documentation before discussing a new change.
+Reviewed current guides and handoff against T11 commit a87b7ca. Corrected README's
+stale T11 next steps, recorded the actual completion commit in progress.md,
+aligned handbook/setup guidance with T12 deferral, and expanded blog/careers
+guidance for the delivered sitemap/browser/deadline behavior. Preserved historical
+test evidence and distinguished documentation review from application verification.
+No application code, deployment or T12 implementation was authorized or changed.
+
+Validation passed for all 17 repository Markdown files, 130 local link targets,
+142 documented command occurrences, balanced fences, five About image assets,
+CLAUDE.md's instruction reference, parsed four-route API YAML, task statuses and
+Git whitespace. Application regression suites were not rerun for these docs-only
+changes. Next action is discussion of the user's proposed application change.
+
+
+## 2026-11-19: T13 section permissions completed
+
+User authorised per-section staff View/Modify rights across all records, without
+per-author ownership. Implemented nine section controls on users/invitations,
+admin-only changes, session revocation, UI hiding and server/API protections.
+Existing staff/invitations default to No access. Supabase is selected, filesystem
+uploads stay in use, and R2/T12 remain deferred. The new migration was applied to
+verified local development/test databases; no production changes or commit/push.
+
+Final validation: lint/TypeScript passed, 73 unit tests, 67 integration tests,
+fresh/latest-down/latest-up migration round trip, webpack production build,
+production HTTP smoke/privacy/ACL checks, and all 42 desktop/mobile browser checks
+passed (2.9 minutes). Documentation links, four-route YAML and whitespace checked.
+
+Implementation corrections: generated migration type imports needed explicit
+`type` for Node's loader. Existing email retry fixtures using exact NOW() were
+made clearly overdue to avoid host/database transaction timing failures. The
+first Turbopack build reported Google-font query-resolution errors; a fresh-output
+retry stalled and its verified build process tree was stopped. Retained output
+initially entered TypeScript's source scan; it was moved into excluded
+node_modules/.cache. Webpack exposed @next/env CommonJS interop: named imports
+worked in webpack but failed native CLI loading; native createRequire supports
+both and was verified by CLI bootstrap/integration and the production build.
+
+Browser testing showed that collection access.admin is not navigation hiding;
+admin.hidden now gates visibility/routes. Browser API requests include Origin for
+cookie authentication. A Blog viewer without Media access initially hit a draft
+relationship-read guard; nested reads now apply their public filter, with an
+integration privacy assertion. The built-in denied admin route renders 404. A
+preview image-count assertion was corrected from the public article's two images
+to the saved replacement draft's single cover; its approved alt text and loaded
+bytes are checked. Final browser run passed every test. Stream-close messages
+occurred during rapid navigation without failing the assertions.
+
+## Netlify handoff and commit preparation: 2026-11-19
+
+The user requested documentation updates and a commit. Added a Netlify-specific
+deployment guide and synchronized setup, operations, handbook, README and current
+planning records. Recorded durable upload storage as the first blocker, production
+environment/build setup, controlled Supabase migrations, explicit first-admin
+bootstrap, separate recruitment scheduling and hosted acceptance requirements.
+T12/R2 remain deferred. No production services were changed or deployment claimed.
+Prior T13 test results remain dated evidence; this pass changes documentation only.

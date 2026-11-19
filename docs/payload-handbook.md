@@ -5,11 +5,14 @@ why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
 This describes the **T01–T11 implementation**, checked against this repository on
-**15 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
+**19 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
+The recorded application verification was run on 15 November; the documentation
+review does not imply those tests were rerun.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
 For current implementation status and the next task, read
-[the handoff](../.planning/progress.md). T12 and production launch approval remain pending.
+[the handoff](../.planning/progress.md). T12 is deferred at the user's request;
+production launch approval remains pending.
 
 If you are learning the system, read the concepts and local setup first. Editors
 of a hosted site can go to [Using the admin panel](#using-the-admin-panel).
@@ -139,7 +142,7 @@ track what has actually been delivered.
 | Person | Responsibilities |
 | --- | --- |
 | Developer | Changes code and schemas; maintains access rules, migrations and tests |
-| Staff member | Creates/edits drafts, submits them for review, and reads permitted private records |
+| Staff member | Views assigned sections; with Modify, creates/edits any draft in those sections and submits for review |
 | CMS administrator | Reviews and publishes content, unpublishes it, and manages invitations/users |
 | Deployment operator | Configures hosting, secrets, database, storage, email, releases and recovery |
 
@@ -150,6 +153,12 @@ Those permissions are managed separately.
 Editors who only use a hosted `/admin` need its URL and an invited account. They
 do not need to clone the repository or install Node/Docker. The local setup below
 is for teammates who want to run or develop the whole application on their machine.
+
+Admins now assign **No access**, **View** or **Modify** per staff member and section.
+Modify covers all records in the section, regardless of author. Set permissions on
+the user or invitation; changes revoke sessions. Existing staff default to No access
+after the migration. See [staff permissions](staff-permissions.md) for the complete
+matrix, Media dependencies and rollout instructions.
 
 Our two CMS roles are **admin** and **staff**. Staff can update their own profile,
 but cannot grant themselves admin status, manage other users, or publish content.
@@ -428,7 +437,8 @@ bulk updates are blocked by the current workflow.
 Media has authenticated JSON previews at `/api/preview/media/<id>`; posts,
 categories, jobs and legal pages also support that endpoint. The blog editor's Preview button opens a
 session-protected visual draft preview. See the [blog guide](blog-editing.md).
-A browser without a valid active staff/admin session cannot preview drafts.
+Draft previews require an active admin session or staff View/Modify access to the
+corresponding section.
 The job editor also has protected visual previews. See the [careers guide](careers-editing.md).
 Legal previews follow the same session/privacy rules; see the [legal guide](legal-editing.md).
 FAQs remain internal even when approved and have no public preview/page.
@@ -444,7 +454,7 @@ page already references it.
 The application form accepts byte-validated PDF/DOCX CVs and stores them in
 `private-files` with random filenames. Candidates submit through the protected
 application endpoint; they cannot browse records or download files. Active
-staff/admins can read/download CVs. Direct upload/metadata management is admin-only;
+admins and staff with Recruitment View/Modify can read/download CVs. Direct upload/metadata management is admin-only;
 CV bytes cannot be replaced and files attached to an application cannot be deleted
 through the normal file API. Keep private documents out of `media`, Next's
 `public/` folder, and public links. See [recruitment operations](recruitment.md)
@@ -899,10 +909,16 @@ enabled and published with approved notice/version/retention values. Read
 [recruitment operations](recruitment.md) before enabling it and scheduling delivery.
 Company-approved policy remains a launch input.
 
-**What should we do next?** Complete the [T12 answer checklist](../.planning/t12-checklist.md)
-for company content, approved policies, production services and launch acceptance.
-Read [the current handoff](../.planning/progress.md) for actual verification status
-and [CMS operations](cms-operations.md) for releases, recovery and editor onboarding.
+**What should we do next?** Prepare deployment using the
+[Netlify handoff](netlify-deployment.md): resolve durable upload storage first,
+then configure production services, migrations, admin setup and hosted checks.
+Environment variables and a push alone are insufficient. T11 is committed as `a87b7ca`; T13 section permissions
+are implemented and verified. Assign actual staff access using the
+[staff permission guide](staff-permissions.md). T12 and R2 remain deferred. When launch work
+resumes, use the [T12 answer checklist](../.planning/t12-checklist.md) for company
+content, approved policies, production services and launch acceptance. Read
+[the current handoff](../.planning/progress.md) for actual verification status and
+[CMS operations](cms-operations.md) for releases, recovery and editor onboarding.
 
 ## Editing company settings and page SEO
 

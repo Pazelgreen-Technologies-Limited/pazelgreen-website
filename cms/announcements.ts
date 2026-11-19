@@ -1,6 +1,6 @@
 import { APIError } from "payload";
 import { withReview } from "./workflow";
-import { isStaff } from "./access";
+import { canAccessSection } from "./permissions";
 
 export function safeAnnouncementURL(value: unknown) {
   if (typeof value !== "string" || /[\u0000-\u0020\\]/.test(value)) return false;
@@ -11,7 +11,7 @@ export function safeAnnouncementURL(value: unknown) {
 export const Announcements = withReview({
   slug: "announcements", admin: { useAsTitle: "title", group: "Website", defaultColumns: ["title", "enabled", "startsAt", "endsAt", "priority", "reviewState"], description: "One notice appears above navigation. Dates store exact UTC instants; the admin date picker displays your browser timezone. Use explicit offsets through the API. Highest priority wins, then newest publication, then lowest ID." },
   fields: [
-    { name: "title", label: "Internal title", type: "text", required: true, maxLength: 120, access: { read: ({ req }) => isStaff(req.user) } },
+    { name: "title", label: "Internal title", type: "text", required: true, maxLength: 120, access: { read: ({ req }) => canAccessSection(req.user, "announcements") } },
     { name: "message", type: "textarea", required: true, maxLength: 300 },
     { name: "linkLabel", type: "text", maxLength: 80 },
     { name: "linkURL", type: "text", maxLength: 1000, validate: (value: unknown) => !value || safeAnnouncementURL(value) || "Use an HTTP(S) or site-relative URL." },

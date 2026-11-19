@@ -5,6 +5,7 @@ import { adminOnly, nobody } from "./access";
 import { audit } from "./audit";
 import { getServerEnvironment } from "../env";
 import { transactionDatabase } from "./transactions";
+import { permissionField } from "./permissions";
 
 export const hashInvitation = (token: string) => createHash("sha256").update(token).digest("hex");
 
@@ -16,6 +17,7 @@ export const Invitations: CollectionConfig = {
     { name: "email", type: "email", required: true },
     { name: "name", type: "text", required: true },
     { name: "role", type: "select", required: true, defaultValue: "staff", options: ["admin", "staff"] },
+    permissionField(),
     { name: "tokenHash", type: "text", unique: true, index: true, admin: { hidden: true }, access: { read: () => false } },
     { name: "expiresAt", type: "date", admin: { readOnly: true } },
     { name: "acceptedAt", type: "date", admin: { readOnly: true } },
@@ -62,7 +64,7 @@ export const Invitations: CollectionConfig = {
         const invitation = found.docs[0];
         if (!invitation) throw new APIError("Invitation is invalid or expired.", 400);
         req.context.acceptInvitation = true;
-        const user = await req.payload.create({ collection: "users", data: { email: invitation.email, name: invitation.name, role: invitation.role, active: true, password: body.password }, overrideAccess: true, req });
+        const user = await req.payload.create({ collection: "users", data: { email: invitation.email, name: invitation.name, role: invitation.role, permissions: invitation.permissions, active: true, password: body.password }, overrideAccess: true, req });
         await req.payload.update({ collection: "invitations", id: invitation.id, data: { acceptedAt: new Date().toISOString() }, overrideAccess: true, req });
         await audit(req, "invitation.accepted", `users:${user.id}`);
         await req.payload.db.commitTransaction(transaction);

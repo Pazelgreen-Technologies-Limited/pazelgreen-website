@@ -8,6 +8,7 @@ import * as migration_20261115_085557 from './20261115_085557';
 import * as migration_20261115_092113_faqs from './20261115_092113_faqs';
 import * as migration_20261115_092830_announcements from './20261115_092830_announcements';
 import * as migration_20261115_094339_legal_pages from './20261115_094339_legal_pages';
+import * as migration_20261119_192433_staff_section_permissions from './20261119_192433_staff_section_permissions';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20261115_094339_legal_pages.up,
     down: migration_20261115_094339_legal_pages.down,
-    name: '20261115_094339_legal_pages'
+    name: '20261115_094339_legal_pages',
+  },
+  {
+    up: migration_20261119_192433_staff_section_permissions.up,
+    down: migration_20261119_192433_staff_section_permissions.down,
+    name: '20261119_192433_staff_section_permissions'
   },
 ];

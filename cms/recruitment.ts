@@ -1,6 +1,7 @@
 import { APIError, type CollectionConfig, type Field, type GlobalConfig } from "payload";
 import { sql } from "@payloadcms/db-postgres";
-import { adminOnly, nobody, staffOnly } from "./access";
+import { adminOnly, nobody } from "./access";
+import { canAccessSection, sectionAccess } from "./permissions";
 import { withGlobalReview } from "./global-review";
 import { transactionDatabase } from "./transactions";
 import { hiringStatuses } from "./recruitment-rules";
@@ -29,7 +30,7 @@ export const RecruitmentDelivery: GlobalConfig = {
 const immutable = (field: Field): Field => ({ ...field, admin: { ...field.admin, readOnly: true }, access: { create: () => false, update: () => false } } as Field);
 export const Applications: CollectionConfig = {
   slug: "applications", admin: { useAsTitle: "reference", group: "Careers", defaultColumns: ["reference", "fullName", "job", "status", "duplicate", "candidateDelivery", "staffDelivery", "retentionReviewAt"] },
-  access: { read: staffOnly, create: nobody, update: staffOnly, delete: nobody },
+  access: { read: sectionAccess("recruitment"), create: nobody, update: sectionAccess("recruitment", "modify"), delete: nobody },
   indexes: [{ fields: ["job", "sequence"], unique: true }],
   fields: [
     ...([
@@ -70,7 +71,7 @@ export const Applications: CollectionConfig = {
     beforeChange: [async ({ data, req }) => {
       if (data.assignedTo && !req.context.deliverApplication) {
         const user = await req.payload.findByID({ collection: "users", id: relationID(data.assignedTo)!, req, overrideAccess: true });
-        if (!user.active || user.mustChangePassword) throw new APIError("Assign an active CMS colleague.", 400);
+        if (!canAccessSection(user, "recruitment")) throw new APIError("Assign an active colleague with recruitment access.", 400);
       }
       return data;
     }],
@@ -87,7 +88,7 @@ export const Applications: CollectionConfig = {
 
 export const HiringHistory: CollectionConfig = {
   slug: "hiring-history", admin: { group: "Careers", defaultColumns: ["application", "status", "actor", "createdAt"] },
-  access: { read: staffOnly, create: nobody, update: nobody, delete: nobody },
+  access: { read: sectionAccess("recruitment"), create: nobody, update: nobody, delete: nobody },
   fields: [
     { name: "application", type: "relationship", relationTo: "applications", required: true, index: true },
     { name: "actor", type: "text", required: true }, { name: "status", type: "text", required: true },

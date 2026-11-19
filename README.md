@@ -4,8 +4,8 @@ Pazelgreen's public website and team content management system. Built with
 Next.js, Payload CMS, PostgreSQL, TypeScript and Tailwind CSS.
 
 **T01–T11 are implemented and verified.**
-Production launch approval and company inputs remain in the
-[T12 answer checklist](.planning/t12-checklist.md).
+T12 launch work is deferred at the user's request. Its company inputs and
+production acceptance checks remain in the [T12 answer checklist](.planning/t12-checklist.md).
 
 ## Where to start
 
@@ -15,7 +15,7 @@ Production launch approval and company inputs remain in the
 | Run the website on your computer | Follow [Run locally](#run-locally) below |
 | Understand how the CMS works | Read the [team handbook](docs/payload-handbook.md) |
 | Operate releases, backups, indexing and editor onboarding | Read [CMS operations](docs/cms-operations.md) |
-| Supply launch decisions and track production acceptance | Fill in the [T12 checklist](.planning/t12-checklist.md) |
+| Resume launch preparation when requested | Fill in the deferred [T12 checklist](.planning/t12-checklist.md) |
 | Continue development or hand work to another agent | Read [AGENTS.md](AGENTS.md), the [task plan](.planning/task.md) and the [current handoff](.planning/progress.md) |
 
 ## What you can edit
@@ -157,11 +157,14 @@ passing results do not mean a remote CI run or deployment happened.
 | --- | --- |
 | [Team handbook](docs/payload-handbook.md) | Concepts, accounts, environments, deployment and backups |
 | [Setup reference](docs/cms-setup.md) | Exact local, test, migration and release commands |
+| [Netlify deployment](docs/netlify-deployment.md) | Outstanding storage, environment, migration, bootstrap and hosted verification work |
 | [Blog](docs/blog-editing.md) / [Careers](docs/careers-editing.md) | Creating and publishing articles and jobs |
 | [Recruitment](docs/recruitment.md) | Private CVs, applicant IDs, hiring operations, email retries and retention |
 | [FAQs](docs/faqs-editing.md) / [Announcements](docs/announcements-editing.md) / [Legal pages](docs/legal-editing.md) | Feature-specific editing rules |
 | [Custom API contract](docs/cms-api.yaml) | Invitations, draft previews, application submission and active announcements |
-| [Task plan](.planning/task.md) / [Current handoff](.planning/progress.md) | Agreed scope, completion evidence, remaining inputs and T11 next steps |
+| [Operations](docs/cms-operations.md) | Publishing/indexing behavior, release recovery, monitoring and editor onboarding |
+| [Staff permissions](docs/staff-permissions.md) | Assign section View/Modify access, media dependencies and migration rollout |
+| [Task plan](.planning/task.md) / [Current handoff](.planning/progress.md) | Agreed scope, T11/T13 completion evidence and deferred T12 inputs |
 | [Archived history](.planning/history.md) | Earlier implementation notes; superseded next actions are historical only |
 
 Code lives in `app/` (public/admin routes), `cms/` (schemas and server rules),
@@ -172,5 +175,10 @@ Production needs independently configured PostgreSQL, SMTP, HTTPS, persistent
 public/private storage, release migrations, recruitment scheduling and verified
 backups. Git does not share or back up content/uploads. Read the
 [production procedure](docs/payload-handbook.md#running-in-production) before
-deploying. T11/T12 still include indexing/navigation checks, recovery work,
-company-approved content/policies and launch acceptance.
+deploying. T11 indexing/navigation checks and recovery instructions are complete.
+Actual production recovery verification, company-approved content/policies and
+launch acceptance remain in the deferred T12 task.
+
+Staff permissions are assigned per section: No access, View or Modify. Modify
+covers every record in that section; publishing remains admin-only. Existing staff
+need explicit assignments after migration. See [staff permissions](docs/staff-permissions.md).

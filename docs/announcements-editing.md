@@ -33,3 +33,7 @@ and closes after navigation. No carousel or stacked notices are supported.
 next schedule boundary and generation time, with no-store/noindex headers.
 It never reads drafts, including when called by a signed-in editor. No company
 notice is automatically seeded or published.
+
+Staff need the corresponding section permission to view drafts or modify records.
+Admins assign access per section; publication remains admin-only. See
+[staff permissions](staff-permissions.md).

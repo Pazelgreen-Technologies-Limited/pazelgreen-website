@@ -45,7 +45,7 @@ characters, 5,000 nodes and 30 levels of nesting.
 ## Preview, submit and publish
 
 Save a draft, then use **Preview** in the editor. It opens
-`/blog/preview/<post-id>`, which requires a current active staff/admin session.
+`/blog/preview/<post-id>`, which requires an active admin session or staff Blog View/Modify access.
 The preview shows the latest saved draft, including draft images available to
 that editor. It is excluded from indexing and served without shared caching.
 Saving a draft does not change the public article.
@@ -68,6 +68,12 @@ listing and its detail URL shows a not-found page; versions remain available to
 editors. Approved changes appear on the next request without a rebuild. Changing
 a published post or category slug changes its URL; automatic redirects are not
 part of this phase.
+
+The request-time sitemap includes approved article URLs and removes withdrawn
+ones without a rebuild. Drafts and preview URLs are excluded. Navigation, browser
+history and returning to a visible tab refresh approved server content; an edit
+made elsewhere while a page stays visible may still need a refresh. See
+[publishing, caching and indexing](cms-operations.md#publishing-caching-and-indexing).
 
 ## Public listing and images
 
@@ -122,3 +128,7 @@ The migration, generated types and admin import map must accompany this feature.
 
 No real articles/categories have been seeded. Initial approved content and image
 rights/attribution remain part of launch preparation.
+
+Staff need the corresponding section permission to view drafts or modify records.
+Admins assign access per section; publication remains admin-only. See
+[staff permissions](staff-permissions.md).

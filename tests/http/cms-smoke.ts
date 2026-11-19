@@ -289,6 +289,30 @@ try {
   assert.equal(docxDownload.headers.get("content-disposition"), "attachment");
   assert.ok(Buffer.from(await docxDownload.arrayBuffer()).subarray(0, 2).equals(Buffer.from("PK")));
 
+  // Section permissions must hold over real HTTP, including file bytes.
+  const editorLogin = await api("/api/users/login", undefined, { email: "blog-editor@pazelgreen.test", password });
+  assert.equal(editorLogin.status, 200);
+  const editorAuth = await editorLogin.json();
+  const editorToken = editorAuth.token as string;
+  for (const route of ["/api/applications", "/api/hiring-history", "/api/private-files", downloadPath, docxPath, "/api/faqs"]) {
+    const response = await api(route, editorToken);
+    assert.equal(response.status, 403, route);
+  }
+  assert.equal((await api("/api/globals/company-settings?draft=true", editorToken)).status, 403);
+  assert.equal((await api(`/api/preview/legal-pages/${legal.id}`, editorToken)).status, 403);
+  const permissionPost = (await (await api("/api/posts?draft=true&where[slug][equals]=permission-fixture", editorToken)).json()).docs[0];
+  assert.ok(permissionPost);
+  assert.equal((await patch(`/api/posts/${permissionPost.id}?draft=true`, editorToken, { title: "HTTP section permission edit" })).status, 200);
+  assert.equal((await patch(`/api/posts/${permissionPost.id}`, editorToken, { _status: "published" })).status, 403);
+  await patch(`/api/users/${editorAuth.user.id}`, editorToken, { permissions: { recruitment: "modify" } });
+  assert.equal((await api(downloadPath, editorToken)).status, 403, "Self-assigned recruitment access must be denied");
+  assert.equal((await patch(`/api/users/${editorAuth.user.id}`, adminToken, { permissions: { blog: "read" } })).status, 200);
+  assert.equal((await api(`/api/preview/posts/${permissionPost.id}`, editorToken)).status, 403, "Permission changes revoke existing sessions");
+  const readerToken = (await (await api("/api/users/login", undefined, { email: "blog-editor@pazelgreen.test", password })).json()).token;
+  assert.equal((await api(`/api/preview/posts/${permissionPost.id}`, readerToken)).status, 200);
+  assert.equal((await patch(`/api/posts/${permissionPost.id}?draft=true`, readerToken, { title: "Forbidden read-only edit" })).status, 403);
+  await patch(`/api/users/${editorAuth.user.id}`, adminToken, { permissions: { blog: "modify" } });
+
   assert.equal((await patch(`/api/users/${staff.id}`, adminToken, { active: false })).status, 200);
   assert.equal((await api(downloadPath, staffToken)).status, 403, "Deactivation must invalidate an existing session.");
   assert.equal((await patch(`/api/users/${staff.id}`, adminToken, { active: true })).status, 200);

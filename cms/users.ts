@@ -4,6 +4,7 @@ import { adminOnly, isAdmin, isStaff } from "./access";
 import { audit } from "./audit";
 import { getEnvironment } from "../env";
 import { matchesStoredPassword } from "./password";
+import { permissionField } from "./permissions";
 
 export const Users: CollectionConfig = {
   slug: "users",
@@ -22,6 +23,7 @@ export const Users: CollectionConfig = {
   },
   fields: [
     { name: "name", type: "text", required: true },
+    permissionField(),
     { name: "role", type: "select", required: true, defaultValue: "staff", options: ["admin", "staff"], saveToJWT: true,
       access: { update: ({ req }) => isAdmin(req.user) } },
     { name: "active", type: "checkbox", defaultValue: true, saveToJWT: true,
@@ -41,8 +43,8 @@ export const Users: CollectionConfig = {
         if (!data.password) data.password = randomBytes(48).toString("hex");
       }
       if (operation === "update" && !isAdmin(req.user) && !req.context.cmsSystem) {
-        if ((data.role !== undefined && data.role !== originalDoc.role) || (data.active !== undefined && data.active !== originalDoc.active)) {
-          throw new APIError("Only administrators can change roles or account status.", 403);
+        if ((data.role !== undefined && data.role !== originalDoc.role) || (data.active !== undefined && data.active !== originalDoc.active) || (data.permissions !== undefined && JSON.stringify(data.permissions) !== JSON.stringify(originalDoc.permissions))) {
+          throw new APIError("Only administrators can change roles, permissions or account status.", 403);
         }
         // Payload's own reset-token updates bypass access, but must not broaden profile edits.
         if (req.user && req.user.id !== originalDoc.id) throw new APIError("You can only update your own profile.", 403);
@@ -61,7 +63,7 @@ export const Users: CollectionConfig = {
         const admins = await req.payload.count({ collection: "users", where: { and: [{ role: { equals: "admin" } }, { active: { equals: true } }] }, overrideAccess: true, req });
         if (admins.totalDocs <= 1) throw new APIError("The final active administrator cannot be deactivated or demoted.", 409);
       }
-      if (data.active === false || (originalDoc && data.role && data.role !== originalDoc.role)) data.sessions = [];
+      if (data.active === false || (originalDoc && data.role && data.role !== originalDoc.role) || (originalDoc && data.permissions && JSON.stringify(data.permissions) !== JSON.stringify(originalDoc.permissions))) data.sessions = [];
       return data;
     }],
     beforeDelete: [async ({ id, req }) => {

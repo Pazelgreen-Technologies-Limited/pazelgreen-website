@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import nextEnv from "@next/env";
+import { createRequire } from "node:module";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
@@ -21,7 +21,9 @@ import { FAQs } from "./cms/faqs";
 import { Announcements } from "./cms/announcements";
 import { LegalPages } from "./cms/legal-pages";
 
-nextEnv.loadEnvConfig(process.cwd());
+// @next/env is CommonJS: native require works in both Payload's CLI and Next's bundlers.
+const { loadEnvConfig } = createRequire(import.meta.url)("@next/env") as typeof import("@next/env");
+loadEnvConfig(process.cwd());
 const env = getServerEnvironment();
 const root = path.dirname(fileURLToPath(import.meta.url));
 

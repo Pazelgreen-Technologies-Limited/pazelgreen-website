@@ -42,8 +42,11 @@ async function verifyScratchDatabase() {
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
     assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types WHERE _status = 'published'")).rows[0].count, 3);
     await runLatestMigration(payload, "down");
-    assert.equal((await payload.db.pool.query("SELECT to_regclass('public.legal_pages') AS relation")).rows[0].relation, null);
+    assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'permissions_blog'")).rows[0].count, 0);
     await runLatestMigration(payload, "up");
+    const permissionColumns = await payload.db.pool.query("SELECT table_name, column_default FROM information_schema.columns WHERE table_name IN ('users', 'invitations') AND column_name LIKE 'permissions_%'");
+    assert.equal(permissionColumns.rows.length, 18);
+    assert.ok(permissionColumns.rows.every(row => row.column_default.startsWith("'none'::")));
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.legal_pages') AS relation")).rows[0].relation, "legal_pages");
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.announcements') AS relation")).rows[0].relation, "announcements");
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.faqs') AS relation")).rows[0].relation, "faqs");

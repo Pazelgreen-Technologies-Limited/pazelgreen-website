@@ -22,7 +22,7 @@ the replacement is approved. Copy historical text into a new draft rather than
 restoring a version to bypass review.
 
 Use the authenticated Preview action to view a saved draft at
-`/legal/preview/<id>`. Active staff/admin access is required; previews are noindex,
+`/legal/preview/<id>`. Admin or staff Legal pages View/Modify access is required; previews are noindex,
 private/no-store and no-referrer. The normal public URL always reads approved
 content, including for signed-in editors and `?preview=true` requests.
 
@@ -40,3 +40,7 @@ candidate. Both company-approved legal copy and recruitment policy are launch
 dependencies. The request-time sitemap includes only approved legal documents;
 withdrawal removes them without rebuilding. Production launch-wide SEO checks
 remain in the [T12 checklist](../.planning/t12-checklist.md).
+
+Staff need the corresponding section permission to view drafts or modify records.
+Admins assign access per section; publication remains admin-only. See
+[staff permissions](staff-permissions.md).
