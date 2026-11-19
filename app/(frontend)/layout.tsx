@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Nunito, Inter } from "next/font/google";
 import { getAnnouncementSnapshot } from "@/lib/announcements";
+import { PublicContentRefresh } from "./_components/PublicContentRefresh";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -32,6 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${nunito.variable} ${inter.variable}`}>
       <body>
+        <Suspense fallback={null}><PublicContentRefresh /></Suspense>
         {/* Shared across all pages */}
         <Navbar announcement={await getAnnouncementSnapshot()} />
         {children}

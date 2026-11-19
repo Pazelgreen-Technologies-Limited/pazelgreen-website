@@ -8,7 +8,7 @@ import { formatWorkingHours, getCompanySettings } from "@/lib/company-settings";
 const companyLinks = [
   { label: "About Us", href: "/about" },
   { label: "Our Team", href: "/team" },
-  { label: "Careers", href: "/careers" },
+  { label: "Careers", href: "/join-us/careers" },
   { label: "News & Blogs", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];

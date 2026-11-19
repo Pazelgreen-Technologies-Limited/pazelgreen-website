@@ -3,9 +3,9 @@
 Pazelgreen's public website and team content management system. Built with
 Next.js, Payload CMS, PostgreSQL, TypeScript and Tailwind CSS.
 
-**The CMS features through T10 are implemented and verified.** The next work is
-T11: cache/indexing checks, sitemap behavior and operational handoff. Production
-launch approval and company content are still pending in T12.
+**T01–T11 are implemented and verified.**
+Production launch approval and company inputs remain in the
+[T12 answer checklist](.planning/t12-checklist.md).
 
 ## Where to start
 
@@ -14,6 +14,8 @@ launch approval and company content are still pending in T12.
 | Edit content on an already hosted site | Open that site's `/admin` with your invited account; no Node or Docker needed |
 | Run the website on your computer | Follow [Run locally](#run-locally) below |
 | Understand how the CMS works | Read the [team handbook](docs/payload-handbook.md) |
+| Operate releases, backups, indexing and editor onboarding | Read [CMS operations](docs/cms-operations.md) |
+| Supply launch decisions and track production acceptance | Fill in the [T12 checklist](.planning/t12-checklist.md) |
 | Continue development or hand work to another agent | Read [AGENTS.md](AGENTS.md), the [task plan](.planning/task.md) and the [current handoff](.planning/progress.md) |
 
 ## What you can edit

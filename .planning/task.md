@@ -1,12 +1,12 @@
 # Payload CMS implementation plan
 
-Status: T01–T10 implemented and verified. T11–T12 remain pending.
+Status: T01–T11 implemented and verified. T12 deferred by the user on 2026-11-19.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 The delivery checklist below is authoritative for completion. Read
 [the current handoff](progress.md) for verified commits, results and concrete
-T11 next steps. Superseded dated milestones are in [history.md](history.md).
-The latest user request is documentation maintenance, not implementation of T11.
+T11 verification and T12 next steps. Superseded dated milestones are in [history.md](history.md).
+The latest user request defers T12 and authorizes committing the completed T11 work.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
 Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
@@ -211,11 +211,20 @@ and sitemaps. Search engines may choose different displayed text.
 - [x] T08: Implement backend-only FAQs and test denied anonymous reads.
 - [x] T09: Implement announcements, scheduling, selection, and responsive navbar.
 - [x] T10: Implement legal pages and SEO for newly built routes.
-- [ ] T11: Complete cache invalidation, sitemap behavior, integration/E2E tests,
+- [x] T11: Complete cache invalidation, sitemap behavior, integration/E2E tests,
   migrations/backup instructions, editor onboarding, and operational documentation.
 - [ ] T12: Validate launch dependencies: actual codes, verified content, approved
   legal/retention policy, email/storage/database deployment, and navigation.
   Record unrelated missing routes separately without expanding implementation.
+
+T11 indexing decision (2026-11-15): approved closed/expired job details remain
+readable with `noindex, follow` and are excluded from the request-time sitemap.
+Open approved jobs regain index eligibility on reopening, with immutable IDs.
+Correct known Careers/Solutions link typos; record unbuilt marketing destinations
+for a T12 hide/redirect decision without implementing excluded pages.
+The [T12 answer checklist](t12-checklist.md) records company inputs and separate
+production acceptance requirements. Recovery documentation is T11; an actual
+production restore rehearsal remains T12 and requires the selected infrastructure.
 
 ## Required acceptance checks
 
@@ -250,6 +259,6 @@ Record scope changes before expanding implementation.
 - Local Docker settings are derived from DEV_DATABASE_URL. No duplicate
   POSTGRES_* values are required in .env. Development, production and test URLs
   remain separate, selected by APP_ENV.
-- T01–T10 have been verified; code baseline and detailed evidence are in progress.md.
-  T11 covers remaining cache/indexing/navigation/operations work. T12 needs actual
+- T01–T11 have been verified; code baseline and detailed evidence are in progress.md.
+  T11 includes cache/indexing/navigation/operations work. T12 needs actual
   company content, policies and deployed providers; local tests do not approve launch.

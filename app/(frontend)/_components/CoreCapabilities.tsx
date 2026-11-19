@@ -54,7 +54,7 @@ export default function CoreCapabilities() {
             value creation across emerging markets.
           </p>
           <Link
-            href="/solution"
+            href="/solutions"
             className="mt-4 inline-flex items-center gap-1 text-2xl font-medium text-green-800 hover:underline"
           >
             View all capabilities{" "}

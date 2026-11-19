@@ -37,4 +37,6 @@ The recruitment notice and its retention approval are configured separately in
 Recruitment Settings. A published general privacy policy does not automatically
 enable applications or replace the exact recruitment notice acknowledged by a
 candidate. Both company-approved legal copy and recruitment policy are launch
-dependencies. Sitemap completion and launch-wide SEO checks remain T11/T12.
+dependencies. The request-time sitemap includes only approved legal documents;
+withdrawal removes them without rebuilding. Production launch-wide SEO checks
+remain in the [T12 checklist](../.planning/t12-checklist.md).

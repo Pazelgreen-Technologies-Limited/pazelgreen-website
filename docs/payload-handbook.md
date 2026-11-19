@@ -4,12 +4,12 @@ Start here if you have never used Payload. This guide explains what the parts do
 why the setup steps exist, and how to work locally and operate a deployed site.
 Keep the [command reference](cms-setup.md) open when following the instructions.
 
-This describes the **T01–T10 implementation**, checked against this repository on
+This describes the **T01–T11 implementation**, checked against this repository on
 **15 November 2026**: Payload 3.93.0, Next.js 16.3.3, Node 24.22.2, and pnpm 10.18.1.
 Online tutorials may describe different versions or different access rules.
 Our configuration and tests determine how this project behaves.
 For current implementation status and the next task, read
-[the handoff](../.planning/progress.md). T11/T12 and launch approval are incomplete.
+[the handoff](../.planning/progress.md). T12 and production launch approval remain pending.
 
 If you are learning the system, read the concepts and local setup first. Editors
 of a hosted site can go to [Using the admin panel](#using-the-admin-panel).
@@ -124,7 +124,7 @@ does not copy your local users, content, emails, or uploaded files to a teammate
 | Image media library; reviewed jobs, dictionaries, permanent advert references and careers pages | Approved real vacancies and full code list: T12 |
 | Private applications/CVs, permanent applicant IDs, hiring history and queued recruitment emails | Approved recruitment notice/retention, recipients and production scheduler: T12 |
 | Audit events, protected previews, SQL migrations, private FAQs, scheduled announcements and reviewed legal pages | Approved company legal copy: T12 |
-| Local Docker services and automated checks | Further caching, operations and launch acceptance work: T11–T12 |
+| Local Docker services, request-time sitemap/robots, browser refreshes, automated checks and operations/onboarding guides | Production services, recovery rehearsal and launch acceptance: T12 |
 
 Most marketing content is still written directly in frontend components. Applications
 appear only after candidates submit to an eligible role with recruitment enabled;
@@ -744,7 +744,7 @@ review the configured CORS/CSRF origins instead of opening them to every website
 7. If enabling recruitment, approve/publish the notice/version/retention settings,
    configure private recipients, schedule `pnpm cms:deliver` every minute and test
    durable submission/delivery recovery without real candidate records.
-8. Confirm backups and an isolated restore test, and complete T11/T12 launch checks.
+8. Confirm backups and an isolated restore test, and complete the T12 launch checks.
 
 `pnpm start` runs the idempotent admin check before Next.js. Use it as the deployment
 command: calling `next start` directly skips the check. It does not install
@@ -772,9 +772,11 @@ forward fix when reversing a migration would lose data. Do not run reset/fresh/d
 commands against production as a routine recovery action.
 
 Editors can maintain existing content without a schema deployment. Current public
-reads use approved data on the next request; drafts stay private. Already open
-pages may need a refresh, while announcements also poll at schedule boundaries
-and at least once per minute. T11 still audits browser cache and indexing behavior.
+reads use approved data on the next request; drafts stay private. Shared layouts
+refresh on pathname/query navigation and returning to a tab; displayed job deadlines and
+announcements refresh at their boundaries. Other edits on an already open visible
+page may need a refresh. See [CMS operations](cms-operations.md#publishing-caching-and-indexing)
+for indexing decisions and browser behavior.
 
 ## Backups and recovery
 
@@ -897,10 +899,10 @@ enabled and published with approved notice/version/retention values. Read
 [recruitment operations](recruitment.md) before enabling it and scheduling delivery.
 Company-approved policy remains a launch input.
 
-**What should we do next?** T11 is the next implementation task: cache/indexing,
-sitemap/navigation checks and operational handoff. Read [the current handoff](../.planning/progress.md)
-for its concrete starting point. T12 still requires production providers, verified
-company content, approved policies and launch acceptance.
+**What should we do next?** Complete the [T12 answer checklist](../.planning/t12-checklist.md)
+for company content, approved policies, production services and launch acceptance.
+Read [the current handoff](../.planning/progress.md) for actual verification status
+and [CMS operations](cms-operations.md) for releases, recovery and editor onboarding.
 
 ## Editing company settings and page SEO
 

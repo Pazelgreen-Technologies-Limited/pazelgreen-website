@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import MotionCard from "@/components/MotionCard";
 import { getOpenJobs } from "@/lib/careers";
+import { RefreshAt } from "@/components/RefreshAt";
 
 // Reasons to join — placeholder, replace with real copy
 const whyJoinUs = [
@@ -16,6 +17,7 @@ export default async function CareersSection() {
   const openings = await getOpenJobs(1, 4);
   return (
     <section className="bg-white px-6 py-16">
+      <RefreshAt timestamps={openings.docs.map(job => job.deadline)} />
       <div className="mx-auto max-w-5xl rounded-2xl bg-gray-50 p-8 md:p-12 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.1)]">
         {/* Section heading */}
         <div className="text-center">

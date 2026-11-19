@@ -19,7 +19,7 @@ export default function SolutionCTA() {
         <Button href="/get-started" variant="white" className="rounded-full!">
           Get Started
         </Button>
-        <Button href="/solution" variant="outline" className="rounded-full!">
+        <Button href="/solutions" variant="outline" className="rounded-full!">
           Learn More
         </Button>
       </div>

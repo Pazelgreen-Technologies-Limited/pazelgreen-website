@@ -141,6 +141,10 @@ see [environment configuration](payload-handbook.md#understanding-environment-va
 
 ## Production release reference
 
+Use [CMS operations](cms-operations.md) for migration recovery, coordinated backups,
+isolated restore rehearsal, scheduler monitoring, indexing and editor onboarding.
+Collect company/deployment decisions in the [T12 checklist](../.planning/t12-checklist.md).
+
 Read the [full production procedure](payload-handbook.md#running-in-production)
 first. The operator must provision PostgreSQL, SMTP, HTTPS hosting and persistent
 upload storage, and configure APP_ENV, the production URL, stable PAYLOAD_SECRET,
@@ -221,6 +225,8 @@ applications: approve notice/retention settings, configure private recipients an
 schedule `pnpm cms:deliver` every minute. Forms are disabled until approved setup.
 See [current functionality](payload-handbook.md#what-is-available-today),
 [task plan](../.planning/task.md) and [progress](../.planning/progress.md).
-T11 is next: indexing/sitemap/navigation and operations work. T12 covers company
-inputs and deployment/launch acceptance. Earlier status notes live in
+T11 adds request-time indexing/sitemap behavior, browser refreshes, navigation
+corrections and the [operations handoff](cms-operations.md). T12 covers company
+inputs and deployment/launch acceptance through the [answer checklist](../.planning/t12-checklist.md).
+Earlier status notes live in
 [archived history](../.planning/history.md), not the current handoff.

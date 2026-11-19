@@ -1,7 +1,7 @@
 # CMS implementation handoff
 
-Last updated: 2026-11-15. Code baseline: `ee3df3b`.
-**T01–T10 are implemented and verified. T11 is next. T11–T12 are incomplete.**
+Last updated: 2026-11-19. Pre-T11 repository baseline: `9ae0cef`; T11 is included in this completion commit.
+**T01–T11 are implemented and verified. T12 is deferred by the user.**
 
 This file is the current snapshot. Read [task.md](task.md) for agreed scope and
 acceptance requirements. Older experiments, failures and superseded next actions
@@ -11,8 +11,7 @@ are preserved in [history.md](history.md); they are historical evidence only.
 
 1. Read [AGENTS.md](../AGENTS.md), task.md and this file.
 2. Inspect `git status` and the code before editing; preserve other work.
-3. Confirm the requested task. The latest user request is a documentation audit;
-   it does not request implementation of T11.
+3. The current user request defers T12 and authorizes committing T11. Await the user's next requested changes; do not start launch work.
 4. For implementation, select the supported runtime and read relevant installed
    Next.js guides. Do not rely on older Next.js conventions or a temporary runtime.
 5. Update this snapshot, task checkboxes and relevant human guides after verified
@@ -32,6 +31,7 @@ are preserved in [history.md](history.md); they are historical evidence only.
 | T08 | Reviewed FAQs with no anonymous reads or public integration | `e7f9601` |
 | T09 | One scheduled notice above responsive navigation; open-page boundary refresh | `e2c1cb1` |
 | T10 | Fixed privacy/terms identities, approved public pages, protected previews and document SEO | `ee3df3b` |
+| T11 | Request-time sitemap/robots, browser/deadline refresh, indexing/navigation checks and operational/editor handoff | This completion commit |
 
 Runtime follow-ups: `6bbadd4` enforces supported Node before startup; `617e6f1`
 documents persistent Git Bash runtime selection. Node 24.22.2 and pnpm 10.18.1 are
@@ -67,8 +67,9 @@ explicitly. Never assume a runtime previously downloaded into Temp still exists.
 
 ## Latest verification evidence
 
-The following checks passed for the T07–T10 code baseline on 2026-11-15. They are
-recorded results, not claims that the current documentation-only edit reran them.
+The following checks passed during T11 on 2026-11-15. Integration/HTTP tests used
+only guarded disposable local fixtures. The final query-navigation refinement was
+verified by a fresh build, lint/typecheck and the expanded browser suite.
 
 | Check | Result |
 | --- | --- |
@@ -78,45 +79,62 @@ recorded results, not claims that the current documentation-only edit reran them
 | `pnpm test:migrations` | Fresh schema/latest down/latest up passed; scratch database removed |
 | `pnpm build` | Passed |
 | `pnpm test:http` | Passed real production HTTP/privacy/SEO/PDF/DOCX checks |
-| `pnpm test:browser` | 28 installed-Chrome checks passed on desktop 1280×900 and mobile 390×844 |
-| `pnpm predev` | Applied all four T07–T10 development migrations; existing admin preserved |
+| `pnpm test:browser` | All 36 installed-Chrome checks verified on desktop 1280×900 and mobile 390×844: 35 passed in the final full run, interrupted mobile schedule check passed in a targeted rerun |
 
-Browser navigation emitted one Next stream-close log; no assertion failed. Test
-servers stopped. No remote CI, push, production deployment or restore rehearsal
-was performed. Baseline evidence and resolved test failures are in history.md.
+Browser navigation emitted Next stream-close logs; the checked UI assertions passed.
+One mobile schedule check timed out during an approximately eight-hour host pause;
+its isolated rerun passed in 11.3 seconds. Earlier test-assumption corrections and
+sandbox restrictions are recorded in history.md. Temporary test servers stopped.
+No remote CI, commit/push, production deployment or production restore rehearsal
+was performed. No schema migration or development records were changed for T11.
 
 Run integration → migration check → build → HTTP → browser sequentially, with
 the [documented test setup](../docs/cms-setup.md#test-database-and-checks). Do not
 rebuild `.next` while HTTP/browser servers are running. HTTP tests change fixtures;
 rerun integration before retrying a failed HTTP sequence from the beginning.
 
-## Next implementation: T11
+## T11 completed: 2026-11-15
 
-When requested, start with a route/indexing audit, then implement the missing
-sitemap/robots behavior. No sitemap/robots route files currently exist in `app/`.
+Added request-time sitemap/robots routes; anonymous approved URLs only, with closed/
+expired jobs excluded and their readable details marked noindex/follow. Added
+admin/API noindex headers, shared-layout refresh on pathname/query/visibility/bfcache
+restoration, and displayed vacancy deadline refresh. Corrected Careers/Solutions
+link typos; unbuilt marketing destinations remain recorded for a T12 decision.
+New browser acceptance checks cover indexing, publication/withdrawal/history,
+approved Footer navigation refresh and automatic deadline expiry.
 
-1. Inspect request-time reads and browser cache behavior across approved settings,
-   posts, jobs, announcements and legal pages. Preserve live content during drafts
-   and schedule/deadline boundaries. Do not add caching that bypasses permissions.
-2. Define sitemap/robots rules for real approved public URLs. Exclude drafts,
-   authenticated previews, FAQs, applications, CVs and admin/API routes. Resolve
-   closed/expired job indexing deliberately against the agreed behavior.
-3. Audit navigation against implemented routes. Known issue: Footer Careers uses
-   `/careers`; the implemented route is `/join-us/careers`. Other legacy links
-   point at unbuilt marketing routes. Fix agreed links or record them; do not
-   silently build excluded marketing features.
-4. Extend meaningful acceptance checks for cache/indexing/navigation behavior.
-   Existing suites already cover T01–T10; do not treat them as missing or rerun
-   destructive fixtures against development/production.
-5. Complete backup/restore and migration recovery instructions, editor onboarding,
-   scheduler/queue monitoring and retention operations. Existing guides provide
-   a foundation; a production restore rehearsal is not complete.
-6. Run appropriate checks, record actual results and then mark T11 complete.
+Added docs/cms-operations.md for cache/indexing/navigation decisions, migration
+recovery, consistent database/files backups, isolated restores, queue monitoring
+and editor onboarding. Added [T12 answer/acceptance checklist](t12-checklist.md).
+Actual production restore verification remains T12, not a local engineering claim.
+
+Changed files: app/sitemap.ts, app/robots.ts, next.config.ts, frontend layout and
+_components/PublicContentRefresh.tsx, components/RefreshAt.tsx, careers listing/
+detail/JobView and Join Us CareersSection; Footer/CoreCapabilities/SolutionCTA
+links; tests/browser/publication.spec.ts; README, operations/setup/handbook/legal
+guides and planning records. No schema or generated-type change was needed.
+
+The audit confirmed request-time approved reads in company settings, Page SEO,
+blog/categories/media, jobs, legal pages and announcements; React cache is scoped
+to rendering. No persistent CMS cache was introduced. Announcements keep their
+existing schedule polling. Sitemap responses use max-age=0/must-revalidate;
+authenticated previews and private CV downloads retain private/no-store behavior.
+
+Verification is recorded above. Checks passed for 15 guide/planning Markdown files,
+127 local link targets, 141 documented command occurrences, balanced fences,
+task statuses and Git whitespace. All T11 engineering work is complete; company-approved data and actual
+deployed services remain T12 dependencies.
 
 T12 is a separate launch acceptance task. Do not mark it complete based on a
 successful local build or the existence of the CMS fields.
 
 ## T12 inputs and operational limits
+
+**Deferred on 2026-11-19:** the user requested committing T11 before further
+rearrangements. Await their next change request. Keep the
+[T12 checklist](t12-checklist.md) for when launch work resumes; record answers
+and scope decisions before implementing the remaining production acceptance list.
+Do not put credentials, private recipients or applicant data into planning files.
 
 - Confirm full company codes, contacts, hours, social URLs, initial articles/image
   rights and actual vacancies. Do not promote examples/fallbacks into approved data.
@@ -131,17 +149,3 @@ successful local build or the existence of the CMS fields.
   existing admins are preserved. Do not reset accounts to redo setup.
 - Contact-form delivery, newsletters, applicant accounts, interview scheduling,
   homepage editing and unrelated marketing routes remain outside agreed scope.
-
-## Documentation audit: 2026-11-15
-
-Reworked README for human onboarding, corrected stale handbook/operations wording,
-and moved superseded progress/task milestones into history.md. The current task
-plan and this snapshot now agree on T11 next and T12 launch dependencies. No app
-code, environment secrets, database records or task completion status changed.
-Validation passed across 15 Markdown files and 103 local file/heading targets:
-no missing targets, broken heading anchors or unbalanced fences. All 24 documented
-command names match package scripts/pnpm built-ins; the four-path API YAML parses,
-the task checklist has exactly T01–T10 checked/T11–T12 pending, and the About-page
-asset files exist. Git whitespace validation passed. Application regression suites
-were not rerun for this documentation-only change; their baseline results above
-remain labelled as earlier evidence.

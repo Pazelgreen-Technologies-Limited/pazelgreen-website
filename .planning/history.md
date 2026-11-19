@@ -781,3 +781,61 @@ production build, HTTP suite, 28 desktop/mobile browser checks and scratch
 migration fresh/down/up. All four development migrations were applied through
 predev; the existing admin was preserved. T11 is the next task; no T11/T12
 completion, production deployment or remote CI result is implied.
+
+### 2026-11-15 - Documentation audit before T11
+
+Reworked README for human onboarding, corrected stale handbook/operations wording,
+and moved superseded progress/task milestones into history.md. At that point T11
+was next and T12 launch dependencies were pending. No app code, environment secrets,
+database records or task completion status changed in the documentation-only audit.
+Validation passed across 15 Markdown files and 103 local file/heading targets;
+24 documented command names matched scripts/pnpm built-ins, API YAML parsed and
+Git whitespace validation passed. Application regression suites were not rerun
+for that documentation-only change. T11 work below supersedes its next action.
+
+### 2026-11-15 - T11 completion and T12 answer sheet
+
+User authorized completing T11 and creating a T12 checklist to answer next.
+Repository baseline was 9ae0cef. Added request-time sitemap/robots with anonymous
+approved routes; closed/expired job details remain readable with noindex/follow
+and leave the sitemap. Added admin/API noindex headers, pathname/query/visibility/
+bfcache refresh for shared content and deadline refresh for displayed jobs.
+Corrected Careers/Solutions link typos. Recorded unbuilt marketing destinations
+without adding excluded features. Created the operations/recovery/editor runbook
+and 14-question T12 answer sheet with a separate production acceptance checklist.
+No schema changes, development records, real content, secrets or applicant data
+were introduced. Changes remain uncommitted for review.
+
+Verified lint/typecheck, 63 unit tests, 61 integration tests, scratch database
+fresh/latest-down/latest-up, production build and production HTTP privacy/SEO/file
+checks. Expanded browser coverage from 28 to 36 desktop/mobile checks, including
+all sitemap URLs (beyond the first post page), draft exclusion, publish/withdrawal,
+browser history, approved Footer data across pathname/query navigation, closed-job
+robots and automatic deadline expiry in listings/Join Us/details.
+
+Initial sandboxed tsx/bootstrap commands failed on Windows user-profile access;
+approved outside-sandbox reruns passed. First browser run finished 32/36 but stalled
+in sandboxed process shutdown; stopped only the verified temporary port-3102 server
+and used approved outside-sandbox runs thereafter. Corrected new tests to accept
+Next's dynamic metadata max-age=0/must-revalidate header, await navigation completion
+before browser back, and inspect sitemap loc URLs instead of rejecting the XML
+declaration's question mark. Subsequent history/indexing tests passed.
+
+The final full browser run passed 35 checks; a mobile announcement timing test was
+interrupted by an approximately eight-hour host pause and timed out. Its targeted
+rerun passed in 11.3 seconds (16.8-second run), verifying all 36 checks across the
+final run and rerun. Next emitted stream-close messages during rapid navigation;
+the final checked UI assertions passed. No remote CI, commit/push, production
+deployment or actual production backup/restore rehearsal was performed. T12
+remains pending answers and independently verified infrastructure.
+
+Final documentation validation passed for 15 guide/planning Markdown files,
+127 local file/heading targets, 141 documented command occurrences, balanced
+fences and T01–T11 checked/T12 pending. Git whitespace validation passed.
+
+### 2026-11-19 - T12 deferred; T11 commit authorized
+
+The user requested skipping T12 for now and committing the completed T11 work
+before further rearrangements. Updated task/progress/checklist status to preserve
+that decision. No application code changed in this commit-preparation step;
+the T11 test evidence above remains the prior verified result. T12 stays unchecked.

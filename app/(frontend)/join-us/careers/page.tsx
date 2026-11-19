@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOpenJobs } from "@/lib/careers";
 import { pageMetadata } from "@/lib/page-seo";
+import { RefreshAt } from "@/components/RefreshAt";
 
 export const generateMetadata = () => pageMetadata("careers", { title: "Careers | Pazelgreen", description: "Find your next opportunity to build a more sustainable food system with Pazelgreen." });
 
@@ -11,6 +12,7 @@ export default async function CareersPage({ searchParams }: { searchParams: Prom
   const page = Number(raw ?? 1);
   const jobs = await getOpenJobs(page);
   return <main>
+    <RefreshAt timestamps={jobs.docs.map(job => job.deadline)} />
     <section className="bg-green-950 px-6 pb-16 pt-40 text-white md:pt-44">
       <div className="mx-auto max-w-5xl">
         <Link href="/join-us" className="text-sm text-green-100 underline underline-offset-4">Join Pazelgreen</Link>

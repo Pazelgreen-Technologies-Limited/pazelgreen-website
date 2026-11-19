@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Job } from "@/payload-types";
 import { jobIsOpen } from "@/cms/career-rules";
 import { ApplicationSection } from "./ApplicationSection";
+import { RefreshAt } from "@/components/RefreshAt";
 
 export function JobView({ job, preview = false }: { job: Job; preview?: boolean }) {
   const open = jobIsOpen(job);
@@ -11,6 +12,7 @@ export function JobView({ job, preview = false }: { job: Job; preview?: boolean 
     catch { deadline = "Check the deadline and timezone before publication"; }
   }
   return <main className="px-6 pb-20 pt-36 md:pt-44">
+    {!preview && open && <RefreshAt timestamps={[job.deadline]} />}
     <article className="mx-auto max-w-3xl break-words">
       <Link href="/join-us/careers" className="font-semibold text-green-800 underline underline-offset-4">All open positions</Link>
       {preview && <p role="status" className="mt-6 rounded-lg border border-orange-300 bg-orange-50 p-4 text-orange-950">Draft preview. This content has not been approved for the public website.</p>}
