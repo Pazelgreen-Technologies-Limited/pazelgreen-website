@@ -247,10 +247,9 @@ sessions. See [staff permissions](staff-permissions.md). Supabase is selected fo
 PostgreSQL and initial S3-compatible object storage; R2 remains deferred. Upload
 storage is selected by environment configuration, not by the database URL.
 
-Next also supports `pnpm exec next build --webpack` for a production build using
-webpack. T13 acceptance uses this mode because the default Turbopack build hit a
-Google-font resolver failure on this machine. The default package script remains
-unchanged; a webpack pass does not establish that the Turbopack issue is resolved.
+`pnpm build` explicitly uses `next build --webpack` for production, including CI
+and Netlify when they run that script. This avoids the observed Turbopack Google-font
+resolver failure; the underlying Turbopack issue is not claimed fixed.
 
 ## Object storage commands
 

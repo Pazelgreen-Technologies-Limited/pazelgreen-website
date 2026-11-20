@@ -10,7 +10,7 @@
   "scripts": {
     "predev": "tsx scripts/database.ts up && payload migrate && tsx scripts/bootstrap-admin.ts",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "prestart": "tsx scripts/bootstrap-admin.ts",
     "start": "next start",
     "lint": "eslint",
