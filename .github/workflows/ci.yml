@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_ENV: development
-      DEV_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5433/pazelgreen
-      TEST_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5433/pazelgreen_test
-      PAYLOAD_SECRET: ci-only-secret-not-for-production-at-least-32-characters
+      DEV_DATABASE_URL: postgresql://user:userpassword@127.0.0.1:5433/pazelgreen
+      TEST_DATABASE_URL: postgresql://user:userpassword@127.0.0.1:5433/pazelgreen_test
+      PAYLOAD_SECRET: dummy
     services:
       postgres:
         image: postgres:17.7-alpine
