@@ -1,11 +1,10 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
-import { unlink } from "node:fs/promises";
-import path from "node:path";
 import { APIError, createLocalReq, type Payload } from "payload";
 import { sql } from "@payloadcms/db-postgres";
 import { transactionDatabase } from "./transactions";
 import { applicantReference, validateCV } from "./recruitment-rules";
 import { jobIsOpen } from "./career-rules";
+import { cleanupApplicationUpload } from "./storage";
 
 function text(form: FormData, key: string, max: number, required = false) {
   const value = form.get(key);
@@ -33,7 +32,6 @@ export async function submitApplication(payload: Payload, form: FormData) {
   const req = await createLocalReq({ context: { submitApplication: true } }, payload);
   req.transactionID = transaction;
   const db = transactionDatabase(payload, transaction);
-  let uploadedPath: string | undefined;
   try {
     // Consistent lock order: retry token, email abuse bucket, then advert.
     await db.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${`submission:${submissionKey}`}, 0))`);
@@ -57,8 +55,6 @@ export async function submitApplication(payload: Payload, form: FormData) {
     const sequence = Number((await db.execute(sql`INSERT INTO applicant_counters (job_id, value) VALUES (${advert.id}, 1) ON CONFLICT (job_id) DO UPDATE SET value = applicant_counters.value + 1 RETURNING value`)).rows[0].value);
     const duplicate = (await payload.count({ collection: "applications", where: { and: [{ job: { equals: advert.id } }, { email: { equals: email } }] }, req, overrideAccess: true })).totalDocs > 0;
     const cv = await payload.create({ collection: "private-files", data: {}, file: { data: bytes, mimetype: mime, name: `${randomUUID()}.${mime === "application/pdf" ? "pdf" : "docx"}`, size: bytes.length }, req, overrideAccess: true });
-    const upload = payload.collections["private-files"].config.upload;
-    if (upload && typeof upload === "object" && cv.filename && path.basename(cv.filename) === cv.filename) uploadedPath = path.resolve(upload.staticDir!, cv.filename);
     const now = new Date();
     const application = await payload.create({ collection: "applications", req, overrideAccess: true, data: {
       reference: applicantReference(advert.reference, sequence), job: advert.id, sequence, submissionKey, fingerprint,
@@ -70,8 +66,7 @@ export async function submitApplication(payload: Payload, form: FormData) {
     return { reference: application.reference };
   } catch (error) {
     await payload.db.rollbackTransaction(transaction);
-    // Filesystem writes are outside PostgreSQL; remove this attempt's random file.
-    if (uploadedPath) await unlink(uploadedPath).catch(() => undefined);
+    await cleanupApplicationUpload(req);
     throw error;
   }
 }

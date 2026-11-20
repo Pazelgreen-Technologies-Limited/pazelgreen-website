@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { once } from "node:events";
 import nextEnv from "@next/env";
+import { testStorageEnvironment } from "../fixtures/storage-environment";
 
 nextEnv.loadEnvConfig(process.cwd());
 const testURL = process.env.TEST_DATABASE_URL;
@@ -11,7 +12,7 @@ if (!testURL || !new URL(testURL).pathname.endsWith("_test") || !["localhost", "
 }
 const base = "http://127.0.0.1:3101";
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3101"], {
-  env: { ...process.env, APP_ENV: "test", SERVER_URL: base, PUBLIC_UPLOAD_DIR: path.resolve("storage/test-public"), PRIVATE_UPLOAD_DIR: path.resolve("storage/test-private") },
+  env: { ...process.env, ...testStorageEnvironment(), APP_ENV: "test", SERVER_URL: base, PUBLIC_UPLOAD_DIR: path.resolve("storage/test-public"), PRIVATE_UPLOAD_DIR: path.resolve("storage/test-private") },
   windowsHide: true, stdio: ["ignore", "pipe", "pipe"],
 });
 let output = "";

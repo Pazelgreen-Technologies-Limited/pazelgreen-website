@@ -1,6 +1,6 @@
 # Payload CMS implementation plan
 
-Status: T01–T11 and T13 implemented and verified. T12 deferred by the user on 2026-11-19.
+Status: T01–T11 and T13 implemented and verified. T14 storage code is implemented; live privacy acceptance is pending. T12 deferred by the user on 2026-11-19.
 Agreed: 2026-11-07. Read progress.md before starting work.
 
 The delivery checklist below is authoritative for completion. Read
@@ -8,7 +8,7 @@ The delivery checklist below is authoritative for completion. Read
 T11 verification and T12 next steps. Superseded dated milestones are in [history.md](history.md).
 T11 was committed as `a87b7ca`. The user authorized section-level staff permissions
 on 2026-11-19 (T13 below); T12 remains deferred. Supabase is selected for production
-PostgreSQL; current filesystem uploads remain in use and R2 is deferred.
+PostgreSQL and initial S3-compatible storage (T14 below); R2 is deferred.
 
 Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
 Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
@@ -23,6 +23,24 @@ controlled Supabase migrations, explicit admin bootstrap, production SMTP,
 hosted build verification and recruitment delivery scheduling if enabled.
 See [Netlify deployment](../docs/netlify-deployment.md). This records prerequisites;
 T12 and R2 remain deferred and no production deployment is claimed.
+
+Storage preparation (2026-11-20): the user created a Supabase bucket and requested
+local environment placeholders. Supabase Storage is selected for the initial
+S3-compatible integration; R2 remains deferred. This preparation was followed by
+the authorised implementation below; placeholders alone did not connect storage.
+
+Storage implementation (T14, authorised 2026-11-20): connect the configured private
+Supabase bucket using Payload's matching S3 adapter, separate media/CV prefixes,
+preserve server permissions and failed-submission cleanup, isolate automated tests,
+validate the connection, and document local-file migration and later R2 cutover.
+- [ ] T14: S3-compatible storage code, migration, tests and handoff implemented and
+  locally verified. Live authenticated write/read passed; bucket privacy check
+  failed (public REST returned 200). Complete only after user makes the bucket
+  private and the live privacy check passes.
+Netlify release automation, SMTP/scheduler setup and T12 remain separate work.
+The user chose to leave the current bucket public for now and requested committing
+the implementation. Keep local storage selected; this decision defers live privacy
+acceptance and does not mark T14 or production deployment complete.
 
 ## Objective and scope
 

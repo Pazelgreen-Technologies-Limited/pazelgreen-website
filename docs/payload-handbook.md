@@ -514,7 +514,9 @@ Restart processes after changing environment values.
 | `PRODUCTION_DATABASE_URL` | Hosted database URL supplied by the operator; never the local Docker address |
 | `PAYLOAD_SECRET` | Random server secret of at least 32 characters; keep stable across restarts and replicas of the same environment |
 | `SERVER_URL` | Browser-facing origin used for links and allowed origins; localhost for local work, HTTPS in production |
-| `PUBLIC_UPLOAD_DIR`, `PRIVATE_UPLOAD_DIR` | Local defaults are `storage/public` and `storage/private`; production requires absolute, persistent, separate paths outside `public/` |
+| `PUBLIC_UPLOAD_DIR`, `PRIVATE_UPLOAD_DIR` | Local defaults are `storage/public` and `storage/private`; filesystem production mode requires absolute, persistent, separate paths outside `public/`; S3 needs no persistent mounts |
+| `STORAGE_DRIVER` | `local` or `s3`; see [object storage](object-storage.md) for automatic selection and test isolation |
+| `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Server-only S3-compatible connection to one private bucket; images/CVs use separate prefixes |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | Mailpit locally: `127.0.0.1`, `1025`, `false`; provider-specific values in production |
 | `SMTP_USER`, `SMTP_PASSWORD` | Production SMTP login; blank for local Mailpit |
 | `EMAIL_FROM_ADDRESS` | Local default `cms@pazelgreen.test`; verified sending address in production |
@@ -684,11 +686,11 @@ Before the first release, the team must name an operator and configure:
 | Release process | A job/process capable of applying migrations using the correct deployment environment |
 | Operations | Owners for logs, uptime, storage capacity, backups, recovery and access removal |
 
-The current implementation supports persistent filesystem storage. An ephemeral
-filesystem can lose uploads on redeploy/restart, even if PostgreSQL survives.
-Before choosing serverless/ephemeral hosting, implement an appropriate storage
-adapter and preserve private download checks. With multiple app replicas, all
-replicas need access to the same uploaded files and the same environment secret.
+The implementation supports persistent filesystem storage and private S3-compatible
+object storage. Use the [S3 setup and migration guide](object-storage.md) for
+Supabase/Netlify and a later R2 move. Ephemeral filesystems can lose uploads on
+redeploy/restart; use S3 mode there. With multiple app replicas, all replicas need
+access to the same uploaded files and the same environment secret.
 The general [Payload deployment guide](https://payloadcms.com/docs/production/deployment)
 describes the hosting pieces; our storage configuration is more specific.
 
@@ -709,6 +711,8 @@ APP_ENV=production
 PRODUCTION_DATABASE_URL=<provider-supplied-postgres-url>
 PAYLOAD_SECRET=<unique-stable-random-secret-for-this-environment>
 SERVER_URL=https://<your-public-hostname>
+# Filesystem example; use the S3 configuration in object-storage.md for Netlify.
+STORAGE_DRIVER=local
 PUBLIC_UPLOAD_DIR=<absolute-path-to-persistent-public-upload-mount>
 PRIVATE_UPLOAD_DIR=<absolute-path-to-persistent-private-upload-mount>
 SMTP_HOST=<provider-smtp-host>
@@ -910,7 +914,7 @@ enabled and published with approved notice/version/retention values. Read
 Company-approved policy remains a launch input.
 
 **What should we do next?** Prepare deployment using the
-[Netlify handoff](netlify-deployment.md): resolve durable upload storage first,
+[Netlify handoff](netlify-deployment.md): verify the private S3 bucket connection first,
 then configure production services, migrations, admin setup and hosted checks.
 Environment variables and a push alone are insufficient. T11 is committed as `a87b7ca`; T13 section permissions
 are implemented and verified. Assign actual staff access using the

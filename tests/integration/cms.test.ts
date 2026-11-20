@@ -17,6 +17,7 @@ import { deliverApplications } from "../../cms/deliver-applications";
 import { randomUUID } from "node:crypto";
 import { cvDOCX, cvPDF } from "../fixtures/cv";
 import { announcementSnapshot } from "../../cms/announcement-rules";
+import { testStorageEnvironment } from "../fixtures/storage-environment";
 
 let payload: Payload;
 let admin: User;
@@ -56,6 +57,7 @@ beforeAll(async () => {
     throw new Error("Integration tests require a local TEST_DATABASE_URL whose database name ends in _test.");
   }
   process.env.APP_ENV = "test";
+  Object.assign(process.env, testStorageEnvironment());
   process.env.PUBLIC_UPLOAD_DIR = path.resolve("storage/test-public");
   process.env.PRIVATE_UPLOAD_DIR = path.resolve("storage/test-private");
   const { default: config } = await import("../../payload.config");
@@ -867,6 +869,9 @@ describe("private recruitment submissions and durable email", () => {
   });
   it("rolls back a durable-write failure and removes its private file bytes", async () => {
     const files = (await readdir(path.resolve("storage/test-private"))).sort();
+    const endpoint = process.env.CMS_TEST_S3_ENDPOINT;
+    const objectKeys = async () => endpoint ? (await (await fetch(`${endpoint}/__control/state`)).json() as { keys: string[] }).keys.sort() : [];
+    const keys = process.env.CMS_TEST_STORAGE === "s3" ? await objectKeys() : [];
     const count = (await payload.count({ collection: "applications", overrideAccess: true })).totalDocs;
     const hooks = payload.collections.applications.config.hooks!.beforeChange!;
     hooks.push(() => { throw new Error("Simulated durable write failure"); });
@@ -874,7 +879,20 @@ describe("private recruitment submissions and durable email", () => {
     finally { hooks.pop(); }
     expect((await payload.count({ collection: "applications", overrideAccess: true })).totalDocs).toBe(count);
     expect((await readdir(path.resolve("storage/test-private"))).sort()).toEqual(files);
+    if (process.env.CMS_TEST_STORAGE === "s3") expect(await objectKeys()).toEqual(keys);
     expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(1001);
+  });
+  it.skipIf(process.env.CMS_TEST_STORAGE !== "s3")("rejects storage write failures without allocating an application or losing existing CVs", async () => {
+    const endpoint = process.env.CMS_TEST_S3_ENDPOINT!;
+    const before = await (await fetch(`${endpoint}/__control/state`)).json() as { keys: string[] };
+    const count = (await payload.count({ collection: "applications", overrideAccess: true })).totalDocs;
+    await fetch(`${endpoint}/__control/fail-writes`, { method: "POST" });
+    try { await expect(submitApplication(payload, form(randomUUID(), "storage-failure@pazelgreen.test"))).rejects.toThrow(); }
+    finally { await fetch(`${endpoint}/__control/fail-writes`, { method: "DELETE" }); }
+    expect((await payload.count({ collection: "applications", overrideAccess: true })).totalDocs).toBe(count);
+    expect(Number((await payload.db.pool.query("SELECT value FROM applicant_counters WHERE job_id=$1", [job.id])).rows[0].value)).toBe(1001);
+    const after = await (await fetch(`${endpoint}/__control/state`)).json() as { keys: string[] };
+    expect(after.keys.sort()).toEqual(before.keys.sort());
   });
   it("accepts DOCX and omitted optional fields, then delivers queued mail through local Mailpit", async () => {
     const application = form(randomUUID(), "docx@pazelgreen.test");
@@ -888,6 +906,22 @@ describe("private recruitment submissions and durable email", () => {
   });
 });
 
+
+describe("immutable upload locations", () => {
+  it("prevents media and CV records from being redirected across storage namespaces", async () => {
+    const media = await payload.create({ collection: "media", draft: true, data: { alt: "Storage namespace check", prefix: "cvs", _objectKey: "forged" },
+      file: { name: "namespace.png", mimetype: "image/png", size: image.length, data: image }, user: asUser(staff), overrideAccess: false });
+    expect(media.prefix).toBe("media"); expect(media._objectKey).toBeNull();
+    const changed = await payload.update({ collection: "media", id: media.id, data: { prefix: "cvs", _objectKey: "forged" }, user: asUser(staff), overrideAccess: false });
+    expect(changed.prefix).toBe("media"); expect(changed._objectKey).toBeNull();
+    const bytes = cvPDF();
+    const cv = await payload.create({ collection: "private-files", data: { prefix: "media", _objectKey: "forged" },
+      file: { name: "namespace.pdf", mimetype: "application/pdf", size: bytes.length, data: bytes }, user: asUser(admin), overrideAccess: false });
+    expect(cv.prefix).toBe("cvs"); expect(cv._objectKey).toBeNull();
+    await payload.delete({ collection: "media", id: media.id, user: asUser(admin), overrideAccess: false });
+    await payload.delete({ collection: "private-files", id: cv.id, user: asUser(admin), overrideAccess: false });
+  });
+});
 
 describe("section-level staff permissions", () => {
   let editor: User;

@@ -2,22 +2,21 @@
 
 Status: the CMS and T13 permissions are verified locally. No Netlify deployment
 has been verified. Adding environment variables and pushing is not sufficient
-for the current filesystem upload implementation. T12 launch acceptance and R2
+without storage configuration, release setup and hosted checks. T12 launch acceptance and R2
 remain deferred; this checklist records outstanding work without approving launch.
 
 ## 1. Resolve upload storage before deployment
 
-Supabase is selected for PostgreSQL. That database connection does not configure
-file storage. Public images and private CVs currently use separate filesystem
-directories, which require persistent mounts. Netlify's temporary filesystem is
-not durable upload storage. Images already committed to the codebase can continue
-to ship with the site; new CMS uploads need a storage adapter.
+Supabase is selected for PostgreSQL and initial object storage. The implemented
+Payload S3 adapter uses separate `media/` and `cvs/` prefixes in one private bucket,
+preserving Payload URLs, approval rules and authenticated CV access. Configure it
+using the [object-storage guide](object-storage.md), run the connection/privacy
+check, and copy existing local uploads before switching a populated installation.
+Never expose this bucket publicly. Images committed to the codebase remain static
+assets. R2 is deferred; a later cutover needs a verified object copy and credential
+change, not a database-provider move. Local filesystem mode still needs persistent
+mounts and is unsuitable for durable Netlify uploads.
 
-Select a durable provider and implement storage for both upload collections before
-enabling uploads on Netlify. R2 is deferred, so no R2 setup is assumed. If another
-provider is selected, verify its Payload integration and private download controls.
-Never expose CV files through a public bucket or bypass the existing authenticated
-download endpoint. Directory environment variables alone do not solve persistence.
 See [Payload deployment guidance](https://payloadcms.com/docs/production/deployment)
 and [Netlify's Payload guide](https://developers.netlify.com/guides/deploy-payload-cms-3-to-netlify/).
 
@@ -31,10 +30,9 @@ through Netlify's environment settings, with the required build and runtime scop
   the deployed website origin.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD` and
   `EMAIL_FROM_ADDRESS` for real invitation and recruitment delivery.
-- Storage credentials/configuration once the adapter is implemented. The current
-  validator still requires separate absolute `PUBLIC_UPLOAD_DIR` and
-  `PRIVATE_UPLOAD_DIR` values; revise that configuration as part of the adapter
-  work rather than treating temporary directories as permanent storage.
+- `STORAGE_DRIVER=s3`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`
+  and `S3_SECRET_ACCESS_KEY` for the private bucket. Persistent directory variables
+  are required only for local filesystem production mode, not S3 mode.
 
 Keep credentials out of Git and planning records. Use isolated databases/storage
 for deploy previews; previews must not run migrations against production.

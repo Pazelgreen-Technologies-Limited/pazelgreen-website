@@ -267,6 +267,8 @@ export interface Media {
   submittedAt?: string | null;
   reviewedAt?: string | null;
   publishedAt?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -286,6 +288,8 @@ export interface Media {
  */
 export interface PrivateFile {
   id: number;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -946,6 +950,8 @@ export interface MediaSelect<T extends boolean = true> {
   submittedAt?: T;
   reviewedAt?: T;
   publishedAt?: T;
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -964,6 +970,8 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "private-files_select".
  */
 export interface PrivateFilesSelect<T extends boolean = true> {
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

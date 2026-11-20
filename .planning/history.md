@@ -900,3 +900,46 @@ environment/build setup, controlled Supabase migrations, explicit first-admin
 bootstrap, separate recruitment scheduling and hosted acceptance requirements.
 T12/R2 remain deferred. No production services were changed or deployment claimed.
 Prior T13 test results remain dated evidence; this pass changes documentation only.
+
+## T14 private S3 storage: 2026-11-20
+
+User filled the S3 environment and authorised code integration. Implemented the
+matching adapter, schema/type/import-map changes, server-controlled namespaces,
+application rollback cleanup, isolated test environments, simulator/CI runner,
+connection/privacy check and local-file copy operations. Read the installed Next
+environment guide and Payload 3.93 adapter source before implementation.
+
+Initial validation corrections: collection storage options omit
+disablePayloadAccessControl to retain its default access checks (the option's
+type only permits true). Added explicit types for async plugin hooks/test env
+maps and a draft flag to the namespace test fixture. Generated migration imports
+use type-only declarations and unused arguments were removed. Supabase bucket
+names can include uppercase/underscores, so validation uses safe path-style names
+rather than AWS-only DNS naming rules. CommonJS simulator imports have a narrow
+lint exemption because Postman requires CommonJS. Its manifest requires version 1.
+
+Live connection successfully wrote/read temporary synthetic objects, but the
+Supabase public REST route returned HTTP 200: the configured bucket is public.
+Removed every temporary check object and asked the user to make the bucket
+private. No candidate content or production DB operations were performed.
+
+The first copy acceptance run verified nine synthetic files but the CLI process
+retained framework handles after destroy; stopped only the identified copy process,
+added the explicit exit used by existing project CLI tools, and restarted acceptance.
+The copy rerun preserves existing destination bytes and local/database records.
+See progress.md for current final validation rather than treating intermediate
+failures or pending statements here as the active handoff.
+
+Final local evidence: lint/TypeScript, 88 unit tests, 68 local integration checks
+(one S3-only case skipped), migration round trip and webpack build passed. The
+expanded S3 runner passed 69 integration checks, real production HTTP permissions/
+PDF/DOCX byte checks, nine-file copy/rerun and six desktop/mobile admin/preview
+checks in Chrome. Simulator state/logs confirmed the expected object operations
+and cleanup. The known public live bucket is still a user configuration dependency;
+T14 stays unchecked until a subsequent live privacy check passes. No production
+database, real content transfer, commit or push was performed.
+
+The user subsequently chose to leave the bucket public for now, then explicitly
+requested committing the implementation so they can push. Recorded the decision
+in task/progress; local storage remains selected and live privacy acceptance stays
+deferred. Committing the tested implementation does not certify Netlify deployment.

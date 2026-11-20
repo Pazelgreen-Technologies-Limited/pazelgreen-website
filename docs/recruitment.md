@@ -1,5 +1,10 @@
 # Recruitment operations
 
+CV bytes use the configured private filesystem directory or the private S3
+bucket's `cvs/` prefix. Downloads still require Payload Recruitment access; never
+make the bucket public. See [object storage](object-storage.md) for setup, failed
+submission cleanup, existing-file transfer and provider cutover.
+
 Applications are private and have no applicant login. Admins and staff with Recruitment View/Modify can filter Applications by job/status.
 Updating statuses or notes requires Recruitment Modify (or admin). Staff with
 Recruitment Modify can select themselves

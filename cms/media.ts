@@ -30,6 +30,9 @@ export const createPrivateFiles = (directory: string): CollectionConfig => ({
       catch { throw new Error("Upload a valid PDF or DOCX CV, no larger than 5 MB."); }
     }
     if (operation === "update" && req.file) throw new Error("Private CV files cannot be replaced.");
+  }], afterChange: [({ doc, operation, req }) => {
+    // Capture before the adapter uploads, including a write followed by timeout.
+    if (operation === "create" && req.context.submitApplication) req.context.applicationUpload = { filename: doc.filename, prefix: doc.prefix, _objectKey: doc._objectKey };
   }], beforeDelete: [async ({ id, req }) => {
     const referenced = await req.payload.count({ collection: "applications", where: { cv: { equals: id } }, req, overrideAccess: true });
     if (referenced.totalDocs) throw new Error("Use the approved recruitment retention procedure to remove a referenced CV.");

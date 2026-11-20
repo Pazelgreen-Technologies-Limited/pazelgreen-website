@@ -33,6 +33,7 @@ async function verifyScratchDatabase() {
     throw new Error("The migration worker requires its own local scratch database.");
   }
   process.env.APP_ENV = "test";
+  process.env.STORAGE_DRIVER = "local";
   process.env.PUBLIC_UPLOAD_DIR = path.resolve("storage/test-public");
   process.env.PRIVATE_UPLOAD_DIR = path.resolve("storage/test-private");
   const { default: config } = await import("../../payload.config");
@@ -42,8 +43,10 @@ async function verifyScratchDatabase() {
     assert.equal((await payload.db.pool.query("SELECT to_regclass('public.jobs') AS relation")).rows[0].relation, "jobs");
     assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM employment_types WHERE _status = 'published'")).rows[0].count, 3);
     await runLatestMigration(payload, "down");
-    assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'permissions_blog'")).rows[0].count, 0);
+    assert.equal((await payload.db.pool.query("SELECT count(*)::int AS count FROM information_schema.columns WHERE table_name = 'private_files' AND column_name = 'prefix'")).rows[0].count, 0);
     await runLatestMigration(payload, "up");
+    const storageColumns = await payload.db.pool.query("SELECT table_name FROM information_schema.columns WHERE table_name IN ('media', '_media_v', 'private_files') AND column_name IN ('prefix', 'version_prefix', '_objectkey', 'version__objectkey')");
+    assert.equal(storageColumns.rows.length, 6);
     const permissionColumns = await payload.db.pool.query("SELECT table_name, column_default FROM information_schema.columns WHERE table_name IN ('users', 'invitations') AND column_name LIKE 'permissions_%'");
     assert.equal(permissionColumns.rows.length, 18);
     assert.ok(permissionColumns.rows.every(row => row.column_default.startsWith("'none'::")));

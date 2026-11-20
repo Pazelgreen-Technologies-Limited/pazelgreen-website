@@ -1,7 +1,7 @@
 # CMS implementation handoff
 
-Last updated: 2026-11-19. T11 code baseline: `a87b7ca`; the subsequent documentation audit, T13 permissions and Netlify handoff are included in the staff-permissions release commit (see Git history).
-**T01–T11 and T13 are implemented and verified. T12 and R2 are deferred by the user.**
+Last updated: 2026-11-20. T11 code baseline: `a87b7ca`; T13 permissions and the Netlify handoff were committed as `1ba249b`. Storage environment preparation below is subsequent work.
+**T01–T11 and T13 are implemented and verified. T14 code is implemented; live bucket privacy acceptance is pending. T12 and R2 are deferred by the user.**
 
 This file is the current snapshot. Read [task.md](task.md) for agreed scope and
 acceptance requirements. Older experiments, failures and superseded next actions
@@ -11,7 +11,7 @@ are preserved in [history.md](history.md); they are historical evidence only.
 
 1. Read [AGENTS.md](../AGENTS.md), task.md and this file.
 2. Inspect `git status` and the code before editing; preserve other work.
-3. T13 is complete and verified. Prepare Netlify deployment using the handoff below; durable upload storage is the first blocker. Review section permissions on Users/Invitations; existing staff default to No access. T12/R2 remain deferred; Supabase is selected and current filesystem uploads remain.
+3. T13 is complete and verified. T14 S3 storage implementation is under verification below; the live bucket privacy check requires the user to make the Supabase bucket private. Existing staff default to No access. T12/R2 remain deferred; Netlify release automation, email scheduling and hosted checks are separate work.
 4. For implementation, select the supported runtime and read relevant installed
    Next.js guides. Do not rely on older Next.js conventions or a temporary runtime.
 5. Update this snapshot, task checkboxes and relevant human guides after verified
@@ -160,8 +160,8 @@ Do not put credentials, private recipients or applicant data into planning files
   rights and actual vacancies. Do not promote examples/fallbacks into approved data.
 - Obtain company-approved privacy/terms/recruitment copy and retention duration,
   including deletion/legal-hold and backup-expiry procedures.
-- Configure the selected Supabase PostgreSQL, choose SMTP/HTTPS hosting and persistent
-  public/private storage. Ephemeral hosting requires a storage adapter. Verify
+- Configure the selected Supabase PostgreSQL/private object storage, choose
+  SMTP/HTTPS hosting and verify bucket privacy. T14 implements the S3 adapter. Verify
   deployment, backups, permissions and recovery independently.
 - Configure private recruitment recipients, delivery scheduling, monitoring and
   ingress upload/time/rate limits. Supabase account is available per the user; no production deployment or scheduler was provisioned in this work.
@@ -227,10 +227,9 @@ requirements. Added [Netlify deployment](../docs/netlify-deployment.md) and link
 setup, operations, handbook and README to it. Local T13 verification above remains
 the application evidence; no application code changed in this documentation pass.
 
-Next action: resolve durable public/private upload storage for Netlify. Current
-filesystem uploads require persistent mounts; directory environment variables do
-not provide them. R2 remains deferred; no alternative adapter is implemented.
-Then configure production secrets/SMTP, the reviewed webpack build command,
+At this handoff, durable uploads were the first blocker. T14 below subsequently
+implements the selected Supabase S3 adapter; live privacy acceptance remains pending.
+R2 remains deferred. After storage acceptance, configure production secrets/SMTP, the reviewed webpack build command,
 controlled Supabase migrations and explicit `pnpm cms:bootstrap` if no admin exists.
 Netlify's standard deployment does not run `pnpm start`/`prestart`. Configure a
 separate recruitment delivery scheduler if enabled, assign staff access, and verify
@@ -242,3 +241,86 @@ No push or production changes are included. T12 and R2 remain deferred. Preserve
 existing account credentials and content. This pass verified 16 Markdown files,
 129 local file targets, balanced fences and Git whitespace checks. The recorded
 application suites were not rerun for prose edits.
+
+## Supabase storage environment preparation: 2026-11-20
+
+The user created a Supabase bucket and copied a PostgreSQL URL, then requested
+environment placeholders. Added empty S3 endpoint, region, bucket, access-key ID
+and secret-key placeholders to the ignored local `.env` and tracked `.env.example`,
+preserving all existing values. Documented that credentials are server-only and
+the bucket must remain private. No secrets were printed or committed.
+
+At the preparation stage, the application did not yet read the new variables.
+The user then filled the placeholders and authorised T14 implementation below.
+T12 and R2 remain deferred.
+
+Validation: confirmed all five placeholder names exist in both files, `.env` is
+ignored by Git, and Git whitespace checks pass. No application tests required
+for unused environment placeholders/documentation. No production changes or push.
+
+## T14 S3 storage implementation: 2026-11-20
+
+User authorised the integration after filling the local environment. Added the
+matching Payload S3 adapter, environment selection/validation, separate media/CV
+prefixes in one private bucket, stable access-controlled Payload URLs and server
+upload validation. Local production still requires persistent mounts; S3 production
+does not. Location metadata is forced server-side to prevent namespace redirection.
+Failed application transactions attempt storage cleanup, including upload errors;
+failed cleanup reports a generic reconciliation warning without applicant data.
+
+Added migration `20261120_080016_s3_upload_storage` for prefix/object-key fields
+on uploads/media versions, with identical schema in local/S3 modes. Generated
+types/import map updated. Test/migration/HTTP/browser harnesses explicitly isolate
+test storage from real `.env` credentials; S3 tests accept loopback endpoints only.
+Added an owned Postman S3 mock/simulation and a portable storage acceptance runner
+for CI. Added connection/privacy and idempotent local-file copy commands and
+[object-storage operations](../docs/object-storage.md), including later R2 cutover.
+
+Live check: configured Supabase credentials successfully wrote/read a temporary
+non-personal object, and each check object was removed. Anonymous Supabase public
+REST access returned HTTP 200. The bucket is public, so privacy acceptance failed.
+The user explicitly chose to leave the bucket public for now and requested a commit.
+Live privacy acceptance is deferred; the public bucket remains unused for CMS files.
+No real content or CVs were uploaded, no production database was changed, and no
+bucket setting was changed by the agent. Do not enable real uploads until privacy
+passes. A successful authenticated S3 request alone does not prove bucket privacy.
+The local `.env` is explicitly kept at `STORAGE_DRIVER=local` until privacy passes,
+preserving every S3 credential. The diagnostic command checks S3 independently of
+that application selection; enable `s3` only after the successful live check.
+
+Final verification on 2026-11-20:
+
+| Check | Result |
+| --- | --- |
+| Lint / TypeScript | Passed |
+| Unit | 88 passed |
+| Local integration | 68 passed; S3-only failure case intentionally skipped |
+| Migration | Fresh schema/latest down/latest up passed on disposable local scratch database; six storage columns verified |
+| Production build | `pnpm exec next build --webpack` passed; default Turbopack issue remains unresolved |
+| S3 integration / HTTP | All 69 expanded integration tests and production HTTP byte/access checks passed against the owned loopback simulator |
+| S3 UI | All six affected desktop/mobile permission/admin/preview checks passed with installed Chrome in 39 seconds |
+| Local-file copy | Nine synthetic objects copied and verified; safe rerun verified the same nine; sources/database preserved |
+| Postman simulation | Earlier 67-test integration run passed with observed PUT/HEAD/GET/DELETE requests; owned mock is not a complete provider/cryptographic-policy emulator |
+| Live Supabase | Authenticated write/read passed; anonymous public REST returned 200, so privacy acceptance failed; every temporary check object removed |
+| Documentation | 17 Markdown files, 140 local targets, balanced fences and Git whitespace passed; YAML parsed separately |
+
+Changed files: env/config/dependencies/lockfile, cms/storage.ts/media.ts/
+submit-application.ts, generated types/import map and storage migration TS/JSON/index;
+unit/integration/test harnesses, storage acceptance runner, owned Postman mock and
+simulation/context, CI; connection/copy scripts; README and setup/handbook/Netlify/
+storage/blog/recruitment/operations guides and planning records. Existing environment
+values were preserved; local `.env` remains ignored. Test servers/simulator stopped;
+local Docker PostgreSQL/Mailpit remain running.
+
+Next action: prepare Netlify release automation when authorised. Before enabling
+S3 uploads, make the bucket private (or configure a separate private bucket), rerun
+`pnpm cms:storage:check` and record actual denial. The user is leaving the current
+bucket public for now; local storage stays selected. T14 remains unchecked for
+live privacy acceptance. `pnpm dev` applies the
+new migration locally before startup; no development/production migration was run
+by this task, only guarded test migrations. Copy any existing installation's local
+uploads before its switch; no real content was transferred. Then implement Netlify
+release automation and verify SMTP/scheduler, hosted upload request-size limits and
+deployment separately. T12/R2 remain deferred. Implementation, tests, environment
+preparation and docs are included in the user-requested commit with subject
+`feat: add S3-compatible upload storage`. No push or production DB changes.

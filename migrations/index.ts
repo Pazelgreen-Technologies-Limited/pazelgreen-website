@@ -9,6 +9,7 @@ import * as migration_20261115_092113_faqs from './20261115_092113_faqs';
 import * as migration_20261115_092830_announcements from './20261115_092830_announcements';
 import * as migration_20261115_094339_legal_pages from './20261115_094339_legal_pages';
 import * as migration_20261119_192433_staff_section_permissions from './20261119_192433_staff_section_permissions';
+import * as migration_20261120_080016_s3_upload_storage from './20261120_080016_s3_upload_storage';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261119_192433_staff_section_permissions.up,
     down: migration_20261119_192433_staff_section_permissions.down,
-    name: '20261119_192433_staff_section_permissions'
+    name: '20261119_192433_staff_section_permissions',
+  },
+  {
+    up: migration_20261120_080016_s3_upload_storage.up,
+    down: migration_20261120_080016_s3_upload_storage.down,
+    name: '20261120_080016_s3_upload_storage'
   },
 ];

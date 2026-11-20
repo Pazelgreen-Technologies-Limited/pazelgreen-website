@@ -2,6 +2,26 @@ import path from "node:path";
 
 type Environment = Record<string, string | undefined>;
 
+export function getStorageEnvironment(source: Environment = process.env) {
+  const keys = ["S3_ENDPOINT", "S3_REGION", "S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const;
+  const testing = getEnvironment(source) === "test";
+  const driver = source.STORAGE_DRIVER || (testing ? "local" : keys.some(key => Boolean(source[key])) ? "s3" : "local");
+  if (driver !== "local" && driver !== "s3") throw new Error("STORAGE_DRIVER must be local or s3.");
+  if (driver === "local") return { driver } as const;
+  for (const key of keys) if (!source[key]?.trim()) throw new Error(`${key} is required for S3 storage.`);
+  let endpoint: URL;
+  try { endpoint = new URL(source.S3_ENDPOINT!); } catch { throw new Error("S3_ENDPOINT must be a valid HTTP(S) URL."); }
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(endpoint.hostname);
+  if (endpoint.username || endpoint.password || endpoint.search || endpoint.hash || !["https:", "http:"].includes(endpoint.protocol)) throw new Error("S3_ENDPOINT must be an HTTP(S) endpoint without credentials, query or fragment.");
+  if (endpoint.protocol !== "https:" && !local) throw new Error("Remote S3 storage requires HTTPS.");
+  if (testing && !local) throw new Error("Automated tests must never use remote S3 storage.");
+  // Supabase permits names (including uppercase/underscores) that AWS DNS-style
+  // buckets do not. Path-style addressing supports them without URL traversal.
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(source.S3_BUCKET!)) throw new Error("S3_BUCKET must be a bucket name without paths or URL characters.");
+  return { driver, endpoint: endpoint.href.replace(/\/$/, ""), region: source.S3_REGION!, bucket: source.S3_BUCKET!,
+    accessKeyId: source.S3_ACCESS_KEY_ID!, secretAccessKey: source.S3_SECRET_ACCESS_KEY! } as const;
+}
+
 /** Deployment environment is independent of Next's build-time NODE_ENV. */
 export function getEnvironment(source: Environment = process.env) {
   const value = source.APP_ENV ?? (source.NODE_ENV === "production" ? "production" : "development");
@@ -14,6 +34,7 @@ export function getEnvironment(source: Environment = process.env) {
 export function getServerEnvironment(source: Environment = process.env) {
   const appEnv = getEnvironment(source);
   const production = appEnv === "production";
+  const storage = getStorageEnvironment(source);
   const databaseKey = production ? "PRODUCTION_DATABASE_URL" : appEnv === "test" ? "TEST_DATABASE_URL" : "DEV_DATABASE_URL";
   const databaseURL = source[databaseKey];
   if (!databaseURL) throw new Error(`${databaseKey} is required for APP_ENV=${appEnv}.`);
@@ -28,8 +49,8 @@ export function getServerEnvironment(source: Environment = process.env) {
   const serverURL = source.SERVER_URL || (production ? undefined : "http://localhost:3000");
   if (!serverURL || !["http:", "https:"].includes(new URL(serverURL).protocol)) throw new Error("SERVER_URL must be an HTTP(S) URL.");
   if (production && new URL(serverURL).protocol !== "https:") throw new Error("Production SERVER_URL must use HTTPS.");
-  const publicStorage = source.PUBLIC_UPLOAD_DIR || (production ? undefined : path.resolve("storage/public"));
-  const privateStorage = source.PRIVATE_UPLOAD_DIR || (production ? undefined : path.resolve("storage/private"));
+  const publicStorage = source.PUBLIC_UPLOAD_DIR || (production && storage.driver === "local" ? undefined : path.resolve("storage/public"));
+  const privateStorage = source.PRIVATE_UPLOAD_DIR || (production && storage.driver === "local" ? undefined : path.resolve("storage/private"));
   if (!publicStorage || !privateStorage || !path.isAbsolute(publicStorage) || !path.isAbsolute(privateStorage)) {
     throw new Error("Upload directories must be absolute paths; production requires persistent mounted directories.");
   }
@@ -47,7 +68,7 @@ export function getServerEnvironment(source: Environment = process.env) {
   if (!Number.isInteger(smtpPort) || smtpPort < 1 || smtpPort > 65535) throw new Error("SMTP_PORT must be an integer between 1 and 65535.");
   return {
     appEnv, production, databaseURL, secret, serverURL: new URL(serverURL).origin,
-    publicStorage, privateStorage,
+    publicStorage, privateStorage, storage,
     smtp: {
       host: source.SMTP_HOST || "127.0.0.1", port: smtpPort,
       secure: source.SMTP_SECURE === "true" || (production && source.SMTP_SECURE !== "false"),

@@ -158,6 +158,7 @@ passing results do not mean a remote CI run or deployment happened.
 | [Team handbook](docs/payload-handbook.md) | Concepts, accounts, environments, deployment and backups |
 | [Setup reference](docs/cms-setup.md) | Exact local, test, migration and release commands |
 | [Netlify deployment](docs/netlify-deployment.md) | Outstanding storage, environment, migration, bootstrap and hosted verification work |
+| [Object storage](docs/object-storage.md) | Private Supabase S3 configuration, connection checks, local-file transfer and later R2 cutover |
 | [Blog](docs/blog-editing.md) / [Careers](docs/careers-editing.md) | Creating and publishing articles and jobs |
 | [Recruitment](docs/recruitment.md) | Private CVs, applicant IDs, hiring operations, email retries and retention |
 | [FAQs](docs/faqs-editing.md) / [Announcements](docs/announcements-editing.md) / [Legal pages](docs/legal-editing.md) | Feature-specific editing rules |
@@ -171,8 +172,8 @@ Code lives in `app/` (public/admin routes), `cms/` (schemas and server rules),
 `lib/` (public reads), `components/` (shared UI), `migrations/`, `scripts/` and
 `tests/`. Follow [AGENTS.md](AGENTS.md) for component placement and coding rules.
 
-Production needs independently configured PostgreSQL, SMTP, HTTPS, persistent
-public/private storage, release migrations, recruitment scheduling and verified
+Production needs independently configured PostgreSQL, SMTP, HTTPS, durable
+public/private storage (private S3 or persistent filesystem mounts), release migrations, recruitment scheduling and verified
 backups. Git does not share or back up content/uploads. Read the
 [production procedure](docs/payload-handbook.md#running-in-production) before
 deploying. T11 indexing/navigation checks and recovery instructions are complete.

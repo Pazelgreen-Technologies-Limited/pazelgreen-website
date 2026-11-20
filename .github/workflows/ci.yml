@@ -77,3 +77,6 @@ jobs:
 
       - name: Check public CMS desktop and mobile flows
         run: pnpm test:browser
+
+      - name: Verify S3 uploads, private downloads and failure recovery
+        run: pnpm test:storage --copy-local --browser

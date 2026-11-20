@@ -4,6 +4,10 @@ The Blog group in Payload contains **Posts** and **Categories**. The existing
 media library provides cover and inline images. The public website has a blog
 listing at `/blog` and article URLs at `/blog/<slug>`.
 
+Images can use the configured private S3 bucket without changing the editor flow.
+They stay behind Payload's approval/access checks. Operators should read
+[object storage](object-storage.md) before switching providers or moving files.
+
 ## Prepare categories and images
 
 Create a category with a name, URL slug and optional description. A new slug is

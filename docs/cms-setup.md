@@ -150,11 +150,12 @@ isolated restore rehearsal, scheduler monitoring, indexing and editor onboarding
 Collect company/deployment decisions in the [T12 checklist](../.planning/t12-checklist.md).
 
 Read the [full production procedure](payload-handbook.md#running-in-production)
-first. The operator must provision PostgreSQL, SMTP, HTTPS hosting and persistent
+first. The operator must provision PostgreSQL, SMTP, HTTPS hosting and durable
 upload storage, and configure APP_ENV, the production URL, stable PAYLOAD_SECRET,
-SERVER_URL, SMTP values, and absolute PUBLIC_UPLOAD_DIR/PRIVATE_UPLOAD_DIR paths.
-The current filesystem storage requires persistent mounts; ephemeral/serverless
-hosting needs an implemented storage adapter before deployment.
+SERVER_URL and SMTP values. Use the implemented private S3 adapter for Netlify;
+see [object storage](object-storage.md) for Supabase configuration, connection
+checks, existing-file transfer and later R2 cutover. Local filesystem production
+mode still requires absolute persistent PUBLIC_UPLOAD_DIR/PRIVATE_UPLOAD_DIR paths.
 
 For a reviewed release, install locked dependencies, run checks in the development/
 CI test environment, and build the release with its required configuration. Back
@@ -242,10 +243,21 @@ Earlier status notes live in
 The section-permissions migration defaults existing staff and pending invitations
 to No access. After applying migrations, sign in as an admin and explicitly assign
 sections on each user; admins retain full access. Permission changes revoke staff
-sessions. See [staff permissions](staff-permissions.md). Current uploads remain on
-the filesystem; Supabase is selected for PostgreSQL and R2 remains deferred.
+sessions. See [staff permissions](staff-permissions.md). Supabase is selected for
+PostgreSQL and initial S3-compatible object storage; R2 remains deferred. Upload
+storage is selected by environment configuration, not by the database URL.
 
 Next also supports `pnpm exec next build --webpack` for a production build using
 webpack. T13 acceptance uses this mode because the default Turbopack build hit a
 Google-font resolver failure on this machine. The default package script remains
 unchanged; a webpack pass does not establish that the Turbopack issue is resolved.
+
+## Object storage commands
+
+Use [object storage](object-storage.md) for private bucket configuration, migration
+of local files and later R2 cutover. `pnpm cms:storage:check` verifies a temporary
+write/read and anonymous denial without changing bucket settings.
+`pnpm cms:storage:copy-local` copies existing local uploads with writes paused.
+After a verified build, `pnpm test:storage --copy-local --browser` exercises the
+local S3 simulator, copy/rerun, integration, HTTP and affected admin screens;
+run ordinary local integration fixtures first when using `--copy-local`.

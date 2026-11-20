@@ -6,6 +6,11 @@ in the [T12 launch checklist](../.planning/t12-checklist.md). Use the supported
 Node/pnpm versions and [environment setup](cms-setup.md#environment-selection).
 Never copy credentials, applicant data, database dumps or recipient lists into Git.
 
+For Supabase/R2, follow [object storage](object-storage.md). Back up the private
+bucket alongside database metadata, preserve full object keys, and rehearse a
+restore of both. A provider switch does not copy objects. Database-only rollback
+or recovery cannot restore missing/deleted file bytes.
+
 ## Publishing, caching and indexing
 
 Public database reads call `connection()` before querying Payload. They request
