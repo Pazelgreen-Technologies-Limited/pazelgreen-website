@@ -1,0 +1,308 @@
+# Payload CMS implementation plan
+
+Status: T01–T11 and T13 implemented and verified. T14 storage code is implemented; live privacy acceptance is pending. T12 deferred by the user on 2026-11-19.
+Agreed: 2026-11-07. Read progress.md before starting work.
+
+The delivery checklist below is authoritative for completion. Read
+[the current handoff](progress.md) for verified commits, results and concrete
+T11 verification and T12 next steps. Superseded dated milestones are in [history.md](history.md).
+T11 was committed as `a87b7ca`. The user authorized section-level staff permissions
+on 2026-11-19 (T13 below); T12 remains deferred. Supabase is selected for production
+PostgreSQL and initial S3-compatible storage (T14 below); R2 is deferred.
+
+Infrastructure decision (2026-11-07): PostgreSQL is confirmed. Development uses
+Docker Compose; APP_ENV selects DEV_DATABASE_URL, PRODUCTION_DATABASE_URL, or a
+separate TEST_DATABASE_URL. Production must never fall back to Docker. Local
+email is captured by Mailpit. Supabase is selected for production PostgreSQL;
+SMTP and deployment remain pending. The foundation uses persistent mounted public/private filesystem directories,
+with a storage adapter required before choosing ephemeral hosting.
+
+Netlify handoff (2026-11-19): environment variables and a push alone are insufficient.
+Durable public/private upload storage is the first deployment blocker, followed by
+controlled Supabase migrations, explicit admin bootstrap, production SMTP,
+hosted build verification and recruitment delivery scheduling if enabled.
+See [Netlify deployment](../docs/netlify-deployment.md). This records prerequisites;
+T12 and R2 remain deferred and no production deployment is claimed.
+
+Storage preparation (2026-11-20): the user created a Supabase bucket and requested
+local environment placeholders. Supabase Storage is selected for the initial
+S3-compatible integration; R2 remains deferred. This preparation was followed by
+the authorised implementation below; placeholders alone did not connect storage.
+
+Storage implementation (T14, authorised 2026-11-20): connect the configured private
+Supabase bucket using Payload's matching S3 adapter, separate media/CV prefixes,
+preserve server permissions and failed-submission cleanup, isolate automated tests,
+validate the connection, and document local-file migration and later R2 cutover.
+- [ ] T14: S3-compatible storage code, migration, tests and handoff implemented and
+  locally verified. Live authenticated write/read passed; bucket privacy check
+  failed (public REST returned 200). Complete only after user makes the bucket
+  private and the live privacy check passes.
+Netlify release automation, SMTP/scheduler setup and T12 remain separate work.
+The user chose to leave the current bucket public for now and requested committing
+the implementation. Keep local storage selected; this decision defers live privacy
+acceptance and does not mark T14 or production deployment complete.
+
+## Objective and scope
+
+Add Payload CMS to the existing Next.js website. Preserve the current designs,
+strict TypeScript, pnpm, and route-specific component colocation.
+
+Included:
+- Company phone, email, address, working hours, and social links.
+- Blog posts, public images, categories, and missing blog frontend routes.
+- Jobs, dynamic reference dictionaries, website applications, and hiring statuses.
+- FAQs in the backend only, with no public routes or anonymous reads.
+- A site-wide announcement bar above navigation, with scheduling.
+- Privacy policy and terms pages.
+- Editable search titles and descriptions for every public page.
+
+Excluded:
+- Homepage hero/headline/image/text editing and other homepage content editing.
+- General page builders, other marketing copy, solutions/PAGEX CMS content,
+  team directories, volunteer portals, and unrelated missing marketing routes.
+- Contact-form delivery and newsletter integration.
+- Applicant accounts, interview scheduling, and a full applicant tracking system.
+
+Announcements and Home SEO remain included despite exclusion of homepage editing.
+
+## Roles and review
+
+- Two roles: admin and staff. Staff are editors; do not add a third editor role.
+- Admins create/invite, deactivate, and delete staff, assign roles, approve and
+  publish public content, and archive records.
+- Staff with section Modify access create/edit any draft in that section and submit
+  for review. Section View is read-only. They cannot publish/approve,
+  manage users, change roles, or permanently delete records.
+- Allow restricted self-service profile/password updates without role changes.
+- Use secure invitations/activation, not emailed passwords. Bootstrap the first
+  admin through controlled setup. Protect the final active admin from removal,
+  deactivation, or demotion.
+- Prefer staff deactivation to deletion. Preserve historical attribution when
+  an admin deletes a staff account.
+- Workflow: draft -> in review -> published, or returned for changes with a note.
+  Edits after submission invalidate pending approval. Keep the last published
+  version live while a replacement is edited.
+- Apply review to all public CMS content: settings, categories, media exposure,
+  jobs, announcements, legal pages, and SEO. Admin approval also controls public
+  job open/closed changes; automatic expiry applies independently.
+- Staff with Recruitment Modify access and admins can immediately update private hiring statuses, notes, and
+  assignments; these operational actions need no editorial approval.
+- Record creator/modifier/reviewer/publisher, timestamps, and hiring history.
+- Enforce permissions server-side on every exposed API and upload/download
+  endpoint. Public reads must never reveal drafts or private application records.
+
+## Section permissions (T13, agreed 2026-11-19)
+
+- Admins assign No access, View, or Modify per staff member and section.
+- Sections: Blog (all posts/categories), Media, Careers (jobs/recruitment settings),
+  Recruitment (applications/CVs/history), Company details, Page SEO, FAQs,
+  Announcements, Legal pages. Media permissions are independent of Blog.
+- Modify permits creating/editing all records in that section, regardless of author.
+- Admin publishing, deletion, dictionaries, recipients and user management remain
+  restricted as before. View includes drafts/previews/history; public approved content
+  stays publicly readable without granting CMS access.
+- Staff cannot grant themselves permissions. New/existing staff default to No access;
+  admins explicitly assign access. Invitations carry permissions to activated users.
+- Enforce in Payload UI, APIs, draft previews, versions and private CV downloads.
+  Permission changes revoke sessions; no third role or record ownership constraints.
+- [x] T13: Implement schema/migration, section access, invitations, tests and docs.
+
+## Company details
+
+Use a global for primary phone/email/address, optional department contacts,
+working hours by day/range with closed state and timezone (Africa/Lagos initially),
+and ordered social links with platform/label/URL. Feed footer and Contact details
+from one source. Private notification recipients must be stored separately.
+Verify real contact details and social URLs before seeding production.
+Implemented public reads use the last approved database global. Before first
+publication or after unpublishing, legacy contacts/social placeholders are shown;
+published optional blanks are omitted. The fallback is not approved launch data.
+
+## Blog and media
+
+Collections: posts, categories, and public media.
+Posts: title, unique slug, excerpt, rich-text body, cover/inline images, author
+attribution, category relationships, publication date, SEO, and review workflow.
+Categories: name, unique slug, optional description.
+Media: image, useful alt text for informative images, optional caption/attribution.
+Build /blog and /blog/[slug], pagination, category filtering, empty states,
+and not-found behavior. Preview drafts only through authenticated preview access.
+
+## Careers and dynamic code dictionaries
+
+Collections: jobs, employment types, departments, position codes.
+Jobs: title, unique slug, department, position code, employment type, location,
+remote/hybrid/on-site arrangement, summary, responsibilities, requirements,
+optional compensation, application deadline/timezone, open/closed state,
+publication workflow, immutable reference fields, and SEO.
+
+Initial employment types: Direct=D, Contract=C, Internship=I.
+TE=Technology & Engineering and DH=Department Head are user-provided examples.
+The complete code list is pending; do not treat example seeds as a final list.
+Admins manage dictionaries, with normalized unique codes and delimiter validation.
+Retire referenced entries instead of deleting them. Position codes may be used
+by jobs across departments. Staff with Careers Modify can select codes, not change the dictionaries.
+
+Advert reference:
+- Example: D-TE | DH-2027-01. REF-ID: is a display label, not stored ID content.
+- Pattern: {employmentCode}-{departmentCode} | {positionCode}-{year}-{sequence}.
+- Sequence counts ALL adverts company-wide within the year, across departments.
+- Allocate once on first approved publication using the Africa/Lagos calendar year.
+  Drafts have no final reference.
+- Use an atomic annual counter plus database uniqueness, never count()+1.
+- Pad to at least two digits; 100 stays 100. Never recycle, wrap, or renumber IDs;
+  gaps are acceptable.
+- Snapshot codes/year/sequence. Dictionary edits, year changes, closure, reopening,
+  and later job edits must not rewrite an issued reference.
+- Lock reference-defining employment/department/position fields after publication;
+  materially different vacancies get new adverts.
+- Use a URL-safe slug/internal ID for URLs rather than the display reference.
+
+Build /join-us/careers and /join-us/careers/[slug] with application UI.
+Only published, open, unexpired jobs appear in any public listing, including Join Us.
+Closed/expired detail URLs show a closed state with applications disabled.
+Draft/unpublished URLs return not found. Recheck eligibility server-side when
+receiving applications. Admins may reopen the same advert without a new reference.
+
+## Applications and recruitment
+
+Use a private applications collection and private CV storage, separate from media.
+
+Initial form:
+- Required: full name, email, CV (PDF or DOCX, maximum 5 MB), acknowledgement of
+  the recruitment privacy notice.
+- Optional: phone, portfolio/LinkedIn URL, short supporting message.
+- Automatically link the job; do not ask candidates to enter advert IDs.
+- No applicant accounts or sensitive demographic questions initially.
+
+Applicant reference example: D-TE | DH-2027-01-001.
+Allocate an atomic sequence per advert on successful durable submission.
+Pad to at least three digits; 1000 stays 1000. Preserve IDs permanently.
+Use database uniqueness, transaction-safe allocation, and submission idempotency.
+A retried submission or email retry must not create a second application/ID.
+Allow intentional later submissions; flag matching email/job for staff review.
+
+Show the ID on the success screen and email an acknowledgement.
+Notify staff through private configured recruitment recipients. Email failure
+must not lose a saved application: retry delivery and show failures to staff.
+Delivery is operated by scheduling `pnpm cms:deliver` every minute; startup does
+not run the worker. SMTP is at least once across crashes, while application/ID
+creation remains idempotent. The existing private user directory limits staff's
+assignment picker to themselves; admins can select active colleagues with Recruitment access.
+Statuses: New, In Review, Shortlisted, Interview, Offer, Hired, Rejected, Withdrawn.
+Support filters by job/status, optional staff assignment, and private notes/history.
+Do not automatically send rejection/offer/status emails in this phase.
+
+Restrict applicant details/CVs/notes to admins and staff with Recruitment access. No public enumeration or
+public media URLs. Validate upload content/type/size server-side, implement abuse
+controls, and keep applicant personal data out of logs.
+Document a configurable retention policy. Company approval of duration and
+recruitment privacy/legal copy is a launch dependency; do not invent final policy.
+
+## FAQs
+
+Backend-only collection: question, restricted rich-text answer, optional group,
+sort order, and draft/admin approval workflow. No public page, anonymous API
+read, sitemap inclusion, or search integration until explicitly requested.
+
+## Announcement bar
+
+Support multiple saved records, displaying one eligible notice at a time.
+Fields: internal title, short message, optional link label/URL, enabled switch,
+optional start/end timestamps, priority, and draft/admin approval.
+Validate end after start and show the scheduling timezone to editors.
+Eligibility: published, enabled, and currently within its schedule.
+Choose highest priority, then latest publication, then stable internal ID.
+If none qualify, render no bar. No carousel or stacking initially.
+Render above navigation on all public pages without overlap on mobile/desktop.
+Schedules must activate/expire without another publish action; account for cache
+boundaries and the existing fixed navbar.
+
+## Legal and SEO
+
+Legal collection: fixed privacy-policy/terms identities, title, rich-text content,
+effective date, version history, and workflow. Build /privacy-policy and
+/terms-of-service and connect the footer. Require approved legal copy before launch.
+Effective dates are calendar values in YYYY-MM-DD, not activation schedules.
+The fixed page identities cannot change; edit the existing records rather than
+creating competing copies. Unpublished legal documents have no public copy.
+
+SEO: title/description with defaults and draft/admin approval.
+Use a constrained global keyed to existing static public routes. Store blog/job/
+legal SEO on its owning document to avoid competing sources. Include new listing
+pages. Emit server-rendered metadata and exclude drafts/private data from indexing
+and sitemaps. Search engines may choose different displayed text.
+
+## Delivery tasks
+
+- [x] T01: Inspect current working tree and relevant local Next.js guides. Record
+  Node/pnpm versions, verify current Payload compatibility, and run baseline checks.
+- [x] T02: Add Payload foundation, isolated frontend/admin layouts, database
+  migrations, generated types, environment documentation, and persistent public/
+  private storage. Use Docker PostgreSQL locally and explicit production DB/SMTP/
+  persistent storage settings. Production providers remain a launch dependency.
+  Do not expose secrets.
+- [x] T03: Implement users/invitations, access rules, last-admin protection,
+  draft/review/publish behavior, authenticated previews, history, and audit fields.
+- [x] T04: Implement company settings and existing-page SEO; connect footer/contact
+  fields without redesigning the site. Seed only verified data when supplied;
+  approved initial contacts/hours/social URLs remain the T12 launch dependency.
+- [x] T05: Implement blog/categories/public media and blog frontend routes.
+- [x] T06: Implement dictionaries, jobs, annual references, careers routes,
+  open/closed/expiry behavior, and dynamic Join Us openings.
+- [x] T07: Implement applications, per-advert IDs, private CVs, hiring workflow,
+  acknowledgements, staff notifications, and retry-safe delivery.
+- [x] T08: Implement backend-only FAQs and test denied anonymous reads.
+- [x] T09: Implement announcements, scheduling, selection, and responsive navbar.
+- [x] T10: Implement legal pages and SEO for newly built routes.
+- [x] T11: Complete cache invalidation, sitemap behavior, integration/E2E tests,
+  migrations/backup instructions, editor onboarding, and operational documentation.
+- [ ] T12: Validate launch dependencies: actual codes, verified content, approved
+  legal/retention policy, email/storage/database deployment, and navigation.
+  Record unrelated missing routes separately without expanding implementation.
+
+T11 indexing decision (2026-11-15): approved closed/expired job details remain
+readable with `noindex, follow` and are excluded from the request-time sitemap.
+Open approved jobs regain index eligibility on reopening, with immutable IDs.
+Correct known Careers/Solutions link typos; record unbuilt marketing destinations
+for a T12 hide/redirect decision without implementing excluded pages.
+The [T12 answer checklist](t12-checklist.md) records company inputs and separate
+production acceptance requirements. Recovery documentation is T11; an actual
+production restore rehearsal remains T12 and requires the selected infrastructure.
+
+## Required acceptance checks
+
+- Role/API tests cover anonymous/staff/admin access, role escalation, user
+  management, last-admin protection, drafts, and private CV downloads.
+- Approval tests prove draft edits preserve live content, staff cannot publish,
+  post-submission edits invalidate review, and publication refreshes public data.
+- Reference tests cover cross-department annual numbering, year rollover,
+  concurrent publishing/applications, idempotent retries, padding overflow,
+  dictionary edits, closure/reopening, and failed submissions.
+- Closed/expired jobs disappear from listings and reject new applications on
+  the server. Closed detail pages remain informative.
+- Validate uploads and prove saved applications survive notification failure.
+- Test blog pagination/filtering, legal routes, metadata, FAQ privacy, announcement
+  disabled/future/expired/tied records, and schedule boundaries.
+- Check announcement/navigation and application forms for responsive behavior
+  and accessibility.
+- Run pnpm lint, TypeScript checks, production build, and meaningful integration/
+  E2E checks. Report unavailable checks honestly; no unrun tests reported as passing.
+
+## Handoff
+
+Mark tasks complete only after implementation and verification. Keep decisions,
+changed files, test evidence, blockers, and the next action in progress.md.
+Record scope changes before expanding implementation.
+
+## Confirmed startup and infrastructure decisions
+
+- Startup creates the first admin only when none exists, using server-side
+  bootstrap email/password variables. First login requires changing the initial
+  password; existing credentials are preserved. There is no super-admin role.
+- Local Docker settings are derived from DEV_DATABASE_URL. No duplicate
+  POSTGRES_* values are required in .env. Development, production and test URLs
+  remain separate, selected by APP_ENV.
+- T01–T11 have been verified; code baseline and detailed evidence are in progress.md.
+  T11 includes cache/indexing/navigation/operations work. T12 needs actual
+  company content, policies and deployed providers; local tests do not approve launch.
