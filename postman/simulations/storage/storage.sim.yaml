@@ -1,0 +1,8 @@
+simulation: private-storage
+routing: path
+mocks:
+  - name: private-s3
+    routeKey: s3
+    origin:
+      - storage.test.invalid
+    path: postman/mocks/s3

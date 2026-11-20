@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
-import { socialLinks } from "@/lib/social-links";
+import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { companySocialLinks } from "@/lib/social-links";
+import { formatWorkingHours, getCompanySettings } from "@/lib/company-settings";
 
 // Footer link columns
 const companyLinks = [
   { label: "About Us", href: "/about" },
   { label: "Our Team", href: "/team" },
-  { label: "Careers", href: "/careers" },
+  { label: "Careers", href: "/join-us/careers" },
   { label: "News & Blogs", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
@@ -20,7 +21,9 @@ const solutionLinks = [
   { label: "Analytics", href: "/analytics" },
 ];
 
-export default function Footer() {
+export default async function Footer() {
+  const company = await getCompanySettings();
+  const socialLinks = companySocialLinks(company.socialLinks);
   return (
     <footer className="bg-white px-6 py-12 text-gray-900">
       <div className="mx-auto max-w-7xl">
@@ -45,24 +48,28 @@ export default function Footer() {
               worldwide.
             </p>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
+              {company.email && <li className="flex items-center gap-2">
                 <span className="bg-brand/20 text-brand p-2 rounded-md">
                   <Mail size={16} />
                 </span>{" "}
-                Pazelgreentech@gmail.com
-              </li>
-              <li className="flex items-center gap-2">
+                <a href={`mailto:${company.email}`}>{company.email}</a>
+              </li>}
+              {company.phone && <li className="flex items-center gap-2">
                 <span className="bg-brand/20 text-brand p-2 rounded-md">
                   <Phone size={16} />
                 </span>{" "}
-                +234 813 381 1594
-              </li>
-              <li className="flex items-center gap-2">
+                <a href={`tel:${company.phone?.replace(/[^+\d]/g, "")}`}>{company.phone}</a>
+              </li>}
+              {company.address && <li className="flex items-center gap-2">
                 <span className="bg-brand/20 text-brand p-2 rounded-md">
                   <MapPin size={16} />
                 </span>{" "}
-                Ikorodu, Lagos Nigeria
-              </li>
+                <span className="whitespace-pre-line">{company.address}</span>
+              </li>}
+              {!!company.workingHours?.length && <li className="flex items-start gap-2">
+                <span className="bg-brand/20 text-brand rounded-md p-2"><Clock size={16} /></span>
+                <div><p>{company.timezone}</p>{formatWorkingHours(company.workingHours).map(row => <p key={row}>{row}</p>)}</div>
+              </li>}
             </ul>
           </div>
 

@@ -1,0 +1,30 @@
+purpose:
+  stands_in_for: Supabase/R2 S3-compatible private storage, limited to the operations used by Payload uploads.
+  unblocks: Local upload, download and failure-path verification without production credentials or applicant data.
+assumptions:
+  - id: s3-contract-subset
+    status: supported
+    claim: Payload uses PutObject, HeadObject, GetObject and DeleteObject for files below the configured 5 MB limit.
+    reason: Adapter source and observed simulator traffic agree for the exercised files below 5 MB. This does not establish multipart or every provider's behavior.
+    verification: On 2026-11-20, 67 integration checks passed through the Postman simulation with observed PUT/HEAD/GET/DELETE. The portable runner then passed 69 expanded integration checks and production HTTP byte/access checks against the same owned mock, plus a nine-file copy and safe rerun.
+    source: https://github.com/payloadcms/payload/tree/v3.93.0/packages/storage-s3
+    updated_at: 2026-11-20
+  - id: authentication-boundary
+    status: supported
+    claim: The simulator requires SigV4 header presence but does not validate cryptographic signatures or bucket policy.
+    reason: This owned mock models binary object operations, not the provider's complete authentication system. Published-owner search was unavailable because this CLI has no status command; no account was connected.
+    verification: Inspected the mock and ran local acceptance on 2026-11-20. The live Supabase authenticated write/read succeeded separately, while its public REST route returned HTTP 200; temporary check objects were removed. Private-bucket acceptance is pending the user's settings change.
+    source: postman/mocks/s3/default.cjs
+    updated_at: 2026-11-20
+  - id: storage-failure-rollback
+    status: supported
+    claim: In the exercised simulator cases, failed S3 writes and later database failures preserve application counters and existing objects; successful orphan cleanup deletes only the failed attempt's CV.
+    reason: The real application ran against injected 503 writes and a database-hook failure, with state comparisons before and after.
+    verification: On 2026-11-20, the 69-test S3 integration suite passed both failure assertions, including object keys, application count and applicant sequence. Deletion failure during compensation and ambiguous provider timeouts remain operational reconciliation cases rather than atomic guarantees.
+    source: tests/integration/cms.test.ts; cms/submit-application.ts; cms/storage.ts
+    updated_at: 2026-11-20
+fingerprints:
+  - id: initial-storage-integration
+    date: 2026-11-20
+    commit: 1ba249b
+    cli: Postman 1.76.0
