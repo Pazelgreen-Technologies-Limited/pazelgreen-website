@@ -39,10 +39,10 @@ for deploy previews; previews must not run migrations against production.
 Netlify variables need appropriate scopes and a new deploy to take effect; see
 [Netlify environment variables](https://docs.netlify.com/build/environment-variables/overview/).
 
-The verified local production build command is `pnpm exec next build --webpack`.
-The default `pnpm build` uses Turbopack and has an unresolved Google-font resolver
-failure/stall on the development machine. The package script is unchanged.
-Configure the reviewed build command and verify Netlify's Next.js integration in
+The production build command is `pnpm build`, which explicitly runs
+`next build --webpack` to avoid the observed Turbopack Google-font resolver
+failure/stall. Set Netlify's build command to `pnpm build` (or the eventual reviewed
+release command that calls it). Verify Netlify's Next.js integration in
 a staging deployment; a local webpack pass does not certify the hosted build.
 
 ## 3. Apply migrations and bootstrap the first admin

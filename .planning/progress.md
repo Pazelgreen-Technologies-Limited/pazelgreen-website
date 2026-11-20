@@ -1,6 +1,6 @@
 # CMS implementation handoff
 
-Last updated: 2026-11-20. T11 code baseline: `a87b7ca`; T13 permissions and the Netlify handoff were committed as `1ba249b`. Storage environment preparation below is subsequent work.
+Last updated: 2026-11-20. T11 code baseline: `a87b7ca`; T13 permissions were committed as `1ba249b` and S3 storage as `3270cd4`. The production build script update below is subsequent work.
 **T01–T11 and T13 are implemented and verified. T14 code is implemented; live bucket privacy acceptance is pending. T12 and R2 are deferred by the user.**
 
 This file is the current snapshot. Read [task.md](task.md) for agreed scope and
@@ -324,3 +324,19 @@ release automation and verify SMTP/scheduler, hosted upload request-size limits 
 deployment separately. T12/R2 remain deferred. Implementation, tests, environment
 preparation and docs are included in the user-requested commit with subject
 `feat: add S3-compatible upload storage`. No push or production DB changes.
+
+## Production webpack build: 2026-11-20
+
+The user requested disabling Turbopack for production because it fails the build.
+Read the installed Next CLI guide and changed package.json's build script to
+`next build --webpack`. `pnpm build` now selects webpack explicitly; CI already
+uses this script, and Netlify should use it as its build command. Updated README,
+setup, Netlify guide and the task decision. Development still uses `next dev`.
+No deployment migration, SMTP, storage selection or schema change is included.
+
+Validation: the actual `pnpm build` passed with webpack compilation, TypeScript,
+19-page generation and tracing. Used `APP_ENV=test`/`STORAGE_DRIVER=local` as
+process-only overrides to avoid real production services; no stored configuration
+was changed. Confirmed CI invokes `pnpm build`; 17 Markdown files, 140 local file
+targets, fences and Git whitespace checks passed. No new unit test is needed for
+a CLI flag; the build verifies the selected bundler. Changes are uncommitted.
