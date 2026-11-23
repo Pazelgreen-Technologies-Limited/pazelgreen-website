@@ -139,7 +139,7 @@ Docker services while preserving their data. `pnpm db:up` starts them again.
 | `pnpm cms:types` / `pnpm cms:importmap` | Refresh generated CMS types/admin imports |
 | `pnpm cms:migration:create <name>` / `pnpm cms:migrate` | Generate a migration for review / apply committed migrations |
 | `pnpm lint` / `pnpm typecheck` | Check code style and TypeScript |
-| `pnpm build` / `pnpm start` | Build / serve the optimized app; start does not start Docker or apply migrations |
+| `pnpm build` / `pnpm start` | Build with webpack / serve the optimized app; start does not start Docker or apply migrations |
 
 For verification, first configure the [separate disposable test database and local
 Mailpit](docs/cms-setup.md#test-database-and-checks). Run lint → typecheck →

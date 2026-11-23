@@ -42,6 +42,11 @@ The user chose to leave the current bucket public for now and requested committi
 the implementation. Keep local storage selected; this decision defers live privacy
 acceptance and does not mark T14 or production deployment complete.
 
+Production build decision (2026-11-20): user requested disabling Turbopack for
+production. `pnpm build` now explicitly runs `next build --webpack`; CI and Netlify
+should invoke that script. This does not implement deployment migrations or SMTP
+changes and does not change T12/T14 acceptance status.
+
 ## Objective and scope
 
 Add Payload CMS to the existing Next.js website. Preserve the current designs,
